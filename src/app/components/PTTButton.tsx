@@ -413,11 +413,11 @@ export function PTTButton({
 
   return (
     <div
-      className="relative flex items-center justify-center p-1"
+      className="relative flex items-center justify-center"
       style={{
-        width: '338px',
-        height: '108px',
-        borderRadius: '54px',
+        width: '332px',
+        height: '102px',
+        borderRadius: '51px',
         background: 'rgba(0, 0, 0, 0.12)',
         boxShadow: isDepressed
           ? 'inset 0 3px 6px rgba(0,0,0,0.4), inset 0 -6px 12px rgba(0,0,0,0.6), inset 0 0 10px rgba(0,0,0,0.35), 0 1px 2px rgba(0,0,0,0.08)'
