@@ -7,6 +7,7 @@ import { useChannelRole } from '../../features/moderation/useChannelRole';
 import { canPerformAction } from '../../features/moderation/permissions';
 import { Shield, ChevronRight } from 'lucide-react';
 import { requestBatteryWhitelist } from '../utils/backgroundSurvival';
+import vintageMic from '../../assets/vintage_mic.png';
 
 export interface SettingsPanelProps {
   onClose: () => void;
@@ -235,112 +236,112 @@ export function SettingsPanel({
           <span className="sr-only">Back</span>
         </button>
 
-        {/* Brand SVG logo */}
+        {/* Brand Logo */}
         <svg
           viewBox="0 0 100 100"
-          className="h-[55px] w-auto mr-1.5 relative z-25"
-          style={{
-            transform: 'translateZ(1px)',
-            filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.25))',
-          }}
+          className="w-[52px] h-[52px] relative z-25 mr-2"
+          style={{ filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.25))' }}
         >
           <defs>
-            {/* High-Intensity Glossy Red Radial Gradient */}
-            <radialGradient id="glossyRedSettingsBar" cx="35%" cy="35%" r="65%">
-              <stop offset="0%" stopColor="#ffffff" />
-              <stop offset="25%" stopColor="#ff1a1a" />
-              <stop offset="70%" stopColor="#b30000" />
-              <stop offset="100%" stopColor="#4a0000" />
-            </radialGradient>
+            <clipPath id="micClipSettings">
+              <circle cx="50" cy="50" r="36" />
+            </clipPath>
           </defs>
 
-          {/* Central Red Sphere 3D Stack */}
+          <path
+            d="M 22 77 A 38 38 0 1 1 78 77"
+            stroke="#0a2e1a"
+            strokeWidth="6"
+            strokeLinecap="round"
+            fill="none"
+            transform="translate(1, 1.2)"
+            opacity="0.5"
+          />
+          <path
+            d="M 22 77 A 38 38 0 1 1 78 77"
+            stroke="#34D399"
+            strokeWidth="6"
+            strokeLinecap="round"
+            fill="none"
+          />
+          <path
+            d="M 22 77 A 38 38 0 1 1 78 77"
+            stroke="#a7f3d0"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            fill="none"
+            opacity="0.65"
+            transform="translate(-0.6, -0.7)"
+          />
+
+          <path
+            d="M 29 71 A 28 28 0 1 1 71 71"
+            stroke="#713f12"
+            strokeWidth="6"
+            strokeLinecap="round"
+            fill="none"
+            transform="translate(1, 1.2)"
+            opacity="0.5"
+          />
+          <path
+            d="M 29 71 A 28 28 0 1 1 71 71"
+            stroke="#eab308"
+            strokeWidth="6"
+            strokeLinecap="round"
+            fill="none"
+          />
+          <path
+            d="M 29 71 A 28 28 0 1 1 71 71"
+            stroke="#fef08a"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            fill="none"
+            opacity="0.65"
+            transform="translate(-0.6, -0.7)"
+          />
+
+          <path
+            d="M 36 65 A 18 18 0 1 1 64 65"
+            stroke="#003a17"
+            strokeWidth="6"
+            strokeLinecap="round"
+            fill="none"
+            transform="translate(1, 1.2)"
+            opacity="0.5"
+          />
+          <path
+            d="M 36 65 A 18 18 0 1 1 64 65"
+            stroke="#00C853"
+            strokeWidth="6"
+            strokeLinecap="round"
+            fill="none"
+          />
+          <path
+            d="M 36 65 A 18 18 0 1 1 64 65"
+            stroke="#69f0ae"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            fill="none"
+            opacity="0.65"
+            transform="translate(-0.6, -0.7)"
+          />
+
           <circle
             cx="50"
             cy="50"
-            r="10"
-            fill="#2d0a0a"
-            transform="translate(0.8, 1)"
-            opacity="0.4"
+            r="11"
+            fill="#1a0000"
+            transform="translate(1.2, 1.5)"
+            opacity="0.45"
           />
-          <circle cx="50" cy="50" r="10" fill="url(#glossyRedSettingsBar)" />
-
-          {/* Inner Arc 3D Stack - Bold Green */}
-          <path
-            d="M 37.3 62.7 A 18 18 0 1 1 62.7 62.7"
-            stroke="#0a3c10"
-            strokeWidth="5.5"
-            strokeLinecap="round"
-            fill="none"
-            transform="translate(0.8, 1)"
-          />
-          <path
-            d="M 37.3 62.7 A 18 18 0 1 1 62.7 62.7"
-            stroke="#00C853"
-            strokeWidth="5.5"
-            strokeLinecap="round"
-            fill="none"
-          />
-          <path
-            d="M 37.3 62.7 A 18 18 0 1 1 62.7 62.7"
-            stroke="#ffffff"
-            strokeWidth="1.2"
-            strokeLinecap="round"
-            fill="none"
-            opacity="0.7"
-            transform="translate(-0.5, -0.6)"
-          />
-
-          {/* Middle Arc 3D Stack - Emerald Green */}
-          <path
-            d="M 30.2 69.8 A 28 28 0 1 1 69.8 69.8"
-            stroke="#083818"
-            strokeWidth="5.5"
-            strokeLinecap="round"
-            fill="none"
-            transform="translate(0.8, 1)"
-          />
-          <path
-            d="M 30.2 69.8 A 28 28 0 1 1 69.8 69.8"
-            stroke="#10B981"
-            strokeWidth="5.5"
-            strokeLinecap="round"
-            fill="none"
-          />
-          <path
-            d="M 30.2 69.8 A 28 28 0 1 1 69.8 69.8"
-            stroke="#ffffff"
-            strokeWidth="1.2"
-            strokeLinecap="round"
-            fill="none"
-            opacity="0.7"
-            transform="translate(-0.5, -0.6)"
-          />
-
-          {/* Outer Arc 3D Stack - Mint Green */}
-          <path
-            d="M 23.1 76.9 A 38 38 0 1 1 76.9 76.9"
-            stroke="#0c351c"
-            strokeWidth="5.5"
-            strokeLinecap="round"
-            fill="none"
-            transform="translate(0.8, 1)"
-          />
-          <path
-            d="M 23.1 76.9 A 38 38 0 1 1 76.9 76.9"
-            stroke="#34D399"
-            strokeWidth="5.5"
-            strokeLinecap="round"
-            fill="none"
-          />
-          <path
-            d="M 23.1 76.9 A 38 38 0 1 1 76.9 76.9"
-            stroke="#ffffff"
-            strokeWidth="1.2"
-            strokeLinecap="round"
-            fill="none"
-            opacity="0.7"
-            transform="translate(-0.5, -0.6)"
+          <image 
+            href={vintageMic} 
+            x="14" 
+            y="14" 
+            width="72" 
+            height="72" 
+            clipPath="url(#micClipSettings)"
+            preserveAspectRatio="xMidYMid slice"
           />
         </svg>
 

@@ -7,7 +7,7 @@ import iconModerator from '../../assets/icon_moderator.png';
 import iconControlled from '../../assets/icon_controlled.png';
 import iconSilent from '../../assets/icon_silent.png';
 import iconWait from '../../assets/icon_wait.png';
-import iconWaitControlled from '../../assets/components/icon_wait_controlled.svg';
+import iconWaitControlled from '../../assets/icon_wait_controlled.png';
 import iconUserBaru from '../../assets/components/icon_tag_baru.svg';
 import iconNoc from '../../assets/icon_noc.png';
 
@@ -510,32 +510,41 @@ function AvatarImage({
   src,
   displayName,
   avatarColor,
+  fallbackIconUrl,
+  badge,
 }: {
   src?: string;
   displayName: string;
   avatarColor: string;
+  fallbackIconUrl: string;
+  badge?: React.ReactNode;
 }) {
   const [hasError, setHasError] = useState(false);
-  const initial = displayName.charAt(0).toUpperCase();
 
   if (hasError || !src) {
     return (
       <div
-        className="w-full h-full rounded-none flex items-center justify-center text-white font-bold text-[22px] shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)] border border-white/20"
-        style={{ backgroundColor: avatarColor }}
+        className="w-full h-full rounded-none flex items-center justify-center bg-white shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)] border border-white/20 p-0.5"
       >
-        {initial}
+        <img
+          src={fallbackIconUrl}
+          alt={displayName}
+          className="w-full h-full object-contain"
+        />
       </div>
     );
   }
 
   return (
-    <img
-      src={src}
-      alt={displayName}
-      onError={() => setHasError(true)}
-      className="w-full h-full rounded-none object-cover shadow-[0_2px_4px_rgba(0,0,0,0.15)] border border-white/20"
-    />
+    <>
+      <img
+        src={src}
+        alt={displayName}
+        onError={() => setHasError(true)}
+        className="w-full h-full rounded-none object-cover shadow-[0_2px_4px_rgba(0,0,0,0.15)] border border-white/20"
+      />
+      {badge}
+    </>
   );
 }
 
@@ -837,32 +846,27 @@ export function UserListModal({ channel, channelName: _channelName, users }: Use
               >
                 {/* Avatar with mode icon overlay */}
                 <div className="relative w-[52px] h-[52px] shrink-0 select-none hover:scale-105 active:scale-95 transition-transform duration-200">
-                  <AvatarImage
-                    src={avatarUrlToUse}
-                    displayName={profile.displayName}
-                    avatarColor={profile.avatarColor}
-                  />
-                  {/* Mode icon badge at bottom-right */}
                   {(() => {
                     const mode = getUserMode(profile);
-                    if (profile.role === 'noc') {
-                      return (
-                        <img
-                          src={iconNoc}
-                          alt="NOC Crown"
-                          title="NOC"
-                          className="absolute bottom-0 right-0 w-[14px] h-[14px] mb-0.5 mr-0.5 object-contain drop-shadow-[0_1.5px_2.5px_rgba(0,0,0,0.35)]"
-                          draggable={false}
-                        />
-                      );
-                    }
-                    return (
+                    const fallbackIconUrl = profile.role === 'noc' ? iconNoc : MODE_ICONS[mode];
+
+                    const badgeNode = (
                       <img
-                        src={MODE_ICONS[mode]}
-                        alt={MODE_LABELS[mode]}
-                        title={MODE_LABELS[mode]}
-                        className="absolute bottom-0 right-0 w-[14px] h-[14px] mb-0.5 mr-0.5 object-contain drop-shadow-[0_1.5px_2.5px_rgba(0,0,0,0.35)]"
+                        src={fallbackIconUrl}
+                        alt={profile.role === 'noc' ? 'NOC' : MODE_LABELS[mode]}
+                        title={profile.role === 'noc' ? 'NOC' : MODE_LABELS[mode]}
+                        className="absolute bottom-0 right-0 w-[20px] h-[20px] mb-0.5 mr-0.5 object-contain drop-shadow-[0_1.5px_2.5px_rgba(0,0,0,0.35)]"
                         draggable={false}
+                      />
+                    );
+
+                    return (
+                      <AvatarImage
+                        src={avatarUrlToUse}
+                        displayName={profile.displayName}
+                        avatarColor={profile.avatarColor}
+                        fallbackIconUrl={fallbackIconUrl}
+                        badge={badgeNode}
                       />
                     );
                   })()}
