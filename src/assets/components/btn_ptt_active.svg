@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 130" width="360" height="130">
+  <title>PTT ACTIVE</title>
+
+      <defs>
+        <linearGradient id="grad-idle" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#00C853"/>
+          <stop offset="100%" stop-color="#008537"/>
+        </linearGradient>
+        <linearGradient id="grad-active" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#ea4335"/>
+          <stop offset="100%" stop-color="#a02316"/>
+        </linearGradient>
+        <linearGradient id="grad-busy" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#f97316"/>
+          <stop offset="100%" stop-color="#9a3c00"/>
+        </linearGradient>
+        <linearGradient id="grad-off" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#5f6368"/>
+          <stop offset="100%" stop-color="#3c4043"/>
+        </linearGradient>
+        <symbol id="btn-idle" viewBox="0 0 326 96">
+  <rect x="0" y="0" width="326" height="96" rx="48" ry="48"
+        fill="rgba(0,0,0,0.12)"
+        style="filter:drop-shadow(inset 0 6px 10px rgba(0,0,0,0.45))"/>
+  <rect x="6" y="4" width="314" height="88" rx="44" ry="44"
+        fill="url(#grad-idle)" stroke="#000" stroke-width="1"/>
+  <rect x="8" y="5" width="310" height="32" rx="42" ry="42"
+        fill="rgba(255,255,255,0.4)" opacity="0.9"/>
+  <rect x="6" y="4" width="314" height="88" rx="44" ry="44"
+        fill="none" stroke="#00ff66" stroke-width="1.5" opacity="0.3"/>
+  <text x="163" y="64"
+        font-family="'Outfit', 'Arial Black', sans-serif"
+        font-size="44" font-weight="800" letter-spacing="3"
+        text-anchor="middle" fill="#ffffff"
+        style="text-shadow:1px 1px 3px rgba(0,0,0,0.4)">PUSH TO TALK</text>
+</symbol>
+
+        <symbol id="btn-active" viewBox="0 0 326 96">
+  <rect x="0" y="0" width="326" height="96" rx="48" ry="48"
+        fill="rgba(0,0,0,0.12)"
+        style="filter:drop-shadow(inset 0 6px 10px rgba(0,0,0,0.45))"/>
+  <rect x="6" y="4" width="314" height="88" rx="44" ry="44"
+        fill="url(#grad-active)" stroke="#000" stroke-width="1"/>
+  <rect x="8" y="5" width="310" height="32" rx="42" ry="42"
+        fill="rgba(255,255,255,0.4)" opacity="0.9"/>
+  <rect x="6" y="4" width="314" height="88" rx="44" ry="44"
+        fill="none" stroke="#ff3333" stroke-width="1.5" opacity="0.3"/>
+  <text x="163" y="64"
+        font-family="'Outfit', 'Arial Black', sans-serif"
+        font-size="44" font-weight="800" letter-spacing="3"
+        text-anchor="middle" fill="#ffffff"
+        style="text-shadow:1px 1px 3px rgba(0,0,0,0.4)">TRANSMITTING</text>
+</symbol>
+
+        <symbol id="btn-busy" viewBox="0 0 326 96">
+  <rect x="0" y="0" width="326" height="96" rx="48" ry="48"
+        fill="rgba(0,0,0,0.12)"
+        style="filter:drop-shadow(inset 0 6px 10px rgba(0,0,0,0.45))"/>
+  <rect x="6" y="4" width="314" height="88" rx="44" ry="44"
+        fill="url(#grad-busy)" stroke="#000" stroke-width="1"/>
+  <rect x="8" y="5" width="310" height="32" rx="42" ry="42"
+        fill="rgba(255,255,255,0.4)" opacity="0.9"/>
+  <rect x="6" y="4" width="314" height="88" rx="44" ry="44"
+        fill="none" stroke="#ffaa00" stroke-width="1.5" opacity="0.3"/>
+  <text x="163" y="64"
+        font-family="'Outfit', 'Arial Black', sans-serif"
+        font-size="44" font-weight="800" letter-spacing="3"
+        text-anchor="middle" fill="#ffffff"
+        style="text-shadow:1px 1px 3px rgba(0,0,0,0.4)">RECEIVING</text>
+</symbol>
+
+        <symbol id="btn-off" viewBox="0 0 326 96">
+  <rect x="0" y="0" width="326" height="96" rx="48" ry="48"
+        fill="rgba(0,0,0,0.12)"
+        style="filter:drop-shadow(inset 0 6px 10px rgba(0,0,0,0.45))"/>
+  <rect x="6" y="4" width="314" height="88" rx="44" ry="44"
+        fill="url(#grad-off)" stroke="#000" stroke-width="1"/>
+  <rect x="8" y="5" width="310" height="32" rx="42" ry="42"
+        fill="rgba(255,255,255,0.4)" opacity="0.9"/>
+  <rect x="6" y="4" width="314" height="88" rx="44" ry="44"
+        fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.3"/>
+  <text x="163" y="64"
+        font-family="'Outfit', 'Arial Black', sans-serif"
+        font-size="44" font-weight="800" letter-spacing="3"
+        text-anchor="middle" fill="#aaa"
+        style="text-shadow:1px 1px 3px rgba(0,0,0,0.4)">POWER OFF</text>
+</symbol>
+
+      </defs>
+    <use href="#btn-active" x="17" y="17" /></svg>

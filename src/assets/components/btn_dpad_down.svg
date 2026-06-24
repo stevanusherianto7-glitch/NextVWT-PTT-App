@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 48" width="60" height="48">
+  <title>D-Pad Down</title>
+  <defs>
+    <linearGradient id="btn-down-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2a2a2a"/>
+      <stop offset="100%" stop-color="#0a0a0a"/>
+    </linearGradient>
+  </defs>
+  <!-- Half capsule bottom -->
+  <path d="M 0 0 L 60 0 L 60 18 A 30 30 0 0 1 0 18 Z" fill="url(#btn-down-grad)" stroke="#111" stroke-width="2"/>
+  <svg x="16.0" y="10.0" width="28" height="28" viewBox="0 0 24 24" fill="#ffffff">
+    <path d="M12 20L2 4H22L12 20Z" />
+  </svg>
+</svg>

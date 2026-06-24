@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 48" width="60" height="48">
+  <title>D-Pad Up</title>
+  <defs>
+    <linearGradient id="btn-up-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3a3a3a"/>
+      <stop offset="100%" stop-color="#1a1a1a"/>
+    </linearGradient>
+  </defs>
+  <!-- Half capsule top -->
+  <path d="M 0 48 L 0 30 A 30 30 0 0 1 60 30 L 60 48 Z" fill="url(#btn-up-grad)" stroke="#111" stroke-width="2"/>
+  <!-- Gloss top -->
+  <path d="M 2 25 A 28 28 0 0 1 58 25 L 58 24.0 L 2 24.0 Z" fill="rgba(255,255,255,0.15)"/>
+  <svg x="16.0" y="14.0" width="28" height="28" viewBox="0 0 24 24" fill="#ffffff">
+    <path d="M12 4L22 20H2L12 4Z" />
+  </svg>
+</svg>
