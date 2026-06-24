@@ -187,25 +187,33 @@ export function LCDPanel({
 
   return (
     <div
-      className="relative w-[300px] h-[155px] rounded-3xl mx-auto p-[10px] transition-all duration-300"
+      className="relative w-[300px] h-[155px] rounded-3xl mx-auto transition-all duration-300"
       style={{
-        background:
-          'linear-gradient(135deg, var(--lcd-border-top) 0%, var(--lcd-border-left) 30%, var(--lcd-border-right) 70%, var(--lcd-border-bottom) 100%)',
         boxShadow: 'var(--lcd-glow)',
       }}
     >
-      {/* 3D Gold Bezel Emboss Overlay */}
+      {/* Background layer with overflow-hidden to prevent color bleed on corners */}
       <div
-        className="absolute inset-0 pointer-events-none rounded-3xl"
+        className="absolute inset-0 rounded-3xl overflow-hidden"
         style={{
-          boxShadow:
-            'inset 0 0 0 1.5px rgba(0,0,0,0.28), inset 0 3.5px 6px rgba(255,255,255,0.55), inset 0 -3.5px 6px rgba(0,0,0,0.55), inset 0 0 14px rgba(0,0,0,0.22)',
+          background:
+            'linear-gradient(135deg, var(--lcd-border-top) 0%, var(--lcd-border-left) 30%, var(--lcd-border-right) 70%, var(--lcd-border-bottom) 100%)',
         }}
-      />
+      >
+        {/* 3D Gold Bezel Emboss Overlay */}
+        <div
+          className="absolute inset-0 pointer-events-none rounded-3xl"
+          style={{
+            boxShadow:
+              'inset 0 0 0 1.5px rgba(0,0,0,0.28), inset 0 3.5px 6px rgba(255,255,255,0.55), inset 0 -3.5px 6px rgba(0,0,0,0.55), inset 0 0 14px rgba(0,0,0,0.22)',
+          }}
+        />
+      </div>
 
-      {/* Inner Screen Container */}
-      <div
-        className="relative w-full h-full rounded-[14px] overflow-hidden"
+      <div className="relative w-full h-full p-[10px]">
+        {/* Inner Screen Container */}
+        <div
+          className="relative w-full h-full rounded-[14px] overflow-hidden"
         style={{
           background: 'var(--lcd-bg)',
         }}
@@ -437,6 +445,7 @@ export function LCDPanel({
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 }

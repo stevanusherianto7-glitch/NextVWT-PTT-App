@@ -113,8 +113,8 @@
 }
 
 .signal-logo {
-  width: 38px; /* Reduced from 52px */
-  height: 30px; /* Reduced from 42px */
+  width: 56px; 
+  height: 40px; 
   position: relative;
   display: inline-block;
   margin-top: 2px;
@@ -124,44 +124,34 @@
 .signal-arc {
   position: absolute;
   left: 50%;
-  bottom: 2px;
-  border: 3.5px solid transparent; /* Reduced from 5px */
-  border-top-color: #00c853;
-  border-left-color: #00c853;
-  border-right-color: #00c853;
-  border-radius: 50% 50% 0 0;
-  transform: translateX(-50%) rotate(0deg);
-  box-shadow:
-    inset 0 1px 2px rgba(255, 255, 255, 0.85),
-    0 1px 1px rgba(0, 0, 0, 0.35);
+  bottom: 8px; /* shared center point */
+  border: 4px solid #00c853;
+  border-bottom: none;
+  border-radius: 100px 100px 0 0;
+  transform: translateX(-50%);
 }
 
 .arc-1 {
-  width: 32px; /* Reduced from 44px */
-  height: 26px; /* Reduced from 36px */
-  opacity: 0.95;
+  width: 56px;
+  height: 28px;
 }
 
 .arc-2 {
-  width: 24px; /* Reduced from 32px */
-  height: 20px; /* Reduced from 26px */
-  bottom: 4px; /* Adjusted from 5px */
-  opacity: 0.92;
+  width: 44px;
+  height: 22px;
 }
 
 .arc-3 {
-  width: 16px; /* Reduced from 20px */
-  height: 14px; /* Reduced from 16px */
-  bottom: 6px; /* Adjusted from 8px */
-  opacity: 0.9;
+  width: 32px;
+  height: 16px;
 }
 
 .signal-dot {
   position: absolute;
   left: 50%;
-  bottom: 6px; /* Adjusted from 8px */
-  width: 12px; /* Reduced from 17px */
-  height: 12px; /* Reduced from 17px */
+  bottom: 2px; /* Center is at 2px + 6px (half height) = 8px */
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   transform: translateX(-50%);
   background: radial-gradient(
@@ -182,11 +172,12 @@ img.signal-dot.mic-orb {
   box-shadow: none;
   object-fit: cover;
   clip-path: circle(50% at 50% 50%);
-  width: 44px;
-  height: 44px;
-  bottom: -10px;
-  right: -10px;
+  width: 28px;
+  height: 28px;
+  bottom: -6px; /* Center is at -6px + 14px (half height) = 8px */
+  right: auto; /* Remove right override to use left 50% centering */
   mix-blend-mode: normal;
+  z-index: 10;
 }
 
 .premium-divider {
@@ -225,15 +216,16 @@ img.signal-dot.mic-orb {
 
 .nextvwt-subtitle {
   font-family: 'Montserrat', 'Poppins', system-ui, sans-serif;
-  font-size: 12px; /* Increased by 3pt (4px) from 8px */
+  font-size: 9.5px;
   font-weight: 850;
-  letter-spacing: 0.22em; /* Reduced from 0.46em */
+  letter-spacing: 0.15em;
   color: #b81f25;
   text-transform: uppercase;
   text-shadow:
     0 1px 0 #ffffff,
     0 2px 4px rgba(184, 31, 37, 0.25);
-  padding-left: 5px;
+  padding-left: 3px;
+  white-space: nowrap;
 }
 
 .channel-modal-content {
