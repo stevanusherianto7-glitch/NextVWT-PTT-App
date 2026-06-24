@@ -608,8 +608,9 @@ export function RadioLayout() {
         >
           {/* Top Bar */}
           <div
-            className="w-full h-[70px] flex items-center justify-between px-5 z-20 relative overflow-hidden"
+            className="w-full h-[70px] flex items-center justify-between pr-5 z-20 relative overflow-hidden"
             style={{
+              paddingLeft: 'max(4px, calc(50% - 176.16px))',
               background: 'var(--header-bg)',
               boxShadow:
                 'var(--header-shadow), inset 0 -12px 20px -6px rgba(0, 0, 0, 0.45), inset 0 3px 6px rgba(255, 255, 255, 0.4)',
@@ -633,7 +634,7 @@ export function RadioLayout() {
                     <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
                       <div
                         className="logo-transmitting-bg"
-                        style={{ width: '75px', height: '75px' }}
+                        style={{ width: '100px', height: '100px' }}
                       >
                         <div className="extra-ripple"></div>
                       </div>
@@ -641,7 +642,7 @@ export function RadioLayout() {
                   )}
                   <svg
                     viewBox="0 0 100 100"
-                    className={`w-[52px] h-[52px] relative z-20 transition-all duration-300 ${isTransmitting ? 'logo-transmitting' : ''}`}
+                    className={`w-[68px] h-[68px] relative z-20 transition-all duration-300 ${isTransmitting ? 'logo-transmitting' : ''}`}
                     style={{ filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.25))' }}
                   >
                     <defs>
