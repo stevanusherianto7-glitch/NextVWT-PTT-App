@@ -420,8 +420,8 @@ export function PTTButton({
         borderRadius: '54px',
         background: 'rgba(0, 0, 0, 0.12)',
         boxShadow: isDepressed
-          ? 'inset 0 3px 6px rgba(0,0,0,0.4), inset 0 -3px 6px rgba(0,0,0,0.4), inset 0 0 10px rgba(0,0,0,0.35), 0 1px 2px rgba(0,0,0,0.08)'
-          : 'inset 0 6px 10px rgba(0,0,0,0.45), inset 0 -6px 10px rgba(0,0,0,0.45), inset 0 0 14px rgba(0,0,0,0.4), 0 3px 6px rgba(0,0,0,0.12)',
+          ? 'inset 0 3px 6px rgba(0,0,0,0.4), inset 0 -6px 12px rgba(0,0,0,0.6), inset 0 0 10px rgba(0,0,0,0.35), 0 1px 2px rgba(0,0,0,0.08)'
+          : 'inset 0 6px 10px rgba(0,0,0,0.45), inset 0 -14px 20px rgba(0,0,0,0.75), inset 0 0 14px rgba(0,0,0,0.4), 0 3px 6px rgba(0,0,0,0.12)',
         transform: `translateY(${yOffset}px) scale(${scaleFactor})`,
         transition: 'transform 0.12s ease-out, box-shadow 0.06s ease-in-out',
       }}
