@@ -803,7 +803,7 @@ export function RadioLayout() {
                 onClose={() => setIsUserListOpen(false)}
               />
             ) : (
-              <>
+              <div className="w-full h-[424px] flex flex-col justify-start items-center relative">
                 {/* Themed Faceplate Container */}
                 <div
                   className="w-full flex flex-col items-center pt-6 pb-3 relative z-10 transition-all duration-300"
@@ -1027,11 +1027,14 @@ export function RadioLayout() {
                     />
                   </div>
                 </div>
-              </>
+              </div>
             )}
 
             {/* Quick Action Dock - Moved outside to ensure visibility during UserListModal */}
-            <div className={`w-full flex justify-center z-20 ${isUserListOpen ? 'mt-3' : 'mt-0'}`}>
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className={`w-full flex justify-center z-20 ${isUserListOpen ? 'mt-3' : 'mt-0'}`}
+            >
               <QuickActionDock
                 onOpenChat={() => setIsChatOpen(true)}
                 onOpenQueue={() => setIsQueueOpen(true)}
