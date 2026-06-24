@@ -8,7 +8,7 @@ import { ProgressBar } from './ProgressBar';
 import { usePTTStore } from '../store/usePTTStore';
 import { UserListModal } from './UserListModal';
 import { ChannelListModal } from './ChannelListModal';
-import { STATIC_CHANNELS, getChannelUserCount } from '../utils/constants';
+import { STATIC_CHANNELS } from '../utils/constants';
 import { useAudioStreamer } from '../hooks/useAudioStreamer';
 import { toast } from 'sonner';
 import { SettingsPanelSkeleton, KaraokePlayerSkeleton } from './SkeletonLoaders';
@@ -608,7 +608,7 @@ export function RadioLayout() {
         >
           {/* Top Bar */}
           <div
-            className="w-full h-[90px] flex items-center justify-between px-5 z-20 relative overflow-hidden"
+            className="w-full h-[70px] flex items-center justify-between px-5 z-20 relative overflow-hidden"
             style={{
               background: 'var(--header-bg)',
               boxShadow:

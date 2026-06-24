@@ -74,7 +74,7 @@ export const USER_PROFILES: Record<string, UserProfile> = {
     location: 'JAKARTA',
     avatarColor: '#4CAF50',
     avatarUrl: 'https://randomuser.me/api/portraits/women/4.jpg',
-    role: 'moderator',
+    role: 'operator',
   },
   mock_muted: {
     displayName: 'Budi',
@@ -115,6 +115,14 @@ export const USER_PROFILES: Record<string, UserProfile> = {
     avatarColor: '#00BCD4',
     avatarUrl: 'https://randomuser.me/api/portraits/men/9.jpg',
     role: 'operator',
+  },
+  mock_guest: {
+    displayName: 'Gilang',
+    callSign: 'GST07',
+    location: 'LOMBOK',
+    avatarColor: '#607D8B',
+    avatarUrl: 'https://randomuser.me/api/portraits/men/26.jpg',
+    role: 'guest',
   },
   noc_global: {
     displayName: 'NOC Global',
@@ -382,73 +390,6 @@ export const USER_PROFILES: Record<string, UserProfile> = {
     avatarUrl:
       'https://randomuser.me/api/portraits/women/42.jpg',
   },
-  noc_global: {
-    displayName: 'NOC Global',
-    callSign: 'N.O.C',
-    location: 'JAKARTA, DKI',
-    avatarColor: '#3F51B5',
-    avatarUrl:
-      'https://randomuser.me/api/portraits/men/43.jpg',
-    role: 'noc',
-  },
-  sys_admin_vwt: {
-    displayName: 'Sys Admin VWT',
-    callSign: 'SYS-01',
-    location: 'SURABAYA, JATIM',
-    avatarColor: '#9C27B0',
-    avatarUrl:
-      'https://randomuser.me/api/portraits/women/44.jpg',
-    role: 'sys_admin',
-  },
-  pjc_room_manager: {
-    displayName: 'PJC Room Manager',
-    callSign: 'PJC-01',
-    location: 'MEDAN, SUMUT',
-    avatarColor: '#E91E63',
-    avatarUrl:
-      'https://randomuser.me/api/portraits/men/45.jpg',
-    role: 'pjc',
-  },
-  operator_otomatis: {
-    displayName: 'Operator Otomatis',
-    callSign: 'OPR-01',
-    location: 'BANDUNG, JABAR',
-    avatarColor: '#009688',
-    avatarUrl:
-      'https://randomuser.me/api/portraits/women/46.jpg',
-    role: 'operator',
-  },
-  user_baru_nextvwt: {
-    displayName: 'User Baru NextVWT',
-    callSign: 'NEW-01',
-    location: 'MAKASSAR, SULSEL',
-    avatarColor: '#4CAF50',
-    avatarUrl:
-      'https://randomuser.me/api/portraits/men/47.jpg',
-    role: 'guest',
-    isNewUser: true,
-    joinedAt: '2026-06-07', // Joined 3 days ago (less than 2 weeks, badge shown)
-  },
-  silent_user: {
-    displayName: 'User Silent',
-    callSign: 'SLT-01',
-    location: 'SEMARANG, JATENG',
-    avatarColor: '#795548',
-    avatarUrl:
-      'https://randomuser.me/api/portraits/women/48.jpg',
-    role: 'guest',
-    isMuted: true,
-  },
-  controlled_user: {
-    displayName: 'User Controlled',
-    callSign: 'CTRL-01',
-    location: 'BALIKPAPAN, KALTIM',
-    avatarColor: '#FF9800',
-    avatarUrl:
-      'https://randomuser.me/api/portraits/men/49.jpg',
-    role: 'guest',
-    isControlled: true,
-  },
 };
 
 function getDeterministicProfile(username: string): UserProfile {
@@ -524,7 +465,8 @@ function AvatarImage({
   if (hasError || !src) {
     return (
       <div
-        className="w-full h-full rounded-none flex items-center justify-center bg-white shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)] border border-white/20"
+        className="w-full h-full rounded-none flex items-center justify-center shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)] border border-white/20"
+        style={{ backgroundColor: avatarColor || '#3F51B5' }}
       >
         <img
           src={fallbackIconUrl}
@@ -768,16 +710,11 @@ export function UserListModal({ channel, channelName: _channelName, users }: Use
   return (
     <div
       onClick={(e) => e.stopPropagation()}
-      className="w-full max-w-[340px] user-list-modal -mt-[14px] pb-4 bg-white border-x-2 border-b-2 border-gray-400 rounded-b-2xl flex flex-col overflow-hidden animate-in fade-in duration-200"
+      className="w-full max-w-[340px] user-list-modal -mt-[14px] bg-white border-x-2 border-b-2 border-gray-400 flex flex-col overflow-hidden animate-in fade-in duration-200"
     >
       <style>{`
         .user-list-modal {
-          height: 380px;
-        }
-        @media (min-height: 700px) {
-          .user-list-modal {
-            height: 460px;
-          }
+          height: 426px;
         }
         .custom-scrollbar::-webkit-scrollbar {
           width: 1px;

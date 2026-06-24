@@ -127,6 +127,7 @@ const BASE_CHANNELS: ChannelConfigItem[] = [
       'mock_wait',
       'mock_wait_controlled',
       'mock_operator',
+      'mock_guest',
     ],
   },
   {
@@ -205,7 +206,7 @@ export const CHANNELS: ChannelConfigItem[] = Array.from({ length: 300 })
       name: `STANDBY CHANNEL ${i.toString().padStart(3, '0')}`,
       type: 'gray',
       users: [],
-    };
+    } as ChannelConfigItem;
   })
   .sort((a, b) => {
     const getSortOrder = (n: number) => (n === 100 ? 0.5 : n);
