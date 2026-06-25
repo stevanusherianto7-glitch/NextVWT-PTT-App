@@ -3,7 +3,6 @@ import twinHeadsIcon from '../../imports/ikon_kepala_kembar-2.png';
 import usernameIcon from '../../imports/ikon_username1.png';
 import { usePTTStore } from '../store/usePTTStore';
 import { AquariumSkeleton } from './SkeletonLoaders';
-import { USER_PROFILES } from './UserListModal';
 
 // [P2-2] AquariumCanvas hanya diload jika user memakai theme-v6 + bgActive
 // Ukuran: ~24KB JS + WebGL canvas — 0% users tidak memakai tema ini tidak perlu download
@@ -42,29 +41,6 @@ export function LCDPanel({
     : isReceiving
       ? activeTransmitter?.displayName
       : localName;
-
-  // Get active user shown on LCD
-  const activeUserId = isTransmitting
-    ? localUserId
-    : isReceiving && activeTransmitter
-      ? activeTransmitter.userId
-      : localUserId;
-
-  const roomId = `ptt-room-${channel}`;
-
-  if (activeUserId === localUserId) {
-    //
-  } else if (isReceiving && activeTransmitter) {
-    const activeUserObj = usePTTStore.getState().activeUsers.find((u) => u.userId === activeUserId);
-
-    // Resolve fallback role and status from USER_PROFILES
-    const matchedProfile = activeUserObj
-      ? USER_PROFILES[activeUserObj.userId] ||
-        USER_PROFILES[activeUserObj.displayName] ||
-        Object.values(USER_PROFILES).find((p) => p.callSign === activeUserObj.callSign)
-      : USER_PROFILES[activeUserId] ||
-        Object.values(USER_PROFILES).find((p) => p.callSign === activeUserId);
-  }
 
   // Signal strength simulator (fluctuates 1-4 bars when online, 0 when offline)
   const [signalBars, setSignalBars] = useState(4);
@@ -201,7 +177,7 @@ export function LCDPanel({
                 {/* Single User Icon — glossy baked into PNG */}
                 <div className="relative shrink-0 select-none flex items-center justify-center w-[32px] h-[32px] ml-1">
                   <img
-                    src={activeUserModeIcon || usernameIcon}
+                    src={usernameIcon}
                     alt="Role Icon"
                     className="h-[28px] w-[28px] object-contain"
                     style={{ filter: 'drop-shadow(0px 1.5px 2px rgba(0,0,0,0.3))' }}
