@@ -46,7 +46,13 @@ export default function App() {
         setUser(u);
         if (u) {
           const name = u.user_metadata?.full_name || u.email?.split('@')[0] || 'User';
-          updateSettings({ infoText: name });
+          
+          const currentSettings = usePTTStore.getState();
+          if (currentSettings.profilePhotoOption === 'custom' && !currentSettings.customPhotoUrl) {
+            updateSettings({ infoText: name, profilePhotoOption: 'google' });
+          } else {
+            updateSettings({ infoText: name });
+          }
         }
       });
 
@@ -60,7 +66,13 @@ export default function App() {
         setUser(u);
         if (u) {
           const name = u.user_metadata?.full_name || u.email?.split('@')[0] || 'User';
-          updateSettings({ infoText: name });
+          
+          const currentSettings = usePTTStore.getState();
+          if (currentSettings.profilePhotoOption === 'custom' && !currentSettings.customPhotoUrl) {
+            updateSettings({ infoText: name, profilePhotoOption: 'google' });
+          } else {
+            updateSettings({ infoText: name });
+          }
         }
       });
       authSubscription = subscription;
