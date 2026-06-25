@@ -1,6 +1,8 @@
 import { useRef, useCallback } from 'react';
 import { usePTTStore } from '../store/usePTTStore';
 
+let sharedAudioContext: AudioContext | null = null;
+
 export function useVAD(threshold = 0.01, silenceTimeout = 1500) {
   const vadAnalyserRef = useRef<AnalyserNode | null>(null);
   const vadIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -9,12 +11,20 @@ export function useVAD(threshold = 0.01, silenceTimeout = 1500) {
   const startVAD = useCallback(
     (stream: MediaStream, micTrack: MediaStreamTrack) => {
       try {
-        const AudioContextClass =
-          window.AudioContext ||
-          (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-        if (!AudioContextClass) return;
+        if (!sharedAudioContext) {
+          const AudioContextClass =
+            window.AudioContext ||
+            (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+          if (!AudioContextClass) return;
+          sharedAudioContext = new AudioContextClass();
+        }
 
-        const ctx = new AudioContextClass();
+        const ctx = sharedAudioContext;
+        // Ensure the context is running (it might be suspended if created early)
+        if (ctx.state === 'suspended') {
+          ctx.resume().catch(console.warn);
+        }
+
         const source = ctx.createMediaStreamSource(stream);
         const analyser = ctx.createAnalyser();
         analyser.fftSize = 512;

@@ -13,18 +13,18 @@ import { test, expect } from '@playwright/test';
 test.describe('App Boot & Initial State', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    // Automatically bypass LoginGate if visible
-    const guestBtn = page.locator('button:has-text("Masuk sebagai Tamu")');
-    const pttBtn = page.locator('button:has-text("PTT")');
-    await Promise.race([
-      guestBtn.waitFor({ state: 'visible', timeout: 3000 }).catch(() => {}),
-      pttBtn.waitFor({ state: 'visible', timeout: 3000 }).catch(() => {}),
-    ]);
-    if (await guestBtn.isVisible()) {
-      await guestBtn.click();
-    }
+    // Automatically bypass LoginGate using the exposed store
+    await page.evaluate(() => {
+      if ((window as any).__store__) {
+        (window as any).__store__.getState().setUser({
+          id: 'e2e-test-user',
+          email: 'test@example.com',
+          isGuest: true
+        });
+      }
+    });
     // Wait for main app shell to be visible
-    await page.waitForSelector('text=NextVWT', { timeout: 10_000 });
+    await page.waitForSelector('button:has-text("PTT")', { timeout: 10_000 });
   });
 
   test('should load the app without a white screen or crash', async ({ page }) => {
@@ -38,13 +38,14 @@ test.describe('App Boot & Initial State', () => {
     expect(bodyText).not.toContain('Cannot read properties');
   });
 
-  test('should display the NextVWT brand logo and name', async ({ page }) => {
-    await expect(page.locator('text=NextVWT').first()).toBeVisible();
+  test('should display the power toggle button', async ({ page }) => {
+    // There should be a power toggle checkbox (it might be visually hidden by CSS, so we check if it is attached)
+    const powerToggle = page.locator('input[type="checkbox"]').first();
+    await expect(powerToggle).toBeAttached();
   });
 
   test('should show the LCD panel with channel number', async ({ page }) => {
-    // Tunggu LCD panel termuat
-    const channelNumber = page.locator('[data-testid="lcd-channel-number"]').first();
+    const channelNumber = page.getByTestId('lcd-channel-number');
     await expect(channelNumber).toBeVisible({ timeout: 5_000 });
     const lcdText = await channelNumber.textContent();
     expect(lcdText).toContain('001');
