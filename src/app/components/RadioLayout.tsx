@@ -274,9 +274,35 @@ export function RadioLayout() {
         const chunksToPlay = [...echoChunksRef.current];
         echoChunksRef.current = [];
         setTimeout(() => {
-          chunksToPlay.forEach((chunk) => {
-            playAudioChunk(chunk);
-          });
+          try {
+            // Combine all base64 chunks into a single ArrayBuffer (full WebM file)
+            // decodeAudioData requires the full file with headers to work properly
+            let totalLength = 0;
+            const byteArrays = chunksToPlay.map(b64 => {
+              const binary = window.atob(b64);
+              const bytes = new Uint8Array(binary.length);
+              for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+              totalLength += bytes.length;
+              return bytes;
+            });
+            
+            const combinedBuffer = new Uint8Array(totalLength);
+            let offset = 0;
+            for (const bytes of byteArrays) {
+              combinedBuffer.set(bytes, offset);
+              offset += bytes.length;
+            }
+            
+            // Convert back to single base64 string and play
+            let combinedBinary = '';
+            for (let i = 0; i < combinedBuffer.length; i++) {
+              combinedBinary += String.fromCharCode(combinedBuffer[i]);
+            }
+            const combinedBase64 = window.btoa(combinedBinary);
+            playAudioChunk(combinedBase64);
+          } catch (err) {
+            console.error('Failed to combine parrot chunks:', err);
+          }
         }, 350);
       }
 
