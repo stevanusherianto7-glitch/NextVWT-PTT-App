@@ -540,7 +540,7 @@ export function RadioLayout() {
 
   const dynamicUserList = [
     ...safeActiveUsers,
-    ...(activeChannelObj?.users?.filter(u => typeof u === 'string' && u.startsWith('mock_')) || [])
+    ...(activeChannelObj?.users || [])
   ];
 
   const dynamicUserCount = dynamicUserList.length;

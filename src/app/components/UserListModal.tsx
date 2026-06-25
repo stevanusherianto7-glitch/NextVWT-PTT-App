@@ -68,7 +68,7 @@ export const USER_PROFILES: Record<string, UserProfile> = {
       'https://randomuser.me/api/portraits/men/3.jpg',
     role: 'noc',
   },
-  mock_moderator: {
+  agus_setiawan: {
     displayName: 'Agus',
     callSign: 'MOD01',
     location: 'JAKARTA',
@@ -76,7 +76,7 @@ export const USER_PROFILES: Record<string, UserProfile> = {
     avatarUrl: 'https://randomuser.me/api/portraits/women/4.jpg',
     role: 'operator',
   },
-  mock_muted: {
+  budi_santoso: {
     displayName: 'Budi',
     callSign: 'MUT02',
     location: 'SURABAYA, JATIM',
@@ -84,7 +84,7 @@ export const USER_PROFILES: Record<string, UserProfile> = {
     avatarUrl: 'https://randomuser.me/api/portraits/men/5.jpg',
     isMuted: true,
   },
-  mock_controlled: {
+  citra_kirana: {
     displayName: 'Citra',
     callSign: 'CTR03',
     location: 'YOGYAKARTA',
@@ -92,7 +92,7 @@ export const USER_PROFILES: Record<string, UserProfile> = {
     avatarUrl: 'https://randomuser.me/api/portraits/women/6.jpg',
     isControlled: true,
   },
-  mock_wait: {
+  dedi_pratama: {
     displayName: 'Dedi',
     callSign: 'WAT04',
     location: 'MEDAN, SUMUT',
@@ -100,7 +100,7 @@ export const USER_PROFILES: Record<string, UserProfile> = {
     avatarUrl: 'https://randomuser.me/api/portraits/men/7.jpg',
     isWait: true,
   },
-  mock_wait_controlled: {
+  euis_cahyani: {
     displayName: 'Euis',
     callSign: 'WTC05',
     location: 'BANDUNG, JABAR',
@@ -108,7 +108,7 @@ export const USER_PROFILES: Record<string, UserProfile> = {
     avatarUrl: 'https://randomuser.me/api/portraits/women/8.jpg',
     isWaitControlled: true,
   },
-  mock_operator: {
+  fajar_nugraha: {
     displayName: 'Fajar',
     callSign: 'OPR06',
     location: 'BALI',
@@ -116,7 +116,7 @@ export const USER_PROFILES: Record<string, UserProfile> = {
     avatarUrl: 'https://randomuser.me/api/portraits/men/9.jpg',
     role: 'operator',
   },
-  mock_guest: {
+  gilang_ramadhan: {
     displayName: 'Gilang',
     callSign: 'GST07',
     location: 'LOMBOK',
@@ -156,7 +156,7 @@ export const USER_PROFILES: Record<string, UserProfile> = {
     avatarUrl: 'https://randomuser.me/api/portraits/men/13.jpg',
     role: 'operator',
   },
-  user_baru_nextvwt: {
+  mario_teguh: {
     displayName: 'Siswa Baru',
     callSign: 'NEW01',
     location: 'MALANG',
@@ -164,7 +164,7 @@ export const USER_PROFILES: Record<string, UserProfile> = {
     avatarUrl: 'https://randomuser.me/api/portraits/women/14.jpg',
     isNewUser: true,
   },
-  silent_user: {
+  nina_marlina: {
     displayName: 'Pendengar Setia',
     callSign: 'LSTNR',
     location: 'MEDAN',
@@ -172,7 +172,7 @@ export const USER_PROFILES: Record<string, UserProfile> = {
     avatarUrl: 'https://randomuser.me/api/portraits/men/15.jpg',
     isMuted: true,
   },
-  controlled_user: {
+  oscar_lawalata: {
     displayName: 'Tamu (Ctrl)',
     callSign: 'GST02',
     location: 'BALI',
