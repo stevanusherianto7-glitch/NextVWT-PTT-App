@@ -87,14 +87,6 @@ export default function App() {
               onLogin={async (provider) => {
                 if (provider === 'google') {
                   await signInWithGoogle();
-                } else if (provider === 'guest') {
-                  // Simulate guest login
-                  setUser({
-                    id: `guest-${Math.random().toString(36).substring(2, 9)}`,
-                    isGuest: true,
-                    user_metadata: { full_name: 'Tamu' }
-                  } as any);
-                  updateSettings({ infoText: 'Tamu' });
                 }
               }}
             />
