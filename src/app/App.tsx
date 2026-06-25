@@ -10,13 +10,7 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { performSecurityAudit } from './utils/appSecurity';
 
 export default function App() {
-  const {
-    initializeSession,
-    user,
-    setUser,
-    updateSettings,
-    signInWithGoogle,
-  } = usePTTStore();
+  const { initializeSession, user, setUser, updateSettings, signInWithGoogle } = usePTTStore();
 
   useEffect(() => {
     performSecurityAudit()
@@ -41,12 +35,12 @@ export default function App() {
       supabase.auth.getSession().then(({ data: { session } }) => {
         const currentUser = usePTTStore.getState().user;
         if (currentUser && 'isGuest' in currentUser && currentUser.isGuest) return;
-        
+
         const u = session?.user || null;
         setUser(u);
         if (u) {
           const name = u.user_metadata?.full_name || u.email?.split('@')[0] || 'User';
-          
+
           const currentSettings = usePTTStore.getState();
           if (currentSettings.profilePhotoOption === 'custom' && !currentSettings.customPhotoUrl) {
             updateSettings({ infoText: name, profilePhotoOption: 'google' });
@@ -66,7 +60,7 @@ export default function App() {
         setUser(u);
         if (u) {
           const name = u.user_metadata?.full_name || u.email?.split('@')[0] || 'User';
-          
+
           const currentSettings = usePTTStore.getState();
           if (currentSettings.profilePhotoOption === 'custom' && !currentSettings.customPhotoUrl) {
             updateSettings({ infoText: name, profilePhotoOption: 'google' });

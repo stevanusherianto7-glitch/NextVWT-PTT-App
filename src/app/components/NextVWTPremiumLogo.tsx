@@ -100,12 +100,12 @@ export function NextVWTPremiumLogo() {
           transform="translate(1.2, 1.5)"
           opacity="0.45"
         />
-        <image 
-          href={vintageMic} 
-          x="14" 
-          y="14" 
-          width="72" 
-          height="72" 
+        <image
+          href={vintageMic}
+          x="14"
+          y="14"
+          width="72"
+          height="72"
           clipPath="url(#micClipPremium)"
           preserveAspectRatio="xMidYMid slice"
         />

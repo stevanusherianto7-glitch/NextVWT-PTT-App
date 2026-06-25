@@ -10,7 +10,6 @@ interface PTTButtonProps {
   waitCountdown?: number | null;
 }
 
-
 // ─── Walkie-Talkie Classic Sound Engine ───────────────────────────────────────
 
 /**
@@ -29,12 +28,14 @@ const createRadioNoise = (
   const data = buffer.getChannelData(0);
 
   // Pink-ish noise: bias toward lower frequencies
-  let b0 = 0, b1 = 0, b2 = 0;
+  let b0 = 0,
+    b1 = 0,
+    b2 = 0;
   for (let i = 0; i < bufferSize; i++) {
     const white = Math.random() * 2 - 1;
     b0 = 0.99886 * b0 + white * 0.0555179;
     b1 = 0.99332 * b1 + white * 0.0750759;
-    b2 = 0.96900 * b2 + white * 0.1538520;
+    b2 = 0.969 * b2 + white * 0.153852;
     data[i] = (b0 + b1 + b2 + white * 0.5362) / 4.5;
   }
 
@@ -150,12 +151,12 @@ const playReleaseSound = (ctx: AudioContext, masterGain: GainNode) => {
   const t = ctx.currentTime;
 
   // ── Squelch Tail Open ──────────────────────────────────────────────
-  createRadioNoise(ctx, masterGain, 0.20, t, 0.32);
+  createRadioNoise(ctx, masterGain, 0.2, t, 0.32);
 
   // ── Roger Beep Sequence ────────────────────────────────────────────
   // Classic 3-tone Motorola roger: high → low → mid
   const rogerTones = [
-    { freq: 1450, start: 0.20, dur: 0.085 },
+    { freq: 1450, start: 0.2, dur: 0.085 },
     { freq: 1150, start: 0.31, dur: 0.085 },
     { freq: 1320, start: 0.42, dur: 0.075 },
   ];
@@ -178,7 +179,7 @@ const playReleaseSound = (ctx: AudioContext, masterGain: GainNode) => {
 
     // Sharp ADSR: fast attack, sustain, fast decay
     env.gain.setValueAtTime(0, t + start);
-    env.gain.linearRampToValueAtTime(0.52, t + start + 0.010);
+    env.gain.linearRampToValueAtTime(0.52, t + start + 0.01);
     env.gain.setValueAtTime(0.52, t + start + dur - 0.015);
     env.gain.exponentialRampToValueAtTime(0.001, t + start + dur);
 
@@ -199,14 +200,14 @@ const playReleaseSound = (ctx: AudioContext, masterGain: GainNode) => {
 
   // ── Squelch Tail Close ─────────────────────────────────────────────
   // Brief crackle as channel gate slams shut after roger beep
-  createRadioNoise(ctx, masterGain, 0.06, t + 0.50, 0.18);
+  createRadioNoise(ctx, masterGain, 0.06, t + 0.5, 0.18);
 
   // Hard gate click (mechanical relay thud)
   const gateClick = ctx.createOscillator();
   const gateEnv = ctx.createGain();
   gateClick.type = 'sine';
   gateClick.frequency.setValueAtTime(60, t + 0.56);
-  gateClick.frequency.exponentialRampToValueAtTime(20, t + 0.60);
+  gateClick.frequency.exponentialRampToValueAtTime(20, t + 0.6);
   gateEnv.gain.setValueAtTime(0.35, t + 0.56);
   gateEnv.gain.exponentialRampToValueAtTime(0.001, t + 0.61);
   gateClick.connect(gateEnv);
@@ -239,7 +240,6 @@ const playRadioSound = (
     console.warn('PTT audio playback failed:', err);
   }
 };
-
 
 export function PTTButton({
   onPressStart,
@@ -393,7 +393,7 @@ export function PTTButton({
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     isPowerOn,
     isBusy,
@@ -404,7 +404,6 @@ export function PTTButton({
     pttVolume,
     vibrateOnStart,
     onPressEnd,
-     
   ]);
 
   // Calculate dynamic scale factor and vertical offset
@@ -426,7 +425,8 @@ export function PTTButton({
         transition: 'transform 0.12s ease-out, box-shadow 0.06s ease-in-out',
       }}
     >
-      <button type="button"
+      <button
+        type="button"
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseLeave}
@@ -436,30 +436,32 @@ export function PTTButton({
         className="relative w-[326px] h-[96px] flex items-center justify-center overflow-hidden focus:outline-none"
         style={{
           borderRadius: '48px',
-          background: (!isPowerOn || isMuted)
-            ? 'linear-gradient(to bottom, #a3a3a3 0%, #737373 100%)' // Gray when power is off or muted
-            : (waitCountdown !== null || isBusy)
-              ? 'linear-gradient(to bottom, #f97316 0%, #ea580c 100%)' // Orange when busy or wait
-              : isActive
-                ? 'linear-gradient(to bottom, #d62828 0%, #a01010 100%)' // Red when active
-                : 'linear-gradient(to bottom, #2cdb66 0%, #19ba42 100%)', // Green when idle
+          background:
+            !isPowerOn || isMuted
+              ? 'linear-gradient(to bottom, #a3a3a3 0%, #737373 100%)' // Gray when power is off or muted
+              : waitCountdown !== null || isBusy
+                ? 'linear-gradient(to bottom, #f97316 0%, #ea580c 100%)' // Orange when busy or wait
+                : isActive
+                  ? 'linear-gradient(to bottom, #d62828 0%, #a01010 100%)' // Red when active
+                  : 'linear-gradient(to bottom, #2cdb66 0%, #19ba42 100%)', // Green when idle
           boxShadow: isDepressed
             ? 'inset 0 8px 12px rgba(0, 0, 0, 0.85), inset 0 -2px 3px rgba(0, 0, 0, 0.2)'
-            : (!isPowerOn || isMuted)
+            : !isPowerOn || isMuted
               ? 'inset 0 3px 6px rgba(255,255,255,0.25), inset 0 -2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.25)'
-              : (waitCountdown !== null || isBusy)
+              : waitCountdown !== null || isBusy
                 ? 'inset 0 3px 6px rgba(255,255,255,0.4), inset 0 -2px 4px rgba(0,0,0,0.2), 0 4px 10px rgba(249, 115, 22, 0.4)'
                 : isActive
                   ? 'inset 0 3px 6px rgba(255,255,255,0.4), inset 0 -2px 4px rgba(0,0,0,0.2), 0 4px 6px rgba(0,0,0,0.3)'
                   : 'inset 0 3px 6px rgba(255, 255, 255, 0.8), 0 4px 10px rgba(44, 219, 102, 0.4)',
           transform: isDepressed ? 'translateY(4px)' : 'translateY(0)',
-          border: (!isPowerOn || isMuted)
-            ? '1px solid #666666'
-            : (waitCountdown !== null || isBusy)
-              ? '1px solid #c2410c'
-              : isActive
-                ? '1px solid #730e0e'
-                : '1px solid #149c35',
+          border:
+            !isPowerOn || isMuted
+              ? '1px solid #666666'
+              : waitCountdown !== null || isBusy
+                ? '1px solid #c2410c'
+                : isActive
+                  ? '1px solid #730e0e'
+                  : '1px solid #149c35',
           transition: 'transform 0.06s ease-in-out, box-shadow 0.06s ease-in-out',
         }}
       >

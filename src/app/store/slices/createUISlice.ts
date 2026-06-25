@@ -101,9 +101,10 @@ export const createUISlice: StateCreator<
       const roomId = `ptt-room-${state.channelNumber}`;
       // Read from store state as fallback — the definitive role is set by useChannelRole hook
       // from the Supabase channel_roles table.
-      const myRole = (state as { _channelRole?: string })._channelRole
-        ?? localStorage.getItem(`channel-role:${roomId}:${state.userId}`)
-        ?? 'guest';
+      const myRole =
+        (state as { _channelRole?: string })._channelRole ??
+        localStorage.getItem(`channel-role:${roomId}:${state.userId}`) ??
+        'guest';
 
       const ROLE_PRIORITY: Record<string, number> = {
         noc: 5,
@@ -144,9 +145,10 @@ export const createUISlice: StateCreator<
       const displayName = state.infoText || userMeta?.user_metadata?.full_name || 'User';
       const roomId = `ptt-room-${state.channelNumber}`;
       // [F-06] Prefer the store-cached role over localStorage for broadcast metadata
-      const myRole = (state as { _channelRole?: string })._channelRole
-        ?? localStorage.getItem(`channel-role:${roomId}:${state.userId}`)
-        ?? 'guest';
+      const myRole =
+        (state as { _channelRole?: string })._channelRole ??
+        localStorage.getItem(`channel-role:${roomId}:${state.userId}`) ??
+        'guest';
 
       activeChannelSubscription.send({
         type: 'broadcast',

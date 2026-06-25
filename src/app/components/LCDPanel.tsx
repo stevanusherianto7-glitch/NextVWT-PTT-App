@@ -1,18 +1,8 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import twinHeadsIcon from '../../imports/ikon_kepala_kembar-2.png';
 import usernameIcon from '../../imports/ikon_username1.png';
-import iconNoc from '../../assets/icon_noc.png';
 import { usePTTStore } from '../store/usePTTStore';
 import { AquariumSkeleton } from './SkeletonLoaders';
-import iconOperator from '../../assets/icon_operator.png';
-import iconModerator from '../../assets/icon_moderator.png';
-import iconControlled from '../../assets/icon_controlled.png';
-import iconSilent from '../../assets/icon_silent.png';
-import iconWait from '../../assets/icon_wait.png';
-import iconWaitControlled from '../../assets/components/icon_wait_controlled.svg';
-import iconVoice from '../../assets/icon_voice.png';
-import { useChannelRole } from '../../features/moderation/useChannelRole';
-import { ChannelRole } from '../../features/moderation/permissions';
 import { USER_PROFILES } from './UserListModal';
 
 // [P2-2] AquariumCanvas hanya diload jika user memakai theme-v6 + bgActive
@@ -61,14 +51,9 @@ export function LCDPanel({
       : localUserId;
 
   const roomId = `ptt-room-${channel}`;
-  const { role: localRole, status: localStatus } = useChannelRole(roomId, localUserId);
-
-  let activeRole: ChannelRole = 'guest';
-  let activeStatus = 'active';
 
   if (activeUserId === localUserId) {
-    activeRole = localRole;
-    activeStatus = localStatus;
+    //
   } else if (isReceiving && activeTransmitter) {
     const activeUserObj = usePTTStore.getState().activeUsers.find((u) => u.userId === activeUserId);
 
@@ -79,42 +64,6 @@ export function LCDPanel({
         Object.values(USER_PROFILES).find((p) => p.callSign === activeUserObj.callSign)
       : USER_PROFILES[activeUserId] ||
         Object.values(USER_PROFILES).find((p) => p.callSign === activeUserId);
-
-    const roleFallback = matchedProfile?.role || 'guest';
-    const statusFallback = matchedProfile?.isMuted
-      ? 'muted'
-      : matchedProfile?.isControlled
-        ? 'controlled'
-        : matchedProfile?.isWait
-          ? 'wait'
-          : matchedProfile?.isWaitControlled
-            ? 'wait_controlled'
-            : 'active';
-
-    activeRole =
-      (sessionStorage.getItem(`channel-role:${roomId}:${activeUserId}`) as ChannelRole | null) ||
-      roleFallback;
-    activeStatus =
-      sessionStorage.getItem(`channel-status:${roomId}:${activeUserId}`) || statusFallback;
-  }
-
-  let activeUserModeIcon: string | null = null;
-  if (activeStatus === 'muted') {
-    activeUserModeIcon = iconSilent;
-  } else if (activeStatus === 'controlled') {
-    activeUserModeIcon = iconControlled;
-  } else if (activeStatus === 'wait') {
-    activeUserModeIcon = iconWait;
-  } else if (activeStatus === 'wait_controlled') {
-    activeUserModeIcon = iconWaitControlled;
-  } else if (activeRole === 'noc') {
-    activeUserModeIcon = iconNoc;
-  } else if (activeRole === 'operator') {
-    activeUserModeIcon = iconOperator;
-  } else if (activeRole === 'pjc' || activeRole === 'sys_admin' || activeRole === 'moderator') {
-    activeUserModeIcon = iconModerator;
-  } else {
-    activeUserModeIcon = iconVoice;
   }
 
   // Signal strength simulator (fluctuates 1-4 bars when online, 0 when offline)
@@ -214,232 +163,232 @@ export function LCDPanel({
         {/* Inner Screen Container */}
         <div
           className="relative w-full h-full rounded-[14px] overflow-hidden"
-        style={{
-          background: 'var(--lcd-bg)',
-        }}
-      >
-        {/* 3D Inner Border/Glass Highlight Overlay */}
-        <div
-          className="absolute inset-0 pointer-events-none rounded-[14px] z-20"
           style={{
-            boxShadow: 'inset 0 0 0 2px rgba(255,255,255,0.45), inset 0 0 12px rgba(0,0,0,0.65)',
+            background: 'var(--lcd-bg)',
           }}
-        />
-
-        {/* Glossy Screen Shine Overlay */}
-        <div
-          className="absolute top-0 left-0 right-0 h-[45%] bg-gradient-to-b from-white/30 to-white/0 pointer-events-none z-10"
-          style={{
-            borderRadius: '14px 14px 0 0',
-          }}
-        />
-
-        {/* Aquarium Canvas Backplate — lazy-loaded, hanya aktif di theme-v6 */}
-        {_isPowerOn && themeText === 'theme-v6' && bgActive && (
-          <Suspense fallback={<AquariumSkeleton />}>
-            <AquariumCanvas theme={themeText} />
-          </Suspense>
-        )}
-
-        {/* Content */}
-        <div
-          className={`relative p-2.5 h-full flex flex-col justify-between transition-opacity duration-300 z-10 opacity-100 ${_isPowerOn ? '' : 'pointer-events-none'}`}
         >
-          {/* Top status bar */}
-          <div className="flex items-start justify-between">
-            {/* Top Left: Username Icon and Letter */}
-            <div className="flex items-end gap-1.5 pt-1">
-              {/* Single User Icon — glossy baked into PNG */}
-              <div className="relative shrink-0 select-none flex items-center justify-center w-[32px] h-[32px] ml-1">
-                <img
-                  src={activeUserModeIcon || usernameIcon}
-                  alt="Role Icon"
-                  className="h-[28px] w-[28px] object-contain"
-                  style={{ filter: 'drop-shadow(0px 1.5px 2px rgba(0,0,0,0.3))' }}
-                  draggable={false}
-                />
-              </div>
-              <span
-                data-testid="lcd-username"
-                className="text-base -ml-1 truncate max-w-[110px] leading-none mb-[7px]"
-                style={{ fontWeight: 600, color: 'var(--lcd-label-color)' }}
-              >
-                {username}
-              </span>
-            </div>
+          {/* 3D Inner Border/Glass Highlight Overlay */}
+          <div
+            className="absolute inset-0 pointer-events-none rounded-[14px] z-20"
+            style={{
+              boxShadow: 'inset 0 0 0 2px rgba(255,255,255,0.45), inset 0 0 12px rgba(0,0,0,0.65)',
+            }}
+          />
 
-            {/* OFFLINE Badge */}
-            {isOffline && (
-              <div
-                className="absolute left-1/2 -translate-x-1/2 top-1 px-2 py-0.5 rounded-full bg-[#E53935] flex items-center gap-1"
-                style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.3)', border: '1px solid #d32f2f' }}
-              >
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="text-white"
+          {/* Glossy Screen Shine Overlay */}
+          <div
+            className="absolute top-0 left-0 right-0 h-[45%] bg-gradient-to-b from-white/30 to-white/0 pointer-events-none z-10"
+            style={{
+              borderRadius: '14px 14px 0 0',
+            }}
+          />
+
+          {/* Aquarium Canvas Backplate — lazy-loaded, hanya aktif di theme-v6 */}
+          {_isPowerOn && themeText === 'theme-v6' && bgActive && (
+            <Suspense fallback={<AquariumSkeleton />}>
+              <AquariumCanvas theme={themeText} />
+            </Suspense>
+          )}
+
+          {/* Content */}
+          <div
+            className={`relative p-2.5 h-full flex flex-col justify-between transition-opacity duration-300 z-10 opacity-100 ${_isPowerOn ? '' : 'pointer-events-none'}`}
+          >
+            {/* Top status bar */}
+            <div className="flex items-start justify-between">
+              {/* Top Left: Username Icon and Letter */}
+              <div className="flex items-end gap-1.5 pt-1">
+                {/* Single User Icon — glossy baked into PNG */}
+                <div className="relative shrink-0 select-none flex items-center justify-center w-[32px] h-[32px] ml-1">
+                  <img
+                    src={activeUserModeIcon || usernameIcon}
+                    alt="Role Icon"
+                    className="h-[28px] w-[28px] object-contain"
+                    style={{ filter: 'drop-shadow(0px 1.5px 2px rgba(0,0,0,0.3))' }}
+                    draggable={false}
+                  />
+                </div>
+                <span
+                  data-testid="lcd-username"
+                  className="text-base -ml-1 truncate max-w-[110px] leading-none mb-[7px]"
+                  style={{ fontWeight: 600, color: 'var(--lcd-label-color)' }}
                 >
-                  <path d="M4 12a8 8 0 0 1 16 0" />
-                  <path d="M8 12a4 4 0 0 1 8 0" />
-                  <circle cx="12" cy="12" r="1" />
-                </svg>
-                <span className="text-[10px] text-white font-bold tracking-wide uppercase">
-                  Offline
+                  {username}
                 </span>
               </div>
-            )}
 
-            {/* BUSY Badge */}
-            {!isOffline && isReceiving && (
-              <div
-                data-testid="lcd-busy-badge"
-                className="absolute left-1/2 -translate-x-1/2 top-1 px-2 py-0.5 rounded-full bg-[#f97316] flex items-center gap-1"
-                style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.3)', border: '1px solid #ea580c' }}
-              >
-                <span className="text-[10px] text-white font-bold tracking-wide uppercase animate-pulse">
-                  Busy
-                </span>
-              </div>
-            )}
-
-            {/* Signal Bar */}
-            <div
-              onClick={handleSignalClick}
-              className="flex items-end h-[28px] relative gap-1 mt-1 mr-1 cursor-pointer select-none"
-            >
+              {/* OFFLINE Badge */}
               {isOffline && (
-                <span className="text-[#d32f2f] font-black text-3xl leading-none absolute -left-3 -top-2 z-10 drop-shadow-[1px_1px_0px_rgba(255,255,255,0.6)]">
-                  ×
-                </span>
-              )}
-
-              {/* Latency Tooltip */}
-              {showLatency && (
                 <div
-                  className="absolute right-full top-1/2 -translate-y-1/2 mr-2 px-2 py-0.5 rounded bg-black text-white text-[10px] font-sans font-medium border border-neutral-800 shadow-lg whitespace-nowrap z-50 animate-in fade-in zoom-in-95 duration-150"
-                  style={{
-                    boxShadow:
-                      '0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3)',
-                  }}
+                  className="absolute left-1/2 -translate-x-1/2 top-1 px-2 py-0.5 rounded-full bg-[#E53935] flex items-center gap-1"
+                  style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.3)', border: '1px solid #d32f2f' }}
                 >
-                  {isOffline ? 'Latency: Offline' : `Latency: ${latencyVal}ms`}
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-white"
+                  >
+                    <path d="M4 12a8 8 0 0 1 16 0" />
+                    <path d="M8 12a4 4 0 0 1 8 0" />
+                    <circle cx="12" cy="12" r="1" />
+                  </svg>
+                  <span className="text-[10px] text-white font-bold tracking-wide uppercase">
+                    Offline
+                  </span>
                 </div>
               )}
 
-              {/* Signal Bars SVG approach */}
-              <div className="flex items-end gap-0 h-full pb-[2px] relative">
-                {[1, 2, 3, 4].map((bar) => {
-                  const isActive = bar <= signalBars;
-                  let barBackground =
-                    'linear-gradient(to bottom, #ffffff 0%, #e5e5e5 50%, #cccccc 100%)';
+              {/* BUSY Badge */}
+              {!isOffline && isReceiving && (
+                <div
+                  data-testid="lcd-busy-badge"
+                  className="absolute left-1/2 -translate-x-1/2 top-1 px-2 py-0.5 rounded-full bg-[#f97316] flex items-center gap-1"
+                  style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.3)', border: '1px solid #ea580c' }}
+                >
+                  <span className="text-[10px] text-white font-bold tracking-wide uppercase animate-pulse">
+                    Busy
+                  </span>
+                </div>
+              )}
 
-                  if (isActive) {
-                    if (signalBars >= 3) {
-                      barBackground =
-                        'linear-gradient(to bottom, #c6ffc2 0%, #00ff55 45%, #008f1f 100%)';
-                    } else if (signalBars === 2) {
-                      barBackground =
-                        'linear-gradient(to bottom, #fff3a1 0%, #ffcc00 45%, #b88600 100%)';
-                    } else if (signalBars === 1) {
-                      barBackground =
-                        'linear-gradient(to bottom, #ffc4c4 0%, #ff1133 45%, #a80000 100%)';
+              {/* Signal Bar */}
+              <div
+                onClick={handleSignalClick}
+                className="flex items-end h-[28px] relative gap-1 mt-1 mr-1 cursor-pointer select-none"
+              >
+                {isOffline && (
+                  <span className="text-[#d32f2f] font-black text-3xl leading-none absolute -left-3 -top-2 z-10 drop-shadow-[1px_1px_0px_rgba(255,255,255,0.6)]">
+                    ×
+                  </span>
+                )}
+
+                {/* Latency Tooltip */}
+                {showLatency && (
+                  <div
+                    className="absolute right-full top-1/2 -translate-y-1/2 mr-2 px-2 py-0.5 rounded bg-black text-white text-[10px] font-sans font-medium border border-neutral-800 shadow-lg whitespace-nowrap z-50 animate-in fade-in zoom-in-95 duration-150"
+                    style={{
+                      boxShadow:
+                        '0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3)',
+                    }}
+                  >
+                    {isOffline ? 'Latency: Offline' : `Latency: ${latencyVal}ms`}
+                  </div>
+                )}
+
+                {/* Signal Bars SVG approach */}
+                <div className="flex items-end gap-0 h-full pb-[2px] relative">
+                  {[1, 2, 3, 4].map((bar) => {
+                    const isActive = bar <= signalBars;
+                    let barBackground =
+                      'linear-gradient(to bottom, #ffffff 0%, #e5e5e5 50%, #cccccc 100%)';
+
+                    if (isActive) {
+                      if (signalBars >= 3) {
+                        barBackground =
+                          'linear-gradient(to bottom, #c6ffc2 0%, #00ff55 45%, #008f1f 100%)';
+                      } else if (signalBars === 2) {
+                        barBackground =
+                          'linear-gradient(to bottom, #fff3a1 0%, #ffcc00 45%, #b88600 100%)';
+                      } else if (signalBars === 1) {
+                        barBackground =
+                          'linear-gradient(to bottom, #ffc4c4 0%, #ff1133 45%, #a80000 100%)';
+                      }
                     }
-                  }
 
-                  return (
-                    <div
-                      key={bar}
-                      className="flex-shrink-0"
-                      style={{
-                        width: '11px',
-                        height: `${bar * 6 + 3}px`,
-                        background: barBackground,
-                        border: '1px solid #000000',
-                        borderRadius: '1px',
-                        marginRight: bar < 4 ? '-1px' : '0px',
-                        boxShadow:
-                          'inset 1px 1.5px 1px rgba(255,255,255,0.7), inset -1px -1px 1px rgba(0,0,0,0.5)',
-                        opacity: 1,
-                        transition: 'background 0.2s ease-in-out',
-                      }}
-                    />
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          {/* Center/Bottom Content */}
-          <div className="flex justify-between items-end pb-2 px-1 mt-auto">
-            <div className="flex items-end gap-1 w-[115px]">
-              <div
-                className="relative text-2xl font-medium tracking-tight"
-                style={{
-                  paddingBottom: '2px',
-                  color: 'var(--lcd-label-color)',
-                }}
-              >
-                CH
-              </div>
-              <div
-                data-testid="lcd-channel-number"
-                className="relative"
-                style={{
-                  fontFamily: "'DSEG7', monospace",
-                  fontSize: '46px',
-                  fontWeight: 'bold',
-                  lineHeight: 0.75,
-                  marginLeft: '-2px',
-                  textShadow: 'var(--lcd-glow)',
-                  paddingBottom: '5px',
-                  color: 'var(--lcd-text-color)',
-                }}
-              >
-                {channelStr}
+                    return (
+                      <div
+                        key={bar}
+                        className="flex-shrink-0"
+                        style={{
+                          width: '11px',
+                          height: `${bar * 6 + 3}px`,
+                          background: barBackground,
+                          border: '1px solid #000000',
+                          borderRadius: '1px',
+                          marginRight: bar < 4 ? '-1px' : '0px',
+                          boxShadow:
+                            'inset 1px 1.5px 1px rgba(255,255,255,0.7), inset -1px -1px 1px rgba(0,0,0,0.5)',
+                          opacity: 1,
+                          transition: 'background 0.2s ease-in-out',
+                        }}
+                      />
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
-            {/* Bottom Right: Twin Heads & Enlarged User Count (Shifted Left via margin) */}
-            <div
-              onClick={(e) => {
-                e.stopPropagation();
-                if (_isPowerOn && onUserCountClick) {
-                  onUserCountClick();
-                }
-              }}
-              className={`flex items-end gap-2 mr-1 relative transition-[opacity,transform] duration-150 ${_isPowerOn && onUserCountClick ? 'cursor-pointer hover:opacity-75 active:scale-95' : ''}`}
-              style={{ paddingBottom: '5px' }}
-            >
-              <div className="flex items-center justify-center w-[38px] h-[38px]">
-                <img
-                  src={twinHeadsIcon}
-                  alt="User Count Icon"
-                  className="h-[38px] w-[38px] object-contain"
-                  style={{ filter: 'drop-shadow(1px 1px 0px rgba(0,0,0,0.2))' }}
-                />
-              </div>
-              <div className="w-[24px] flex justify-end">
-                <span
-                  className="text-2xl font-medium tracking-tight leading-none"
+            {/* Center/Bottom Content */}
+            <div className="flex justify-between items-end pb-2 px-1 mt-auto">
+              <div className="flex items-end gap-1 w-[115px]">
+                <div
+                  className="relative text-2xl font-medium tracking-tight"
                   style={{
-                    textShadow: '1px 1px 1px rgba(255,255,255,0.3)',
+                    paddingBottom: '2px',
                     color: 'var(--lcd-label-color)',
                   }}
                 >
-                  {_isPowerOn ? userCount.toString().padStart(2, '0') : '00'}
-                </span>
+                  CH
+                </div>
+                <div
+                  data-testid="lcd-channel-number"
+                  className="relative"
+                  style={{
+                    fontFamily: "'DSEG7', monospace",
+                    fontSize: '46px',
+                    fontWeight: 'bold',
+                    lineHeight: 0.75,
+                    marginLeft: '-2px',
+                    textShadow: 'var(--lcd-glow)',
+                    paddingBottom: '5px',
+                    color: 'var(--lcd-text-color)',
+                  }}
+                >
+                  {channelStr}
+                </div>
+              </div>
+
+              {/* Bottom Right: Twin Heads & Enlarged User Count (Shifted Left via margin) */}
+              <div
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (_isPowerOn && onUserCountClick) {
+                    onUserCountClick();
+                  }
+                }}
+                className={`flex items-end gap-2 mr-1 relative transition-[opacity,transform] duration-150 ${_isPowerOn && onUserCountClick ? 'cursor-pointer hover:opacity-75 active:scale-95' : ''}`}
+                style={{ paddingBottom: '5px' }}
+              >
+                <div className="flex items-center justify-center w-[38px] h-[38px]">
+                  <img
+                    src={twinHeadsIcon}
+                    alt="User Count Icon"
+                    className="h-[38px] w-[38px] object-contain"
+                    style={{ filter: 'drop-shadow(1px 1px 0px rgba(0,0,0,0.2))' }}
+                  />
+                </div>
+                <div className="w-[24px] flex justify-end">
+                  <span
+                    className="text-2xl font-medium tracking-tight leading-none"
+                    style={{
+                      textShadow: '1px 1px 1px rgba(255,255,255,0.3)',
+                      color: 'var(--lcd-label-color)',
+                    }}
+                  >
+                    {_isPowerOn ? userCount.toString().padStart(2, '0') : '00'}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
     </div>
   );
 }

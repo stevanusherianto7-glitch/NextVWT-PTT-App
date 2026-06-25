@@ -6,7 +6,10 @@ import { registerPlugin } from '@capacitor/core';
  */
 export interface NextVWTNativePlugin {
   // PTT Floor Control
-  requestPTT(options: { userId: string; role: string }): Promise<{ granted: boolean; position?: number }>;
+  requestPTT(options: {
+    userId: string;
+    role: string;
+  }): Promise<{ granted: boolean; position?: number }>;
   releasePTT(options: { userId: string }): Promise<{ success: boolean }>;
 
   // Audio Codec & AI
@@ -14,7 +17,10 @@ export interface NextVWTNativePlugin {
   setCodec(options: { codec: 'OPUS' | 'CODEC2' }): Promise<{ success: boolean }>;
 
   // Financial & Wallet
-  createQRISInvoice(options: { amount: number; description: string }): Promise<{ invoiceId: string; qrisData: string }>;
+  createQRISInvoice(options: {
+    amount: number;
+    description: string;
+  }): Promise<{ invoiceId: string; qrisData: string }>;
   getWalletBalance(): Promise<{ balance: number }>;
 
   // ROIP Gateway

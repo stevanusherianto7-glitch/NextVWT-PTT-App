@@ -75,7 +75,7 @@ export function ModerationLogPanel({ roomId }: ModerationLogPanelProps) {
         getSupabase().then((sub) => sub.removeChannel(channel!));
       }
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId]);
 
   const getActorRoleLabel = (role: string) => {
@@ -148,7 +148,8 @@ export function ModerationLogPanel({ roomId }: ModerationLogPanelProps) {
           <ClipboardList className="h-3.5 w-3.5 text-emerald-400" />
           Log Aktivitas Moderasi
         </span>
-        <button type="button"
+        <button
+          type="button"
           onClick={loadLogs}
           className="p-1 hover:bg-white/5 rounded text-slate-400 hover:text-white transition-colors"
           title="Segarkan Log"

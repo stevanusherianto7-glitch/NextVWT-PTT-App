@@ -82,14 +82,13 @@ export const createAuthSlice: StateCreator<
     }
   },
 
-
-
   signOut: async () => {
     try {
       // [F-08] Step 1: Unsubscribe from active channel to stop receiving broadcasts
       // This MUST happen before auth.signOut() to prevent spurious state updates
       // from arriving after the user session is cleared.
-      const { activeChannelSubscription, setActiveChannelSubscription } = await import('../subscription');
+      const { activeChannelSubscription, setActiveChannelSubscription } =
+        await import('../subscription');
       if (activeChannelSubscription) {
         try {
           activeChannelSubscription.unsubscribe();

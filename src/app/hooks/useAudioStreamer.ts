@@ -492,7 +492,7 @@ export function useAudioStreamer() {
             'audio/ogg;codecs=opus',
             'audio/mp4;codecs=mp4a.40.2', // Fallback for Safari
             'audio/mp4',
-            '' // Native browser fallback
+            '', // Native browser fallback
           ];
           for (const t of types) {
             if (t === '' || MediaRecorder.isTypeSupported(t)) return t;
@@ -521,11 +521,10 @@ export function useAudioStreamer() {
               }
             };
 
-            // Start with a 250ms timeslice. 
+            // Start with a 250ms timeslice.
             // The recorder will automatically fire ondataavailable every 250ms natively
             // WITHOUT needing to be destroyed and recreated, saving massive mobile CPU.
             recorder.start(250);
-
           } catch (err) {
             console.error('Failed to create robust MediaRecorder:', err);
           }

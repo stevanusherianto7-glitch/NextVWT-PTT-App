@@ -44,7 +44,8 @@ export const FeedbackModal: React.FC = () => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-300 font-sans">
       <div className="max-w-xs w-full bg-[#1e2026] border border-white/10 rounded-3xl p-6 shadow-2xl relative text-center">
-        <button type="button"
+        <button
+          type="button"
           onClick={handleClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
           disabled={isSubmitting}
@@ -63,7 +64,8 @@ export const FeedbackModal: React.FC = () => {
         </p>
 
         <div className="flex gap-4 justify-center">
-          <button type="button"
+          <button
+            type="button"
             onClick={() => handleSubmit(true)}
             disabled={isSubmitting}
             className="flex-1 flex flex-col items-center justify-center gap-2 py-4 bg-[#2a2d36] hover:bg-[#343844] rounded-2xl border border-white/5 transition-all active:scale-95 group disabled:opacity-50"
@@ -74,7 +76,8 @@ export const FeedbackModal: React.FC = () => {
             <span className="text-xs font-semibold text-gray-300">Bagus</span>
           </button>
 
-          <button type="button"
+          <button
+            type="button"
             onClick={() => handleSubmit(false)}
             disabled={isSubmitting}
             className="flex-1 flex flex-col items-center justify-center gap-2 py-4 bg-[#2a2d36] hover:bg-[#343844] rounded-2xl border border-white/5 transition-all active:scale-95 group disabled:opacity-50"

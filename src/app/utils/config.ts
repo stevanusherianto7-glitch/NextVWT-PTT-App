@@ -384,11 +384,12 @@ export async function fetchChannels(): Promise<ChannelConfigItem[]> {
       const mapped = {
         number: ch.number,
         name: ch.name,
-        type: (ch.type === 'red' || ch.type === 'green' || ch.type === 'gray' || ch.type === 'violet' ? ch.type : 'gray') as
-          | 'green'
-          | 'red'
-          | 'gray'
-          | 'violet',
+        type: (ch.type === 'red' ||
+        ch.type === 'green' ||
+        ch.type === 'gray' ||
+        ch.type === 'violet'
+          ? ch.type
+          : 'gray') as 'green' | 'red' | 'gray' | 'violet',
         users: [],
       };
       if (idx !== -1) {

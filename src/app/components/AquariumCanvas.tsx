@@ -426,20 +426,20 @@ export function AquariumCanvas({ theme }: AquariumCanvasProps) {
         // --- DRAW FISH ---
         ctx.save();
         ctx.translate(fish.x, fish.y);
-        
+
         const isMovingLeft = fish.vx < 0;
         const scaleX = isMovingLeft !== fish.facingLeft ? -1 : 1;
-        
-        // Instant horizontal flip 
+
+        // Instant horizontal flip
         ctx.scale(scaleX, 1);
 
         // Pitch rotation based on velocity vector
         const speedX = Math.abs(fish.vx);
         const pitch = Math.atan2(fish.vy, speedX);
-        
+
         // Wiggle rotation
-        const wiggle = Math.sin(fish.wigglePhase) * 0.1; 
-        
+        const wiggle = Math.sin(fish.wigglePhase) * 0.1;
+
         ctx.rotate(pitch + wiggle);
 
         // Scale by fish size
@@ -457,7 +457,7 @@ export function AquariumCanvas({ theme }: AquariumCanvasProps) {
         const srcY = fish.spriteRow * srcH;
 
         if (fishImage.complete) {
-          ctx.drawImage(fishImage, srcX, srcY, srcW, srcH, -srcW/2, -srcH/2, srcW, srcH);
+          ctx.drawImage(fishImage, srcX, srcY, srcW, srcH, -srcW / 2, -srcH / 2, srcW, srcH);
         }
 
         ctx.restore();

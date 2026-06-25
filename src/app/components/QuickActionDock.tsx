@@ -24,14 +24,18 @@ export function QuickActionDock({
 
   // Map each theme to an accent color for the dock
   const THEME_ACCENT: Record<string, { color: string; glow: string; tint: string }> = {
-    'theme-classic':  { color: '#00C853', glow: 'rgba(0,200,83,0.25)',   tint: 'rgba(0,200,83,0.08)'  },
-    'theme-v1':       { color: '#00b4d8', glow: 'rgba(0,180,216,0.25)',  tint: 'rgba(0,180,216,0.08)' },
-    'theme-v2':       { color: '#10b981', glow: 'rgba(16,185,129,0.25)', tint: 'rgba(16,185,129,0.08)'},
-    'theme-v3':       { color: '#00e5ff', glow: 'rgba(0,229,255,0.25)',  tint: 'rgba(0,229,255,0.08)' },
-    'theme-v4':       { color: '#39ff14', glow: 'rgba(57,255,20,0.25)',  tint: 'rgba(57,255,20,0.08)' },
-    'theme-v5':       { color: '#e040fb', glow: 'rgba(224,64,251,0.25)', tint: 'rgba(224,64,251,0.08)'},
-    'theme-v6':       { color: '#0077b6', glow: 'rgba(0,119,182,0.25)',  tint: 'rgba(0,119,182,0.08)' },
-    'theme-monokrom': { color: '#64748b', glow: 'rgba(100,116,139,0.2)', tint: 'rgba(100,116,139,0.06)'},
+    'theme-classic': { color: '#00C853', glow: 'rgba(0,200,83,0.25)', tint: 'rgba(0,200,83,0.08)' },
+    'theme-v1': { color: '#00b4d8', glow: 'rgba(0,180,216,0.25)', tint: 'rgba(0,180,216,0.08)' },
+    'theme-v2': { color: '#10b981', glow: 'rgba(16,185,129,0.25)', tint: 'rgba(16,185,129,0.08)' },
+    'theme-v3': { color: '#00e5ff', glow: 'rgba(0,229,255,0.25)', tint: 'rgba(0,229,255,0.08)' },
+    'theme-v4': { color: '#39ff14', glow: 'rgba(57,255,20,0.25)', tint: 'rgba(57,255,20,0.08)' },
+    'theme-v5': { color: '#e040fb', glow: 'rgba(224,64,251,0.25)', tint: 'rgba(224,64,251,0.08)' },
+    'theme-v6': { color: '#0077b6', glow: 'rgba(0,119,182,0.25)', tint: 'rgba(0,119,182,0.08)' },
+    'theme-monokrom': {
+      color: '#64748b',
+      glow: 'rgba(100,116,139,0.2)',
+      tint: 'rgba(100,116,139,0.06)',
+    },
   };
   const accent = THEME_ACCENT[themeKey] ?? THEME_ACCENT['theme-classic'];
 
@@ -116,15 +120,13 @@ export function QuickActionDock({
 
   return (
     <div className="w-full mt-1.5 relative z-30 flex justify-center">
-      
       {/* ── Reaction Popover (Centered over the dock) ── */}
       {showReactions && (
         <div
           ref={popoverRef}
           className="absolute bottom-[80px] left-1/2 -translate-x-1/2 z-50 p-2 rounded-2xl flex flex-col gap-2 min-w-[200px]"
           style={{
-            background:
-              'linear-gradient(160deg, rgba(22,26,38,0.97) 0%, rgba(12,14,22,0.98) 100%)',
+            background: 'linear-gradient(160deg, rgba(22,26,38,0.97) 0%, rgba(12,14,22,0.98) 100%)',
             backdropFilter: 'blur(24px)',
             WebkitBackdropFilter: 'blur(24px)',
             border: '1px solid rgba(255,255,255,0.10)',
@@ -143,28 +145,57 @@ export function QuickActionDock({
             <button
               onClick={() => setActiveTab('animation')}
               className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-colors ${activeTab === 'animation' ? 'text-white' : 'text-white/50 hover:text-white'}`}
-              style={activeTab === 'animation' ? { background: accent.tint, color: '#ffffff', boxShadow: `0 0 8px ${accent.glow}` } : {}}
+              style={
+                activeTab === 'animation'
+                  ? {
+                      background: accent.tint,
+                      color: '#ffffff',
+                      boxShadow: `0 0 8px ${accent.glow}`,
+                    }
+                  : {}
+              }
             >
               Animasi
             </button>
             <button
               onClick={() => setActiveTab('sound')}
               className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-colors ${activeTab === 'sound' ? 'text-white' : 'text-white/50 hover:text-white'}`}
-              style={activeTab === 'sound' ? { background: accent.tint, color: '#ffffff', boxShadow: `0 0 8px ${accent.glow}` } : {}}
+              style={
+                activeTab === 'sound'
+                  ? {
+                      background: accent.tint,
+                      color: '#ffffff',
+                      boxShadow: `0 0 8px ${accent.glow}`,
+                    }
+                  : {}
+              }
             >
               Suara
             </button>
             <button
               onClick={() => setActiveTab('gift')}
               className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-colors ${activeTab === 'gift' ? 'text-white' : 'text-white/50 hover:text-white'}`}
-              style={activeTab === 'gift' ? { background: accent.tint, color: '#ffffff', boxShadow: `0 0 8px ${accent.glow}` } : {}}
+              style={
+                activeTab === 'gift'
+                  ? {
+                      background: accent.tint,
+                      color: '#ffffff',
+                      boxShadow: `0 0 8px ${accent.glow}`,
+                    }
+                  : {}
+              }
             >
               Gifts
             </button>
           </div>
 
           <div className="grid grid-cols-4 gap-1.5">
-            {(activeTab === 'animation' ? animationReactions : activeTab === 'sound' ? soundReactions : giftReactions).map((r) => (
+            {(activeTab === 'animation'
+              ? animationReactions
+              : activeTab === 'sound'
+                ? soundReactions
+                : giftReactions
+            ).map((r) => (
               <button
                 type="button"
                 key={r.kind}
@@ -193,7 +224,7 @@ export function QuickActionDock({
           isPowerOn ? '' : 'opacity-35 pointer-events-none'
         }`}
         style={{
-      /* Glassmorphic base tinted by theme */
+          /* Glassmorphic base tinted by theme */
           background: `linear-gradient(145deg, ${accent.tint} 0%, rgba(15,18,28,0.92) 100%)`,
           backdropFilter: 'blur(20px) saturate(160%)',
           WebkitBackdropFilter: 'blur(20px) saturate(160%)',
@@ -237,7 +268,8 @@ export function QuickActionDock({
             {/* Reaction popover removed from here and placed at the root of the dock */}
 
             {/* ── Skeuomorphic Glass Keycap Button ── */}
-            <button type="button"
+            <button
+              type="button"
               onClick={btn.onClick}
               disabled={!isPowerOn}
               title={btn.label}
@@ -321,10 +353,10 @@ export function QuickActionDock({
                 }}
               />
               {/* Icon with glowing outline effect */}
-              <div 
+              <div
                 className="relative z-10 transition-all duration-300"
                 style={{
-                  filter: `drop-shadow(0 0 3px ${btn.iconColor}) drop-shadow(0 0 8px ${btn.glowColor})`
+                  filter: `drop-shadow(0 0 3px ${btn.iconColor}) drop-shadow(0 0 8px ${btn.glowColor})`,
                 }}
               >
                 {btn.icon}

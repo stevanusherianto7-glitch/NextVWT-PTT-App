@@ -74,7 +74,7 @@ export function PrivateChannelPanel({ onClose, onOpenWallet }: PrivateChannelPan
   useEffect(() => {
     checkBadgeStatus();
     fetchCoins();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   // Exchange 10 coins for Badge Merah
@@ -162,7 +162,8 @@ export function PrivateChannelPanel({ onClose, onOpenWallet }: PrivateChannelPan
       >
         <div className="absolute top-0 left-0 right-0 h-[40%] bg-gradient-to-b from-white/35 to-transparent pointer-events-none z-10" />
 
-        <button type="button"
+        <button
+          type="button"
           onClick={onClose}
           className="mr-2.5 w-9 h-9 flex items-center justify-center rounded-full border border-slate-300 bg-gradient-to-b from-white via-[#f1f5f9] to-[#cbd5e1] shadow-[0_2px_0_#94a3b8,inset_0_1px_0_rgba(255,255,255,0.8)] active:translate-y-[1.5px] active:shadow-none hover:brightness-105 transition-all duration-100 cursor-pointer focus:outline-none relative z-25 flex-shrink-0"
           style={{ color: 'var(--header-text-color)' }}
@@ -231,7 +232,8 @@ export function PrivateChannelPanel({ onClose, onOpenWallet }: PrivateChannelPan
             <span className="flex items-center gap-1 font-bold">
               <Coins className="w-3.5 h-3.5 text-amber-500" /> Saldo: {coins} Koin
             </span>
-            <button type="button"
+            <button
+              type="button"
               onClick={() => {
                 onClose();
                 onOpenWallet();
@@ -259,7 +261,8 @@ export function PrivateChannelPanel({ onClose, onOpenWallet }: PrivateChannelPan
               </div>
             </div>
 
-            <button type="button"
+            <button
+              type="button"
               onClick={handleExchangeBadge}
               disabled={isExchanging || coins < 10}
               className="w-full py-2.5 rounded-xl text-white font-bold text-[11px] uppercase bg-gradient-to-b from-[#818cf8] via-[#4f46e5] to-[#3730a3] border-t border-white/20 border-b border-black/20 shadow-md active:translate-y-[1px] active:shadow-none hover:brightness-105 transition-all duration-100 flex items-center justify-center gap-1.5 focus:outline-none cursor-pointer disabled:opacity-40 disabled:pointer-events-none"
@@ -296,7 +299,8 @@ export function PrivateChannelPanel({ onClose, onOpenWallet }: PrivateChannelPan
                 </div>
 
                 {/* Entry Action */}
-                <button type="button"
+                <button
+                  type="button"
                   onClick={() => handleChannelJoin(ch)}
                   className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase flex items-center gap-1.5 cursor-pointer active:scale-95 transition-all ${
                     hasAccess

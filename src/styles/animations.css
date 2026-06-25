@@ -105,29 +105,80 @@
 
 /* ── 3D Rocket Launch ── */
 @keyframes rocket3d {
-  0%   { transform: translateY(0) rotate(-45deg) scale(0.5) perspective(300px) rotateX(30deg); opacity: 0; }
-  10%  { opacity: 1; }
-  40%  { transform: translateY(-40px) rotate(-45deg) scale(1.2) perspective(300px) rotateX(10deg); }
-  70%  { transform: translateY(-90px) rotate(-50deg) scale(1.0) perspective(300px) rotateX(0deg); opacity: 1; }
-  100% { transform: translateY(-160px) rotate(-55deg) scale(0.7) perspective(300px) rotateX(-10deg); opacity: 0; }
+  0% {
+    transform: translateY(0) rotate(-45deg) scale(0.5) perspective(300px) rotateX(30deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  40% {
+    transform: translateY(-40px) rotate(-45deg) scale(1.2) perspective(300px) rotateX(10deg);
+  }
+  70% {
+    transform: translateY(-90px) rotate(-50deg) scale(1) perspective(300px) rotateX(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-160px) rotate(-55deg) scale(0.7) perspective(300px) rotateX(-10deg);
+    opacity: 0;
+  }
 }
 
 /* ── 3D Lightning Strike ── */
 @keyframes lightning3d {
-  0%   { transform: scaleY(0) scaleX(0.6) perspective(200px) rotateY(-20deg); opacity: 0; }
-  8%   { transform: scaleY(1.4) scaleX(1.1) perspective(200px) rotateY(10deg); opacity: 1; }
-  16%  { transform: scaleY(0.9) scaleX(0.9) perspective(200px) rotateY(-5deg); opacity: 0.7; }
-  24%  { transform: scaleY(1.2) scaleX(1.0) perspective(200px) rotateY(5deg); opacity: 1; }
-  50%  { transform: translateY(-30px) scale(1.0) perspective(200px) rotateY(0deg); opacity: 0.9; }
-  80%  { transform: translateY(-70px) scale(0.9) perspective(200px) rotateY(15deg); opacity: 0.5; }
-  100% { transform: translateY(-110px) scale(0.6) perspective(200px) rotateY(30deg); opacity: 0; }
+  0% {
+    transform: scaleY(0) scaleX(0.6) perspective(200px) rotateY(-20deg);
+    opacity: 0;
+  }
+  8% {
+    transform: scaleY(1.4) scaleX(1.1) perspective(200px) rotateY(10deg);
+    opacity: 1;
+  }
+  16% {
+    transform: scaleY(0.9) scaleX(0.9) perspective(200px) rotateY(-5deg);
+    opacity: 0.7;
+  }
+  24% {
+    transform: scaleY(1.2) scaleX(1) perspective(200px) rotateY(5deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-30px) scale(1) perspective(200px) rotateY(0deg);
+    opacity: 0.9;
+  }
+  80% {
+    transform: translateY(-70px) scale(0.9) perspective(200px) rotateY(15deg);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(-110px) scale(0.6) perspective(200px) rotateY(30deg);
+    opacity: 0;
+  }
 }
 
 /* ── 3D Star Burst Spin ── */
 @keyframes star3dSpin {
-  0%   { transform: scale(0) rotate(0deg) perspective(300px) rotateX(60deg) rotateZ(0deg); opacity: 0; }
-  15%  { transform: scale(1.5) rotate(180deg) perspective(300px) rotateX(20deg) rotateZ(90deg); opacity: 1; }
-  35%  { transform: translateY(-20px) scale(1.2) rotate(360deg) perspective(300px) rotateX(0deg) rotateZ(180deg); }
-  60%  { transform: translateY(-60px) scale(1.0) rotate(540deg) perspective(300px) rotateX(-10deg) rotateZ(270deg); opacity: 1; }
-  100% { transform: translateY(-120px) scale(0.5) rotate(720deg) perspective(300px) rotateX(-30deg) rotateZ(360deg); opacity: 0; }
+  0% {
+    transform: scale(0) rotate(0deg) perspective(300px) rotateX(60deg) rotateZ(0deg);
+    opacity: 0;
+  }
+  15% {
+    transform: scale(1.5) rotate(180deg) perspective(300px) rotateX(20deg) rotateZ(90deg);
+    opacity: 1;
+  }
+  35% {
+    transform: translateY(-20px) scale(1.2) rotate(360deg) perspective(300px) rotateX(0deg)
+      rotateZ(180deg);
+  }
+  60% {
+    transform: translateY(-60px) scale(1) rotate(540deg) perspective(300px) rotateX(-10deg)
+      rotateZ(270deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-120px) scale(0.5) rotate(720deg) perspective(300px) rotateX(-30deg)
+      rotateZ(360deg);
+    opacity: 0;
+  }
 }

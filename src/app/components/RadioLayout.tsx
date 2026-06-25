@@ -37,15 +37,17 @@ import foxSvg from '../../assets/reactions/fox.svg';
 
 const playReactionSound = (kind: string) => {
   try {
-    const AudioContextClass = window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    const AudioContextClass =
+      window.AudioContext ||
+      (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
     if (!AudioContextClass) return;
     const audioCtx = new AudioContextClass();
     const osc = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
-    
+
     osc.connect(gainNode);
     gainNode.connect(audioCtx.destination);
-    
+
     if (kind === 'laugh') {
       osc.type = 'triangle';
       osc.frequency.setValueAtTime(400, audioCtx.currentTime);
@@ -79,8 +81,8 @@ const playReactionSound = (kind: string) => {
       osc.start();
       osc.stop(audioCtx.currentTime + 0.2);
     }
-  } catch(e) {
-    console.warn("Audio play failed:", e);
+  } catch (e) {
+    console.warn('Audio play failed:', e);
   }
 };
 
@@ -499,7 +501,10 @@ export function RadioLayout() {
       if (isPowerOn) {
         const id = payload.id || Math.random().toString();
         const x = 30 + Math.random() * 40;
-        setFloatingReactions((prev) => [...prev, { id, category: payload.category, reaction: payload.reaction, x }]);
+        setFloatingReactions((prev) => [
+          ...prev,
+          { id, category: payload.category, reaction: payload.reaction, x },
+        ]);
         if (payload.category === 'sound') playReactionSound(payload.reaction);
         setTimeout(() => {
           setFloatingReactions((prev) => prev.filter((r) => r.id !== id));
@@ -538,10 +543,7 @@ export function RadioLayout() {
   // activeChannelObj already declared at the top of the component
   const safeActiveUsers = activeUsers || [];
 
-  const dynamicUserList = [
-    ...safeActiveUsers,
-    ...(activeChannelObj?.users || [])
-  ];
+  const dynamicUserList = [...safeActiveUsers, ...(activeChannelObj?.users || [])];
 
   const dynamicUserCount = dynamicUserList.length;
 
@@ -549,7 +551,7 @@ export function RadioLayout() {
   const displayLoc = locationText ? locationText.toUpperCase() : 'BANDUNG, JAWA BARAT';
   const channelNameStr = activeChannelObj ? activeChannelObj.name.toUpperCase() : 'STANDBY CHANNEL';
   const programName = channelSettings?.channel_description;
-  const marqueeText = programName 
+  const marqueeText = programName
     ? `PROGRAM SAAT INI: ${programName.toUpperCase()} • CHANNEL ${channel} • ${channelNameStr} • ${displayUser} (${displayLoc}) • STANDBY • READY`
     : `CHANNEL ${channel} • ${channelNameStr} • ${displayUser} (${displayLoc}) • STANDBY • READY`;
 
@@ -571,7 +573,10 @@ export function RadioLayout() {
           userId={userId}
           initialChannelName={activeChannelObj?.name}
           onClose={() => setIsManageOpen(false)}
-          onOpenPrivate={() => { setIsManageOpen(false); setIsPrivateOpen(true); }}
+          onOpenPrivate={() => {
+            setIsManageOpen(false);
+            setIsPrivateOpen(true);
+          }}
         />
       ) : isWalletOpen ? (
         <WalletPanel onClose={() => setIsWalletOpen(false)} />
@@ -744,12 +749,12 @@ export function RadioLayout() {
                       transform="translate(1.2, 1.5)"
                       opacity="0.45"
                     />
-                    <image 
-                      href={vintageMic} 
-                      x="14" 
-                      y="14" 
-                      width="72" 
-                      height="72" 
+                    <image
+                      href={vintageMic}
+                      x="14"
+                      y="14"
+                      width="72"
+                      height="72"
                       clipPath="url(#micClip)"
                       preserveAspectRatio="xMidYMid slice"
                     />
@@ -839,7 +844,12 @@ export function RadioLayout() {
                       <div className="absolute w-[280px] h-[135px] pointer-events-none z-30 rounded-[14px] top-[10px] left-1/2 -translate-x-1/2">
                         {floatingReactions.map((r) => {
                           if (r.category === 'sound') {
-                            const soundEmojis: Record<string, string> = { laugh: '🤣', buzzer: '❌', drum: '🥁', horn: '🎺' };
+                            const soundEmojis: Record<string, string> = {
+                              laugh: '🤣',
+                              buzzer: '❌',
+                              drum: '🥁',
+                              horn: '🎺',
+                            };
                             return (
                               <div
                                 key={r.id}
@@ -847,20 +857,29 @@ export function RadioLayout() {
                                 style={{ left: `${r.x}%` }}
                               >
                                 <div className="animate-float-up w-full h-full flex items-center justify-center opacity-80">
-                                  <span className="text-[32px]">{soundEmojis[r.reaction] || '🎵'}</span>
+                                  <span className="text-[32px]">
+                                    {soundEmojis[r.reaction] || '🎵'}
+                                  </span>
                                 </div>
                               </div>
                             );
                           }
 
                           if (r.category === 'gift') {
-                            const giftEmojis: Record<string, string> = { giftbox: '🎁', rose: '🌹', diamond: '💎', coffee: '☕' };
+                            const giftEmojis: Record<string, string> = {
+                              giftbox: '🎁',
+                              rose: '🌹',
+                              diamond: '💎',
+                              coffee: '☕',
+                            };
                             return (
                               <div
                                 key={r.id}
                                 className="fixed inset-0 m-auto w-[150px] h-[150px] flex items-center justify-center animate-bounce z-[100] pointer-events-none drop-shadow-2xl"
                               >
-                                <span className="text-[120px] filter drop-shadow-[0_0_20px_rgba(255,255,255,0.8)]">{giftEmojis[r.reaction] || '🎁'}</span>
+                                <span className="text-[120px] filter drop-shadow-[0_0_20px_rgba(255,255,255,0.8)]">
+                                  {giftEmojis[r.reaction] || '🎁'}
+                                </span>
                               </div>
                             );
                           }
@@ -918,9 +937,12 @@ export function RadioLayout() {
                                     style={{
                                       display: 'inline-block',
                                       animation: 'rocket3d 4s ease-out forwards',
-                                      filter: 'drop-shadow(0 0 10px rgba(255,140,0,0.9)) drop-shadow(0 6px 12px rgba(0,0,0,0.5))',
+                                      filter:
+                                        'drop-shadow(0 0 10px rgba(255,140,0,0.9)) drop-shadow(0 6px 12px rgba(0,0,0,0.5))',
                                     }}
-                                  >🚀</span>
+                                  >
+                                    🚀
+                                  </span>
                                 </div>
                               </div>
                             );
@@ -939,9 +961,12 @@ export function RadioLayout() {
                                     style={{
                                       display: 'inline-block',
                                       animation: 'lightning3d 4s ease-out forwards',
-                                      filter: 'drop-shadow(0 0 16px rgba(255,255,60,1)) drop-shadow(0 0 32px rgba(255,200,0,0.7))',
+                                      filter:
+                                        'drop-shadow(0 0 16px rgba(255,255,60,1)) drop-shadow(0 0 32px rgba(255,200,0,0.7))',
                                     }}
-                                  >⚡</span>
+                                  >
+                                    ⚡
+                                  </span>
                                 </div>
                               </div>
                             );
@@ -960,9 +985,12 @@ export function RadioLayout() {
                                     style={{
                                       display: 'inline-block',
                                       animation: 'star3dSpin 4.5s ease-out forwards',
-                                      filter: 'drop-shadow(0 0 14px rgba(255,220,0,0.95)) drop-shadow(0 0 28px rgba(255,180,0,0.6))',
+                                      filter:
+                                        'drop-shadow(0 0 14px rgba(255,220,0,0.95)) drop-shadow(0 0 28px rgba(255,180,0,0.6))',
                                     }}
-                                  >🌟</span>
+                                  >
+                                    🌟
+                                  </span>
                                 </div>
                               </div>
                             );

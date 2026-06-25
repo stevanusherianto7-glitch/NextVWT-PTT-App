@@ -86,7 +86,12 @@ export function ControlButtons({
                 result="rim-inverse-top"
               />
               <feFlood floodColor="white" floodOpacity="0.9" result="rim-color-top" />
-              <feComposite operator="in" in="rim-color-top" in2="rim-inverse-top" result="rim-shadow-top" />
+              <feComposite
+                operator="in"
+                in="rim-color-top"
+                in2="rim-inverse-top"
+                result="rim-shadow-top"
+              />
 
               {/* Inner Shadow around the whole bezel */}
               <feOffset dx="0" dy="0" />
@@ -98,7 +103,12 @@ export function ControlButtons({
                 result="rim-inverse-all"
               />
               <feFlood floodColor="black" floodOpacity="0.5" result="rim-color-all" />
-              <feComposite operator="in" in="rim-color-all" in2="rim-inverse-all" result="rim-shadow-all" />
+              <feComposite
+                operator="in"
+                in="rim-color-all"
+                in2="rim-inverse-all"
+                result="rim-shadow-all"
+              />
 
               {/* Merge shadow layers */}
               <feMerge>
@@ -138,7 +148,8 @@ export function ControlButtons({
       </div>
 
       {/* Scan Button */}
-      <button type="button"
+      <button
+        type="button"
         onClick={onScan}
         onMouseDown={() => setPressedBtn('scan')}
         onMouseUp={() => setPressedBtn(null)}
@@ -175,7 +186,8 @@ export function ControlButtons({
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[5px] bg-[#1a1a1a] opacity-65 z-20 pointer-events-none shadow-[0_1px_1px_rgba(255,255,255,0.25)]" />
 
         {/* Up Button */}
-        <button type="button"
+        <button
+          type="button"
           onClick={onUp}
           onMouseDown={() => setPressedBtn('up')}
           onMouseUp={() => setPressedBtn(null)}
@@ -205,7 +217,8 @@ export function ControlButtons({
         </button>
 
         {/* Down Button */}
-        <button type="button"
+        <button
+          type="button"
           onClick={onDown}
           onMouseDown={() => setPressedBtn('down')}
           onMouseUp={() => setPressedBtn(null)}
@@ -236,7 +249,8 @@ export function ControlButtons({
       </div>
 
       {/* Set Button */}
-      <button type="button"
+      <button
+        type="button"
         onClick={onSet}
         onMouseDown={() => setPressedBtn('set')}
         onMouseUp={() => setPressedBtn(null)}

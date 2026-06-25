@@ -188,7 +188,10 @@ export function useChannelSettings(roomId: string, initialChannelName = 'Channel
         throw error || new Error(edgeResponse?.error || 'Gagal menyimpan pengaturan.');
       }
     } catch (err) {
-      console.warn('Prototype Mode: Edge Function failed, but keeping local optimistic update.', err);
+      console.warn(
+        'Prototype Mode: Edge Function failed, but keeping local optimistic update.',
+        err
+      );
       // Di mode prototype (tanpa login Supabase), kita biarkan saja perubahan
       // bertahan secara lokal di state (optimistic update) dan tidak dilempar (throw).
       // Jangan melakukan revert ke DB.

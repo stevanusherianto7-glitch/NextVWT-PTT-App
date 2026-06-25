@@ -19,6 +19,7 @@ export function ChannelSettingsPanel({ roomId, actorRole }: ChannelSettingsPanel
     if (settings) {
       setLocalProgramName(settings.channel_description || '');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings?.channel_description]);
 
   const hasSettingsPerm = canPerformAction(actorRole, 'MANAGE_SETTINGS');
@@ -48,9 +49,10 @@ export function ChannelSettingsPanel({ roomId, actorRole }: ChannelSettingsPanel
       await updateSettings({ [key]: value });
       setSaveStatus('success');
       setTimeout(() => setSaveStatus('idle'), 1200);
-    } catch (err: any) {
-      console.error(err);
-      toast.error(`Gagal menyimpan: ${err.message || 'Unknown error'}`);
+    } catch (err: unknown) {
+      const e = err as Error;
+      console.error(e);
+      toast.error(`Gagal menyimpan: ${e.message || 'Unknown error'}`);
       setSaveStatus('error');
     }
   };
@@ -62,9 +64,10 @@ export function ChannelSettingsPanel({ roomId, actorRole }: ChannelSettingsPanel
       await updateSettings({ [key]: value });
       setSaveStatus('success');
       setTimeout(() => setSaveStatus('idle'), 1200);
-    } catch (err: any) {
-      console.error(err);
-      toast.error(`Gagal menyimpan: ${err.message || 'Unknown error'}`);
+    } catch (err: unknown) {
+      const e = err as Error;
+      console.error(e);
+      toast.error(`Gagal menyimpan: ${e.message || 'Unknown error'}`);
       setSaveStatus('error');
     }
   };
@@ -105,11 +108,12 @@ export function ChannelSettingsPanel({ roomId, actorRole }: ChannelSettingsPanel
         <h3 className="text-xs font-bold text-white flex items-center gap-2 pb-1.5 border-b border-white/5">
           <MessageSquare className="h-3.5 w-3.5 text-emerald-400" /> INFORMASI PROGRAM
         </h3>
-          <div className="flex flex-col pt-2 pb-1 border-b border-slate-200">
+        <div className="flex flex-col pt-2 pb-1 border-b border-slate-200">
           <div className="setting-info !max-w-full mb-3">
             <span className="setting-label">Nama Program Saat Ini (Marquee)</span>
             <span className="setting-desc">
-              Teks ini akan berjalan pada header utama (atas) seluruh pengguna. Kosongkan untuk menampilkan teks default.
+              Teks ini akan berjalan pada header utama (atas) seluruh pengguna. Kosongkan untuk
+              menampilkan teks default.
             </span>
           </div>
           <div className="flex flex-col gap-2">
@@ -123,7 +127,9 @@ export function ChannelSettingsPanel({ roomId, actorRole }: ChannelSettingsPanel
             />
             <button
               onClick={() => handleSelectChange('channel_description', localProgramName)}
-              disabled={!hasSettingsPerm || localProgramName === (settings?.channel_description || '')}
+              disabled={
+                !hasSettingsPerm || localProgramName === (settings?.channel_description || '')
+              }
               className="w-full px-3 py-2 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-md transition-colors"
             >
               Simpan

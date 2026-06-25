@@ -108,35 +108,47 @@ function subscribeToChannel(channelNum: number, retryCount = 0) {
           const users = Array.from(uniqueUsersMap.values());
           usePTTStore.setState({ activeUsers: users });
         })
-        .on('broadcast', { event: 'ptt_state' }, ({ payload: rawPayload }: { payload: unknown }) => {
-          if (activeChannelSubscription !== channelInstance) return;
-          // [F-04] Validate before using payload to prevent state corruption
-          const payload = safeParseRealtimePayload(PttStatePayloadSchema, rawPayload, 'ptt_state');
-          if (!payload) return;
-          if (payload.isTransmitting) {
-            usePTTStore.setState({
-              activeTransmitter: {
-                userId: payload.userId,
-                displayName: payload.displayName,
-                callSign: payload.callSign,
-                role: payload.role,
-                isNewUser: payload.isNewUser,
-              },
-            });
-          } else {
-            const currentTx = usePTTStore.getState().activeTransmitter;
-            if (currentTx && currentTx.userId === payload.userId) {
-              usePTTStore.setState({ activeTransmitter: null });
+        .on(
+          'broadcast',
+          { event: 'ptt_state' },
+          ({ payload: rawPayload }: { payload: unknown }) => {
+            if (activeChannelSubscription !== channelInstance) return;
+            // [F-04] Validate before using payload to prevent state corruption
+            const payload = safeParseRealtimePayload(
+              PttStatePayloadSchema,
+              rawPayload,
+              'ptt_state'
+            );
+            if (!payload) return;
+            if (payload.isTransmitting) {
+              usePTTStore.setState({
+                activeTransmitter: {
+                  userId: payload.userId,
+                  displayName: payload.displayName,
+                  callSign: payload.callSign,
+                  role: payload.role,
+                  isNewUser: payload.isNewUser,
+                },
+              });
+            } else {
+              const currentTx = usePTTStore.getState().activeTransmitter;
+              if (currentTx && currentTx.userId === payload.userId) {
+                usePTTStore.setState({ activeTransmitter: null });
+              }
             }
           }
-        })
+        )
         .on(
           'broadcast',
           { event: 'voice_chunk' },
           ({ payload: rawPayload }: { payload: unknown }) => {
             if (activeChannelSubscription !== channelInstance) return;
             // [F-04] Validate chunk size and userId before piping to audio
-            const payload = safeParseRealtimePayload(VoiceChunkPayloadSchema, rawPayload, 'voice_chunk');
+            const payload = safeParseRealtimePayload(
+              VoiceChunkPayloadSchema,
+              rawPayload,
+              'voice_chunk'
+            );
             if (!payload) return;
             const state = usePTTStore.getState();
             // Ignore our own broadcasted voice chunks to avoid feedback loop
@@ -151,7 +163,11 @@ function subscribeToChannel(channelNum: number, retryCount = 0) {
           ({ payload: rawPayload }: { payload: unknown }) => {
             if (activeChannelSubscription !== channelInstance) return;
             // [F-04] Validate signaling message structure before processing
-            const payload = safeParseRealtimePayload(WebRTCSignalingPayloadSchema, rawPayload, 'webrtc_signaling');
+            const payload = safeParseRealtimePayload(
+              WebRTCSignalingPayloadSchema,
+              rawPayload,
+              'webrtc_signaling'
+            );
             if (!payload) return;
             const state = usePTTStore.getState();
             if (payload.senderUserId !== state.userId && state.onWebRTCSignalingReceived) {
@@ -159,62 +175,52 @@ function subscribeToChannel(channelNum: number, retryCount = 0) {
             }
           }
         )
-        .on(
-          'broadcast',
-          { event: 'hang_up' },
-          ({ payload: rawPayload }: { payload: unknown }) => {
-            if (activeChannelSubscription !== channelInstance) return;
-            // [F-04] Validate before acting on hang_up to prevent spoofed disconnections
-            const payload = safeParseRealtimePayload(HangUpPayloadSchema, rawPayload, 'hang_up');
-            if (!payload) return;
-            const state = usePTTStore.getState();
+        .on('broadcast', { event: 'hang_up' }, ({ payload: rawPayload }: { payload: unknown }) => {
+          if (activeChannelSubscription !== channelInstance) return;
+          // [F-04] Validate before acting on hang_up to prevent spoofed disconnections
+          const payload = safeParseRealtimePayload(HangUpPayloadSchema, rawPayload, 'hang_up');
+          if (!payload) return;
+          const state = usePTTStore.getState();
 
-            // If we are the target and currently transmitting, force-stop our transmission
-            if (payload.targetUserId === state.userId && state.isTransmitting) {
-              console.warn(
-                `[Hang Up] Transmission interrupted by moderator${payload.moderatorName ? ` (${payload.moderatorName})` : ''}`
-              );
-              usePTTStore.setState({ isTransmitting: false, progress: 0 });
-            }
+          // If we are the target and currently transmitting, force-stop our transmission
+          if (payload.targetUserId === state.userId && state.isTransmitting) {
+            console.warn(
+              `[Hang Up] Transmission interrupted by moderator${payload.moderatorName ? ` (${payload.moderatorName})` : ''}`
+            );
+            usePTTStore.setState({ isTransmitting: false, progress: 0 });
+          }
 
-            // If the target matches the current active transmitter, clear it for all listeners
-            const currentTx = state.activeTransmitter;
-            if (currentTx && currentTx.userId === payload.targetUserId) {
-              usePTTStore.setState({ activeTransmitter: null, progress: 0 });
-            }
+          // If the target matches the current active transmitter, clear it for all listeners
+          const currentTx = state.activeTransmitter;
+          if (currentTx && currentTx.userId === payload.targetUserId) {
+            usePTTStore.setState({ activeTransmitter: null, progress: 0 });
           }
-        )
-        .on(
-          'broadcast',
-          { event: 'reaction' },
-          ({ payload: rawPayload }: { payload: unknown }) => {
-            if (activeChannelSubscription !== channelInstance) return;
-            // [F-04] Validate reaction payload to prevent XSS via reaction strings
-            const payload = safeParseRealtimePayload(ReactionPayloadSchema, rawPayload, 'reaction');
-            if (!payload) return;
-            const state = usePTTStore.getState();
-            if (state.onReactionReceived) {
-              state.onReactionReceived(payload);
-            }
+        })
+        .on('broadcast', { event: 'reaction' }, ({ payload: rawPayload }: { payload: unknown }) => {
+          if (activeChannelSubscription !== channelInstance) return;
+          // [F-04] Validate reaction payload to prevent XSS via reaction strings
+          const payload = safeParseRealtimePayload(ReactionPayloadSchema, rawPayload, 'reaction');
+          if (!payload) return;
+          const state = usePTTStore.getState();
+          if (state.onReactionReceived) {
+            state.onReactionReceived(payload);
           }
-        )
-        .on(
-          'broadcast',
-          { event: 'kick' },
-          ({ payload: rawPayload }: { payload: unknown }) => {
-            if (activeChannelSubscription !== channelInstance) return;
-            // [F-04] Validate kick payload
-            const payload = safeParseRealtimePayload(KickPayloadSchema, rawPayload, 'kick');
-            if (!payload) return;
-            const state = usePTTStore.getState();
-            
-            if (payload.targetUserId === state.userId) {
-              console.warn(`[Kick] You have been kicked/banned. Reason: ${payload.reason || 'No reason'}. Moving to CH 302...`);
-              // Force channel change to 302
-              state.setChannelNumber(302);
-            }
+        })
+        .on('broadcast', { event: 'kick' }, ({ payload: rawPayload }: { payload: unknown }) => {
+          if (activeChannelSubscription !== channelInstance) return;
+          // [F-04] Validate kick payload
+          const payload = safeParseRealtimePayload(KickPayloadSchema, rawPayload, 'kick');
+          if (!payload) return;
+          const state = usePTTStore.getState();
+
+          if (payload.targetUserId === state.userId) {
+            console.warn(
+              `[Kick] You have been kicked/banned. Reason: ${payload.reason || 'No reason'}. Moving to CH 302...`
+            );
+            // Force channel change to 302
+            state.setChannelNumber(302);
           }
-        );
+        });
 
       channelInstance.subscribe((status: string) => {
         if (activeChannelSubscription !== channelInstance) return;

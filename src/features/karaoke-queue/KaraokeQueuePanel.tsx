@@ -211,7 +211,8 @@ export function KaraokeQueuePanel({ onClose }: KaraokeQueuePanelProps) {
       <div className="w-full h-[90px] flex items-center px-5 z-20 relative overflow-hidden shrink-0 bg-white border-b border-gray-200 shadow-sm">
         <div className="absolute top-0 left-0 right-0 h-[40%] bg-gradient-to-b from-slate-100/50 to-transparent pointer-events-none z-10" />
 
-        <button type="button"
+        <button
+          type="button"
           onClick={onClose}
           title="Kembali"
           aria-label="Kembali"
@@ -272,7 +273,8 @@ export function KaraokeQueuePanel({ onClose }: KaraokeQueuePanelProps) {
               </p>
             </div>
 
-            <button type="button"
+            <button
+              type="button"
               onClick={() => handleLeaveQueue(myActiveItem.id)}
               className="p-2.5 rounded-xl border border-red-200 bg-red-50 hover:bg-red-100 text-red-500 cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-1.5 font-bold text-xs"
             >
@@ -381,7 +383,8 @@ export function KaraokeQueuePanel({ onClose }: KaraokeQueuePanelProps) {
                       {isAdmin && (
                         <div className="flex gap-1">
                           {item.status !== 'live' && (
-                            <button type="button"
+                            <button
+                              type="button"
                               onClick={() => handleUpdateStatus(item.id, 'live')}
                               title="Set Live"
                               className="w-6 h-6 rounded bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center cursor-pointer transition-all active:scale-90"
@@ -390,7 +393,8 @@ export function KaraokeQueuePanel({ onClose }: KaraokeQueuePanelProps) {
                             </button>
                           )}
                           {item.status === 'live' && (
-                            <button type="button"
+                            <button
+                              type="button"
                               onClick={() => handleUpdateStatus(item.id, 'finished')}
                               title="Selesai"
                               className="w-6 h-6 rounded bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center cursor-pointer transition-all active:scale-90"
@@ -398,7 +402,8 @@ export function KaraokeQueuePanel({ onClose }: KaraokeQueuePanelProps) {
                               <CheckCircle2 className="w-3.5 h-3.5" />
                             </button>
                           )}
-                          <button type="button"
+                          <button
+                            type="button"
                             onClick={() => handleUpdateStatus(item.id, 'skipped')}
                             title="Lewati"
                             className="w-6 h-6 rounded bg-gray-200 hover:bg-gray-300 text-gray-600 flex items-center justify-center cursor-pointer transition-all active:scale-90"

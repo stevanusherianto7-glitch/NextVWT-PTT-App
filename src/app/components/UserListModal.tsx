@@ -55,8 +55,7 @@ export const USER_PROFILES: Record<string, UserProfile> = {
     callSign: '2DYUA',
     location: 'BANDUNG, JABAR',
     avatarColor: '#3F51B5',
-    avatarUrl:
-      'https://randomuser.me/api/portraits/women/2.jpg',
+    avatarUrl: 'https://randomuser.me/api/portraits/women/2.jpg',
     role: 'operator',
   },
   'Pebe Herianto': {
@@ -64,8 +63,7 @@ export const USER_PROFILES: Record<string, UserProfile> = {
     callSign: 'N.O.C',
     location: 'BANDUNG, JABAR',
     avatarColor: '#3F51B5',
-    avatarUrl:
-      'https://randomuser.me/api/portraits/men/3.jpg',
+    avatarUrl: 'https://randomuser.me/api/portraits/men/3.jpg',
     role: 'noc',
   },
   agus_santika: {
@@ -217,80 +215,70 @@ export const USER_PROFILES: Record<string, UserProfile> = {
     callSign: 'FLPSP',
     location: 'CILEGON, BANTEN',
     avatarColor: '#E91E63',
-    avatarUrl:
-      'https://randomuser.me/api/portraits/men/17.jpg',
+    avatarUrl: 'https://randomuser.me/api/portraits/men/17.jpg',
   },
   budi_salatiga: {
     displayName: 'Benhur',
     callSign: '6EKR4',
     location: 'DEMAK, JATENG',
     avatarColor: '#9C27B0',
-    avatarUrl:
-      'https://randomuser.me/api/portraits/women/18.jpg',
+    avatarUrl: 'https://randomuser.me/api/portraits/women/18.jpg',
   },
   rudi_bandung: {
     displayName: 'Ayda',
     callSign: 'L2P8G',
     location: 'SEMARANG, JATENG',
     avatarColor: '#FF9800',
-    avatarUrl:
-      'https://randomuser.me/api/portraits/men/19.jpg',
+    avatarUrl: 'https://randomuser.me/api/portraits/men/19.jpg',
   },
   medan_dx: {
     displayName: 'Zainiz',
     callSign: '6Y2RM',
     location: 'BANDA ACEH, ACEH',
     avatarColor: '#009688',
-    avatarUrl:
-      'https://randomuser.me/api/portraits/women/20.jpg',
+    avatarUrl: 'https://randomuser.me/api/portraits/women/20.jpg',
   },
   palembang_line: {
     displayName: 'Gun Pakabelo',
     callSign: 'JYQTJ',
     location: 'PALU, SULTENG',
     avatarColor: '#795548',
-    avatarUrl:
-      'https://randomuser.me/api/portraits/men/21.jpg',
+    avatarUrl: 'https://randomuser.me/api/portraits/men/21.jpg',
   },
   touring_rider: {
     displayName: 'Topo',
     callSign: '0S9W4',
     location: 'BANDAR LAMPUNG, LAMPUNG',
     avatarColor: '#4CAF50',
-    avatarUrl:
-      'https://randomuser.me/api/portraits/women/22.jpg',
+    avatarUrl: 'https://randomuser.me/api/portraits/women/22.jpg',
   },
   ninja_club: {
     displayName: 'Nengkleo',
     callSign: 'J3REY',
     location: 'PASURUAN, JATIM',
     avatarColor: '#00BCD4',
-    avatarUrl:
-      'https://randomuser.me/api/portraits/men/23.jpg',
+    avatarUrl: 'https://randomuser.me/api/portraits/men/23.jpg',
   },
   pak_rudi_rt: {
     displayName: 'Endang Wahyuni',
     callSign: 'JK4Z1',
     location: 'SOLO, JATENG',
     avatarColor: '#FF5722',
-    avatarUrl:
-      'https://randomuser.me/api/portraits/women/24.jpg',
+    avatarUrl: 'https://randomuser.me/api/portraits/women/24.jpg',
   },
   siskamling_1: {
     displayName: 'Gwenie',
     callSign: 'KWZ10',
     location: 'SAMARINDA, KALTIM',
     avatarColor: '#607D8B',
-    avatarUrl:
-      'https://randomuser.me/api/portraits/men/25.jpg',
+    avatarUrl: 'https://randomuser.me/api/portraits/men/25.jpg',
   },
   lalin_update: {
     displayName: 'Rudi Interizti',
     callSign: 'QR95J',
     location: 'CILACAP, JATENG',
     avatarColor: '#3F51B5',
-    avatarUrl:
-      'https://randomuser.me/api/portraits/women/26.jpg',
+    avatarUrl: 'https://randomuser.me/api/portraits/women/26.jpg',
     isNewUser: true,
     joinedAt: '2026-05-20', // Joined 21 days ago (older than 2 weeks, badge automatically hidden)
   },
@@ -299,128 +287,112 @@ export const USER_PROFILES: Record<string, UserProfile> = {
     callSign: 'XGYQK',
     location: 'LIMA PULUH KOTA, SUMBAR',
     avatarColor: '#E91E63',
-    avatarUrl:
-      'https://randomuser.me/api/portraits/men/27.jpg',
+    avatarUrl: 'https://randomuser.me/api/portraits/men/27.jpg',
   },
   doni_depok: {
     displayName: 'Zaki',
     callSign: '1C0TT',
     location: 'SUMENEP, JATIM',
     avatarColor: '#9C27B0',
-    avatarUrl:
-      'https://randomuser.me/api/portraits/women/28.jpg',
+    avatarUrl: 'https://randomuser.me/api/portraits/women/28.jpg',
   },
   makassar_boy: {
     displayName: 'Pin Ponelipu',
     callSign: '84NCR',
     location: 'MOROWALI, SULTENG',
     avatarColor: '#FF9800',
-    avatarUrl:
-      'https://randomuser.me/api/portraits/men/29.jpg',
+    avatarUrl: 'https://randomuser.me/api/portraits/men/29.jpg',
   },
   sar_team_1: {
     displayName: 'Dino',
     callSign: 'FKXFV',
     location: 'JAMBI KOTA, JAMBI',
     avatarColor: '#009688',
-    avatarUrl:
-      'https://randomuser.me/api/portraits/women/30.jpg',
+    avatarUrl: 'https://randomuser.me/api/portraits/women/30.jpg',
   },
   mount_hiker: {
     displayName: 'Saif Sereyang',
     callSign: '5UFQ4',
     location: 'METRO, LAMPUNG',
     avatarColor: '#795548',
-    avatarUrl:
-      'https://randomuser.me/api/portraits/men/31.jpg',
+    avatarUrl: 'https://randomuser.me/api/portraits/men/31.jpg',
   },
   support_admin: {
     displayName: '☆•°•LÌÀ••°•☆',
     callSign: 'SATU HATI',
     location: 'SEMARANG, JATENG',
     avatarColor: '#4CAF50',
-    avatarUrl:
-      'https://randomuser.me/api/portraits/women/32.jpg',
+    avatarUrl: 'https://randomuser.me/api/portraits/women/32.jpg',
   },
   eko_pratama: {
     displayName: 'Gam Cantoy',
     callSign: 'H4T1P',
     location: 'BANDA ACEH, ACEH',
     avatarColor: '#00BCD4',
-    avatarUrl:
-      'https://randomuser.me/api/portraits/men/33.jpg',
+    avatarUrl: 'https://randomuser.me/api/portraits/men/33.jpg',
   },
   dewi_sari: {
     displayName: 'Neng Tien',
     callSign: 'NPT3U',
     location: 'PADANG LAWAS, SUMUT',
     avatarColor: '#FF5722',
-    avatarUrl:
-      'https://randomuser.me/api/portraits/women/34.jpg',
+    avatarUrl: 'https://randomuser.me/api/portraits/women/34.jpg',
   },
   siti_aminah: {
     displayName: 'Zha Zha',
     callSign: 'XJV6T',
     location: 'MADIUN, JATIM',
     avatarColor: '#607D8B',
-    avatarUrl:
-      'https://randomuser.me/api/portraits/men/35.jpg',
+    avatarUrl: 'https://randomuser.me/api/portraits/men/35.jpg',
   },
   joko_susilo: {
     displayName: 'Putra Paser',
     callSign: '65TQH',
     location: 'BANTAENG, SULSEL',
     avatarColor: '#3F51B5',
-    avatarUrl:
-      'https://randomuser.me/api/portraits/women/36.jpg',
+    avatarUrl: 'https://randomuser.me/api/portraits/women/36.jpg',
   },
   hendra_w: {
     displayName: 'Hendra Wijaya',
     callSign: '8YFD3',
     location: 'DENPASAR, BALI',
     avatarColor: '#E91E63',
-    avatarUrl:
-      'https://randomuser.me/api/portraits/men/37.jpg',
+    avatarUrl: 'https://randomuser.me/api/portraits/men/37.jpg',
   },
   yudi_antara: {
     displayName: 'Yudi Antara',
     callSign: '5TGB7',
     location: 'MATARAM, NTB',
     avatarColor: '#9C27B0',
-    avatarUrl:
-      'https://randomuser.me/api/portraits/women/38.jpg',
+    avatarUrl: 'https://randomuser.me/api/portraits/women/38.jpg',
   },
   agus_setiawan: {
     displayName: 'Agus Setiawan',
     callSign: '4RFV2',
     location: 'SURABAYA, JATIM',
     avatarColor: '#FF9800',
-    avatarUrl:
-      'https://randomuser.me/api/portraits/men/39.jpg',
+    avatarUrl: 'https://randomuser.me/api/portraits/men/39.jpg',
   },
   roni_h: {
     displayName: 'Roni Hidayat',
     callSign: '9OLK4',
     location: 'BALIKPAPAN, KALTIM',
     avatarColor: '#009688',
-    avatarUrl:
-      'https://randomuser.me/api/portraits/women/40.jpg',
+    avatarUrl: 'https://randomuser.me/api/portraits/women/40.jpg',
   },
   irma_p: {
     displayName: 'Irma Permata',
     callSign: '1QAZ2',
     location: 'PALEMBANG, SUMSEL',
     avatarColor: '#795548',
-    avatarUrl:
-      'https://randomuser.me/api/portraits/men/41.jpg',
+    avatarUrl: 'https://randomuser.me/api/portraits/men/41.jpg',
   },
   pebri_fans: {
     displayName: 'Pebri Fans Club',
     callSign: '7UJM8',
     location: 'CIREBON, JABAR',
     avatarColor: '#4CAF50',
-    avatarUrl:
-      'https://randomuser.me/api/portraits/women/42.jpg',
+    avatarUrl: 'https://randomuser.me/api/portraits/women/42.jpg',
   },
 };
 
@@ -500,11 +472,7 @@ function AvatarImage({
         className="w-full h-full rounded-none flex items-center justify-center shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)] border border-white/20"
         style={{ backgroundColor: avatarColor || '#3F51B5' }}
       >
-        <img
-          src={fallbackIconUrl}
-          alt={displayName}
-          className="w-[50%] h-[50%] object-contain"
-        />
+        <img src={fallbackIconUrl} alt={displayName} className="w-[50%] h-[50%] object-contain" />
       </div>
     );
   }
@@ -527,11 +495,7 @@ function AvatarImage({
  */
 function isNewUserJoined(profile: UserProfile): boolean {
   // Seorang NOC atau System Admin tidak boleh dilabeli sebagai user baru
-  if (
-    profile.role === 'noc' ||
-    profile.role === 'sys_admin' ||
-    profile.callSign === 'N.O.C'
-  ) {
+  if (profile.role === 'noc' || profile.role === 'sys_admin' || profile.callSign === 'N.O.C') {
     return false;
   }
   if (!profile.isNewUser) return false;
@@ -595,12 +559,13 @@ export function UserListModal({ channel, channelName: _channelName, users }: Use
 
   const profilePhotoOption = usePTTStore((state) => state.profilePhotoOption);
   const customPhotoUrl = usePTTStore((state) => state.customPhotoUrl);
-  
-  const localAvatar = profilePhotoOption === 'google' 
-    ? localUser?.user_metadata?.avatar_url 
-    : (profilePhotoOption === 'custom' && customPhotoUrl) 
-      ? customPhotoUrl 
-      : null;
+
+  const localAvatar =
+    profilePhotoOption === 'google'
+      ? localUser?.user_metadata?.avatar_url
+      : profilePhotoOption === 'custom' && customPhotoUrl
+        ? customPhotoUrl
+        : null;
 
   const showMyPhoto = usePTTStore((s) => s.showMyPhoto ?? true);
   const showOtherPhotos = usePTTStore((s) => s.showOtherPhotos ?? true);
@@ -611,7 +576,9 @@ export function UserListModal({ channel, channelName: _channelName, users }: Use
     return list.map((user) => {
       const uId = typeof user === 'string' ? user : user.userId;
       const roomId = `ptt-room-${channel}`;
-      const localRole = sessionStorage.getItem(`channel-role:${roomId}:${uId}`) as ChannelRole | null;
+      const localRole = sessionStorage.getItem(
+        `channel-role:${roomId}:${uId}`
+      ) as ChannelRole | null;
       const localStatus = sessionStorage.getItem(`channel-status:${roomId}:${uId}`);
 
       let profileData: UserProfile;
@@ -663,7 +630,7 @@ export function UserListModal({ channel, channelName: _channelName, users }: Use
   // Sync state if users or channel changes
   useEffect(() => {
     setModalUsers(mapUsers(users));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [users, channel]);
 
   const [activeZoomedAvatar, setActiveZoomedAvatar] = useState<(typeof modalUsers)[0] | null>(null);
@@ -778,8 +745,6 @@ export function UserListModal({ channel, channelName: _channelName, users }: Use
 
       {/* User List Container (Scrollable) */}
       <div className="flex-1 overflow-y-auto bg-[#fafbfc] custom-scrollbar">
-
-
         {/* Users List */}
         {modalUsers.length > 0 ? (
           modalUsers.map((profile, idx) => {
@@ -939,7 +904,8 @@ export function UserListModal({ channel, channelName: _channelName, users }: Use
                 </div>
                 <div className="grid grid-cols-2 gap-1.5 w-full">
                   {/* Voice / Normal */}
-                  <button type="button"
+                  <button
+                    type="button"
                     onClick={() => handleUpdateStatus(activeZoomedAvatar.userId, 'normal')}
                     className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[11px] font-semibold transition-all duration-200 ${
                       !activeZoomedAvatar.isMuted &&
@@ -955,7 +921,8 @@ export function UserListModal({ channel, channelName: _channelName, users }: Use
                   </button>
 
                   {/* Silent / Muted */}
-                  <button type="button"
+                  <button
+                    type="button"
                     onClick={() => handleUpdateStatus(activeZoomedAvatar.userId, 'muted')}
                     className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[11px] font-semibold transition-all duration-200 ${
                       activeZoomedAvatar.isMuted
@@ -968,7 +935,8 @@ export function UserListModal({ channel, channelName: _channelName, users }: Use
                   </button>
 
                   {/* Controlled */}
-                  <button type="button"
+                  <button
+                    type="button"
                     onClick={() => handleUpdateStatus(activeZoomedAvatar.userId, 'controlled')}
                     className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[11px] font-semibold transition-all duration-200 ${
                       activeZoomedAvatar.isControlled
@@ -985,7 +953,8 @@ export function UserListModal({ channel, channelName: _channelName, users }: Use
                   </button>
 
                   {/* Wait */}
-                  <button type="button"
+                  <button
+                    type="button"
                     onClick={() => handleUpdateStatus(activeZoomedAvatar.userId, 'wait')}
                     className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[11px] font-semibold transition-all duration-200 ${
                       activeZoomedAvatar.isWait
@@ -998,7 +967,8 @@ export function UserListModal({ channel, channelName: _channelName, users }: Use
                   </button>
 
                   {/* Wait Controlled */}
-                  <button type="button"
+                  <button
+                    type="button"
                     onClick={() => handleUpdateStatus(activeZoomedAvatar.userId, 'wait_controlled')}
                     className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[11px] font-semibold transition-all duration-200 ${
                       activeZoomedAvatar.isWaitControlled
@@ -1015,7 +985,8 @@ export function UserListModal({ channel, channelName: _channelName, users }: Use
                   </button>
 
                   {/* Hang Up */}
-                  <button type="button"
+                  <button
+                    type="button"
                     id="btn-hang-up-user"
                     onClick={() => {
                       usePTTStore.getState().hangUpUser(activeZoomedAvatar.userId);
@@ -1039,7 +1010,8 @@ export function UserListModal({ channel, channelName: _channelName, users }: Use
                 </div>
                 <div className="grid grid-cols-2 gap-1.5 w-full">
                   {/* Operator */}
-                  <button type="button"
+                  <button
+                    type="button"
                     onClick={() => handleUpdateRole(activeZoomedAvatar.userId, 'operator')}
                     className={`flex items-center justify-center gap-0.5 py-1 rounded-lg border text-[10px] font-semibold transition-all duration-200 ${
                       activeZoomedAvatar.role === 'operator'
@@ -1052,7 +1024,8 @@ export function UserListModal({ channel, channelName: _channelName, users }: Use
                   </button>
 
                   {/* Moderator */}
-                  <button type="button"
+                  <button
+                    type="button"
                     onClick={() => handleUpdateRole(activeZoomedAvatar.userId, 'pjc')}
                     className={`flex items-center justify-center gap-0.5 py-1 rounded-lg border text-[10px] font-semibold transition-all duration-200 ${
                       activeZoomedAvatar.role === 'pjc'
@@ -1071,7 +1044,8 @@ export function UserListModal({ channel, channelName: _channelName, users }: Use
 
                 {/* NOC Only: Banned Button */}
                 {localRole === 'noc' && (
-                  <button type="button"
+                  <button
+                    type="button"
                     id="btn-banned-user"
                     onClick={() => {
                       // 1. Mark target user as silent/muted globally (optional, but good practice)
@@ -1099,7 +1073,8 @@ export function UserListModal({ channel, channelName: _channelName, users }: Use
             )}
 
             {/* Close Button */}
-            <button type="button"
+            <button
+              type="button"
               onClick={() => setActiveZoomedAvatar(null)}
               className="mt-5 px-6 py-2 bg-gray-800 hover:bg-gray-700 active:bg-gray-900 text-white text-xs font-semibold rounded-full shadow transition-colors duration-200 w-full text-center"
             >

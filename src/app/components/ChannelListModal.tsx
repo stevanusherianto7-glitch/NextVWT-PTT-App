@@ -27,7 +27,7 @@ export function ChannelListModal({ onClose, onSelectChannel }: ChannelListModalP
       try {
         const { getSupabase } = await import('../utils/supabase');
         const supabase = await getSupabase();
-        
+
         // Fetch badge status
         if (userId) {
           const { data: badgeData, error: badgeError } = await supabase
@@ -45,7 +45,7 @@ export function ChannelListModal({ onClose, onSelectChannel }: ChannelListModalP
         const { data: settingsData, error: settingsError } = await supabase
           .from('channel_settings')
           .select('room_id, channel_description');
-        
+
         if (active && !settingsError && settingsData) {
           const infos: Record<string, string> = {};
           settingsData.forEach((row) => {
@@ -187,7 +187,8 @@ export function ChannelListModal({ onClose, onSelectChannel }: ChannelListModalP
                   const row2Text = customInfo || activeUsersStr;
 
                   return (
-                    <button type="button"
+                    <button
+                      type="button"
                       key={ch.number}
                       onClick={() => {
                         setActivePrivateChannel(ch);
@@ -210,7 +211,8 @@ export function ChannelListModal({ onClose, onSelectChannel }: ChannelListModalP
                   );
                 })}
                 {filteredChannels.length > visibleCount && (
-                  <button type="button"
+                  <button
+                    type="button"
                     onClick={() => setVisibleCount((prev) => prev + 15)}
                     className="w-full flex items-center p-0 hover:bg-gray-50 active:bg-gray-100 text-left border-b border-gray-200 cursor-pointer select-none focus:outline-none"
                   >
@@ -234,7 +236,8 @@ export function ChannelListModal({ onClose, onSelectChannel }: ChannelListModalP
           <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-55 p-0 animate-in fade-in duration-100">
             <div className="absolute inset-0" onClick={() => setActivePrivateChannel(null)} />
             <div className="bg-white w-full max-w-[340px] rounded-lg shadow-2xl flex flex-col z-10 overflow-hidden border border-gray-100 animate-in fade-in zoom-in-95 duration-100">
-              <button type="button"
+              <button
+                type="button"
                 onClick={() => {
                   const ch = activePrivateChannel;
                   setActivePrivateChannel(null);
@@ -250,7 +253,8 @@ export function ChannelListModal({ onClose, onSelectChannel }: ChannelListModalP
               >
                 Menuju Channel {activePrivateChannel.number}
               </button>
-              <button type="button"
+              <button
+                type="button"
                 onClick={() => {
                   const ch = activePrivateChannel;
                   setActivePrivateChannel(null);
@@ -274,7 +278,8 @@ export function ChannelListModal({ onClose, onSelectChannel }: ChannelListModalP
                 Channel ini terbatas hanya untuk anggota channel
               </p>
               <div className="mt-6 flex justify-center">
-                <button type="button"
+                <button
+                  type="button"
                   onClick={() => setRestrictedChannel(null)}
                   className="text-[15px] font-bold text-[#0c62a8] hover:text-[#0b5490] px-6 py-2 cursor-pointer focus:outline-none select-none"
                 >
@@ -336,7 +341,8 @@ export function ChannelListModal({ onClose, onSelectChannel }: ChannelListModalP
               </div>
 
               <div className="mt-1.5 flex justify-center">
-                <button type="button"
+                <button
+                  type="button"
                   onClick={() => setInfoChannel(null)}
                   className="text-[15px] font-bold text-[#0c62a8] hover:text-[#0b5490] px-6 py-0.5 cursor-pointer focus:outline-none select-none"
                 >

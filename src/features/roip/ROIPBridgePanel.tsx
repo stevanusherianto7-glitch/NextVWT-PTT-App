@@ -104,7 +104,8 @@ export function ROIPBridgePanel({ onClose }: ROIPBridgePanelProps) {
           borderBottom: '2px solid #374151',
         }}
       >
-        <button type="button"
+        <button
+          type="button"
           onClick={onClose}
           title="Kembali"
           aria-label="Kembali"
@@ -211,7 +212,8 @@ export function ROIPBridgePanel({ onClose }: ROIPBridgePanelProps) {
               placeholder="Contoh: YB1AAA / YC2XYZ"
               className="flex-1 bg-[#141822] border border-[#374151] rounded px-3 py-2 text-xs text-white uppercase placeholder-slate-500 outline-none focus:border-sky-500 font-mono disabled:opacity-60 disabled:cursor-not-allowed"
             />
-            <button type="button"
+            <button
+              type="button"
               onClick={handleVerifyLicense}
               disabled={isLicenseVerified || isVerifying}
               className={`px-4 py-2 text-xs font-extrabold rounded text-white bg-gradient-to-b from-sky-400 to-sky-600 border-t border-sky-300 border-b border-black/30 shadow-[0_2px_0_#0369a1] active:translate-y-[1px] active:shadow-none hover:brightness-105 transition-all duration-100 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1`}
@@ -339,7 +341,8 @@ export function ROIPBridgePanel({ onClose }: ROIPBridgePanelProps) {
                 Simulasikan sinyal pembawa frekuensi HT analog terdeteksi aktif/sibuk.
               </span>
             </div>
-            <button type="button"
+            <button
+              type="button"
               onClick={() => setCorSignal(!corSignal)}
               className={`px-4 py-2 rounded-lg text-xs font-bold text-white transition-all cursor-pointer shadow-[0_2px_0_rgba(0,0,0,0.3)] active:translate-y-[1.5px] active:shadow-none ${
                 corSignal

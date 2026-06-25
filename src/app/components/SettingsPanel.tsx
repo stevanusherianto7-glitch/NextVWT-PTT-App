@@ -215,7 +215,8 @@ export function SettingsPanel({
         {/* Top Glossy Reflection */}
         <div className="absolute top-0 left-0 right-0 h-[40%] bg-gradient-to-b from-white/35 to-transparent pointer-events-none z-10" />
 
-        <button type="button"
+        <button
+          type="button"
           onClick={onClose}
           className="mr-2.5 w-9 h-9 flex items-center justify-center rounded-full border border-slate-300 bg-gradient-to-b from-white via-[#f1f5f9] to-[#cbd5e1] shadow-[0_2px_0_#94a3b8,inset_0_1px_0_rgba(255,255,255,0.8)] active:translate-y-[1.5px] active:shadow-none hover:brightness-105 transition-all duration-100 cursor-pointer focus:outline-none relative z-25 flex-shrink-0"
           style={{ color: 'var(--header-text-color)' }}
@@ -334,12 +335,12 @@ export function SettingsPanel({
             transform="translate(1.2, 1.5)"
             opacity="0.45"
           />
-          <image 
-            href={vintageMic} 
-            x="14" 
-            y="14" 
-            width="72" 
-            height="72" 
+          <image
+            href={vintageMic}
+            x="14"
+            y="14"
+            width="72"
+            height="72"
             clipPath="url(#micClipSettings)"
             preserveAspectRatio="xMidYMid slice"
           />
@@ -361,7 +362,8 @@ export function SettingsPanel({
         {/* MODERATION CHANNEL TAB */}
         {canPerformAction(role, 'VIEW_ADMIN_PANEL') && channel !== 100 && (
           <div className="w-full bg-white border-b border-gray-200">
-            <button type="button"
+            <button
+              type="button"
               onClick={handleOpenModeration}
               className="w-full px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors cursor-pointer text-left focus:outline-none"
             >
@@ -412,7 +414,9 @@ export function SettingsPanel({
           Info
         </div>
         <div className="bg-white px-6 py-4 border-b border-gray-200 flex gap-2">
-          <label htmlFor="infoTextInput" className="sr-only">Display Name</label>
+          <label htmlFor="infoTextInput" className="sr-only">
+            Display Name
+          </label>
           <input
             id="infoTextInput"
             title="Username or Display name"
@@ -423,7 +427,8 @@ export function SettingsPanel({
             className="flex-1 border border-gray-300 rounded px-2.5 py-1.5 text-sm bg-white text-black outline-none focus:border-blue-500"
             placeholder="Username / Display name..."
           />
-          <button type="button"
+          <button
+            type="button"
             aria-label="Daftar kata"
             onClick={() => setIsPhraseModalOpen(true)}
             className="p-2 rounded text-white font-bold bg-gradient-to-b from-[#38bdf8] via-[#0ea5e9] to-[#0284c7] border-t border-white/40 border-b border-black/20 shadow-[0_3px_0_#0369a1,inset_0_1px_0_rgba(255,255,255,0.4)] active:translate-y-[2px] active:shadow-none hover:brightness-105 transition-all duration-100 cursor-pointer focus:outline-none"
@@ -454,7 +459,9 @@ export function SettingsPanel({
           Lokasi
         </div>
         <div className="bg-white px-6 py-4 border-b border-gray-200 flex gap-2">
-          <label htmlFor="locationTextInput" className="sr-only">Lokasi</label>
+          <label htmlFor="locationTextInput" className="sr-only">
+            Lokasi
+          </label>
           <input
             id="locationTextInput"
             title="User Location"
@@ -464,7 +471,8 @@ export function SettingsPanel({
             onChange={(e) => setLocationText(e.target.value)}
             className="flex-1 border border-gray-300 rounded px-2.5 py-1.5 text-sm bg-white text-black font-semibold outline-none focus:border-blue-500"
           />
-          <button type="button"
+          <button
+            type="button"
             aria-label="Pilih lokasi"
             onClick={() => setIsProvinceModalOpen(true)}
             className="p-2 rounded text-white font-bold bg-gradient-to-b from-[#38bdf8] via-[#0ea5e9] to-[#0284c7] border-t border-white/40 border-b border-black/20 shadow-[0_3px_0_#0369a1,inset_0_1px_0_rgba(255,255,255,0.4)] active:translate-y-[2px] active:shadow-none hover:brightness-105 transition-all duration-100 cursor-pointer focus:outline-none"
@@ -562,11 +570,15 @@ export function SettingsPanel({
           {/* Account action buttons */}
           <div className="w-full flex flex-col gap-2.5">
             {!user?.app_metadata?.provider && (
-              <button type="button" className="w-full text-center py-2.5 text-sm font-bold rounded text-slate-800 bg-gradient-to-b from-white via-[#f1f5f9] to-[#cbd5e1] border-t border-white/40 border-b border-black/20 shadow-[0_3px_0_#94a3b8,inset_0_1px_0_rgba(255,255,255,0.8)] active:translate-y-[2px] active:shadow-none hover:brightness-105 transition-all duration-100 cursor-pointer focus:outline-none">
+              <button
+                type="button"
+                className="w-full text-center py-2.5 text-sm font-bold rounded text-slate-800 bg-gradient-to-b from-white via-[#f1f5f9] to-[#cbd5e1] border-t border-white/40 border-b border-black/20 shadow-[0_3px_0_#94a3b8,inset_0_1px_0_rgba(255,255,255,0.8)] active:translate-y-[2px] active:shadow-none hover:brightness-105 transition-all duration-100 cursor-pointer focus:outline-none"
+              >
                 Ubah Kata Sandi
               </button>
             )}
-            <button type="button"
+            <button
+              type="button"
               onClick={() => {
                 signOut();
                 onClose();
@@ -696,7 +708,9 @@ export function SettingsPanel({
           Antrian Maksimal Pemutar Suara (per 20ms)
         </div>
         <div className="bg-white px-6 py-4 border-b border-gray-200">
-          <label htmlFor="maxQueueInput" className="sr-only">Max Queue</label>
+          <label htmlFor="maxQueueInput" className="sr-only">
+            Max Queue
+          </label>
           <input
             id="maxQueueInput"
             title="Max Audio Queue"
@@ -836,7 +850,9 @@ export function SettingsPanel({
               title="Mode Peredam Bising"
               aria-label="Mode Peredam Bising"
               value={noiseMode}
-              onChange={(e) => setNoiseMode(e.target.value as 'normal' | 'ojol' | 'wind' | 'crowd' | 'emergency')}
+              onChange={(e) =>
+                setNoiseMode(e.target.value as 'normal' | 'ojol' | 'wind' | 'crowd' | 'emergency')
+              }
               className="w-full border border-gray-300 rounded px-2.5 py-1.5 text-sm bg-white text-black font-semibold outline-none focus:border-blue-500 cursor-pointer"
             >
               <option value="normal">Mode Normal (Ruangan/Kantor)</option>
@@ -1042,7 +1058,10 @@ export function SettingsPanel({
             </div>
           </div>
 
-          <button type="button" className="w-full text-center py-2.5 text-sm font-bold rounded text-slate-800 bg-gradient-to-b from-white via-[#f1f5f9] to-[#cbd5e1] border-t border-white/40 border-b border-black/20 shadow-[0_3px_0_#94a3b8,inset_0_1px_0_rgba(255,255,255,0.8)] active:translate-y-[2px] active:shadow-none hover:brightness-105 transition-all duration-100 cursor-pointer focus:outline-none">
+          <button
+            type="button"
+            className="w-full text-center py-2.5 text-sm font-bold rounded text-slate-800 bg-gradient-to-b from-white via-[#f1f5f9] to-[#cbd5e1] border-t border-white/40 border-b border-black/20 shadow-[0_3px_0_#94a3b8,inset_0_1px_0_rgba(255,255,255,0.8)] active:translate-y-[2px] active:shadow-none hover:brightness-105 transition-all duration-100 cursor-pointer focus:outline-none"
+          >
             Tambah Tombol PTT POC
           </button>
         </div>
@@ -1080,7 +1099,8 @@ export function SettingsPanel({
           </div>
 
           {/* MAIN SIMPAN BUTTON */}
-          <button type="button"
+          <button
+            type="button"
             onClick={handleSave}
             className="w-full text-center py-2.5 text-sm font-bold rounded text-white bg-gradient-to-b from-[#4ade80] via-[#22c55e] to-[#16a34a] border-t border-white/40 border-b border-black/20 shadow-[0_3px_0_#15803d,inset_0_1px_0_rgba(255,255,255,0.4)] active:translate-y-[2px] active:shadow-none hover:brightness-105 transition-all duration-100 cursor-pointer focus:outline-none"
           >
@@ -1098,25 +1118,41 @@ export function SettingsPanel({
           </div>
 
           <div className="flex flex-col gap-2.5">
-            <button type="button" className="w-full text-left px-4 py-2.5 text-xs font-bold rounded text-slate-800 bg-gradient-to-b from-white via-[#f1f5f9] to-[#cbd5e1] border-t border-white/40 border-b border-black/20 shadow-[0_3px_0_#94a3b8,inset_0_1px_0_rgba(255,255,255,0.8)] active:translate-y-[2px] active:shadow-none hover:brightness-105 transition-all duration-100 cursor-pointer focus:outline-none">
+            <button
+              type="button"
+              className="w-full text-left px-4 py-2.5 text-xs font-bold rounded text-slate-800 bg-gradient-to-b from-white via-[#f1f5f9] to-[#cbd5e1] border-t border-white/40 border-b border-black/20 shadow-[0_3px_0_#94a3b8,inset_0_1px_0_rgba(255,255,255,0.8)] active:translate-y-[2px] active:shadow-none hover:brightness-105 transition-all duration-100 cursor-pointer focus:outline-none"
+            >
               Persyaratan & Ketentuan
             </button>
-            <button type="button" className="w-full text-left px-4 py-2.5 text-xs font-bold rounded text-slate-800 bg-gradient-to-b from-white via-[#f1f5f9] to-[#cbd5e1] border-t border-white/40 border-b border-black/20 shadow-[0_3px_0_#94a3b8,inset_0_1px_0_rgba(255,255,255,0.8)] active:translate-y-[2px] active:shadow-none hover:brightness-105 transition-all duration-100 cursor-pointer focus:outline-none">
+            <button
+              type="button"
+              className="w-full text-left px-4 py-2.5 text-xs font-bold rounded text-slate-800 bg-gradient-to-b from-white via-[#f1f5f9] to-[#cbd5e1] border-t border-white/40 border-b border-black/20 shadow-[0_3px_0_#94a3b8,inset_0_1px_0_rgba(255,255,255,0.8)] active:translate-y-[2px] active:shadow-none hover:brightness-105 transition-all duration-100 cursor-pointer focus:outline-none"
+            >
               Kebijakan Privasi
             </button>
-            <button type="button"
+            <button
+              type="button"
               onClick={() => setIsUserGuideOpen(true)}
               className="w-full text-left px-4 py-2.5 text-xs font-bold rounded text-slate-800 bg-gradient-to-b from-white via-[#f1f5f9] to-[#cbd5e1] border-t border-white/40 border-b border-black/20 shadow-[0_3px_0_#94a3b8,inset_0_1px_0_rgba(255,255,255,0.8)] active:translate-y-[2px] active:shadow-none hover:brightness-105 transition-all duration-100 cursor-pointer focus:outline-none"
             >
               Panduan Pengguna
             </button>
-            <button type="button" className="w-full text-left px-4 py-2.5 text-xs font-bold rounded text-slate-800 bg-gradient-to-b from-white via-[#f1f5f9] to-[#cbd5e1] border-t border-white/40 border-b border-black/20 shadow-[0_3px_0_#94a3b8,inset_0_1px_0_rgba(255,255,255,0.8)] active:translate-y-[2px] active:shadow-none hover:brightness-105 transition-all duration-100 cursor-pointer focus:outline-none">
+            <button
+              type="button"
+              className="w-full text-left px-4 py-2.5 text-xs font-bold rounded text-slate-800 bg-gradient-to-b from-white via-[#f1f5f9] to-[#cbd5e1] border-t border-white/40 border-b border-black/20 shadow-[0_3px_0_#94a3b8,inset_0_1px_0_rgba(255,255,255,0.8)] active:translate-y-[2px] active:shadow-none hover:brightness-105 transition-all duration-100 cursor-pointer focus:outline-none"
+            >
               Legal
             </button>
-            <button type="button" className="w-full text-left px-4 py-2.5 text-xs font-bold rounded text-slate-800 bg-gradient-to-b from-white via-[#f1f5f9] to-[#cbd5e1] border-t border-white/40 border-b border-black/20 shadow-[0_3px_0_#94a3b8,inset_0_1px_0_rgba(255,255,255,0.8)] active:translate-y-[2px] active:shadow-none hover:brightness-105 transition-all duration-100 cursor-pointer focus:outline-none">
+            <button
+              type="button"
+              className="w-full text-left px-4 py-2.5 text-xs font-bold rounded text-slate-800 bg-gradient-to-b from-white via-[#f1f5f9] to-[#cbd5e1] border-t border-white/40 border-b border-black/20 shadow-[0_3px_0_#94a3b8,inset_0_1px_0_rgba(255,255,255,0.8)] active:translate-y-[2px] active:shadow-none hover:brightness-105 transition-all duration-100 cursor-pointer focus:outline-none"
+            >
               Jika Suka Berikan Rating
             </button>
-            <button type="button" className="w-full text-left px-4 py-2.5 text-xs font-bold rounded text-white bg-gradient-to-b from-red-400 via-red-500 to-red-600 border-t border-white/40 border-b border-black/20 shadow-[0_3px_0_#991b1b,inset_0_1px_0_rgba(255,255,255,0.4)] active:translate-y-[2px] active:shadow-none hover:brightness-105 transition-all duration-100 cursor-pointer focus:outline-none mt-1">
+            <button
+              type="button"
+              className="w-full text-left px-4 py-2.5 text-xs font-bold rounded text-white bg-gradient-to-b from-red-400 via-red-500 to-red-600 border-t border-white/40 border-b border-black/20 shadow-[0_3px_0_#991b1b,inset_0_1px_0_rgba(255,255,255,0.4)] active:translate-y-[2px] active:shadow-none hover:brightness-105 transition-all duration-100 cursor-pointer focus:outline-none mt-1"
+            >
               Hapus Akun Saya
             </button>
           </div>
@@ -1157,7 +1193,8 @@ export function SettingsPanel({
             {/* Phrase List */}
             <div className="flex-1 overflow-y-auto bg-white text-left divide-y divide-gray-100">
               {PREDEFINED_PHRASES.map((phrase, idx) => (
-                <button type="button"
+                <button
+                  type="button"
                   key={idx}
                   onClick={() => {
                     setInfoText(phrase);
@@ -1182,7 +1219,8 @@ export function SettingsPanel({
           <div className="bg-white app-uniform-modal rounded-lg shadow-2xl flex flex-col z-10 overflow-hidden border border-gray-300">
             {/* Header */}
             <div className="flex items-center px-4 py-3 bg-white shrink-0 border-b border-gray-200">
-              <button type="button"
+              <button
+                type="button"
                 onClick={() => setIsUserGuideOpen(false)}
                 className="mr-2.5 w-9 h-9 flex items-center justify-center rounded-full border border-slate-300 bg-gradient-to-b from-white via-[#f1f5f9] to-[#cbd5e1] shadow-[0_2px_0_#94a3b8,inset_0_1px_0_rgba(255,255,255,0.8)] active:translate-y-[1.5px] active:shadow-none hover:brightness-105 transition-all duration-100 cursor-pointer focus:outline-none text-black flex-shrink-0"
               >
@@ -1408,7 +1446,8 @@ export function SettingsPanel({
           <div className="absolute inset-0" onClick={() => setIsProvinceModalOpen(false)} />
           <div className="bg-white app-uniform-modal rounded-lg shadow-2xl flex flex-col z-10 overflow-hidden border border-gray-300 animate-in fade-in zoom-in-95 duration-100">
             <div className="flex items-center px-4 py-3 bg-white shrink-0 border-b border-gray-200">
-              <button type="button"
+              <button
+                type="button"
                 onClick={() => setIsProvinceModalOpen(false)}
                 className="mr-2.5 w-9 h-9 flex items-center justify-center rounded-full border border-slate-300 bg-gradient-to-b from-white via-[#f1f5f9] to-[#cbd5e1] shadow-[0_2px_0_#94a3b8,inset_0_1px_0_rgba(255,255,255,0.8)] active:translate-y-[1.5px] active:shadow-none hover:brightness-105 transition-all duration-100 cursor-pointer focus:outline-none text-black flex-shrink-0"
               >
@@ -1430,7 +1469,8 @@ export function SettingsPanel({
 
             <div className="flex-1 overflow-y-auto bg-white text-left divide-y divide-gray-100">
               {Object.keys(PROVINCE_CITIES).map((prov) => (
-                <button type="button"
+                <button
+                  type="button"
                   key={prov}
                   onClick={() => {
                     setSelectedProvince(prov);
@@ -1453,7 +1493,8 @@ export function SettingsPanel({
           <div className="absolute inset-0" onClick={() => setIsCityModalOpen(false)} />
           <div className="bg-white app-uniform-modal rounded-lg shadow-2xl flex flex-col z-10 overflow-hidden border border-gray-300 animate-in fade-in zoom-in-95 duration-100">
             <div className="flex items-center px-4 py-3 bg-white shrink-0 border-b border-gray-200">
-              <button type="button"
+              <button
+                type="button"
                 onClick={() => {
                   setIsCityModalOpen(false);
                   setIsProvinceModalOpen(true);
@@ -1479,7 +1520,8 @@ export function SettingsPanel({
             <div className="flex-1 overflow-y-auto bg-white text-left divide-y divide-gray-100">
               {selectedProvince &&
                 PROVINCE_CITIES[selectedProvince]?.map((city) => (
-                  <button type="button"
+                  <button
+                    type="button"
                     key={city}
                     onClick={() => {
                       setLocationText(`${city}, ${selectedProvince}`);
@@ -1500,7 +1542,8 @@ export function SettingsPanel({
           <div className="absolute inset-0" onClick={() => setIsThemeModalOpen(false)} />
           <div className="bg-white app-uniform-modal rounded-lg shadow-2xl flex flex-col z-10 overflow-hidden border border-gray-300 animate-in fade-in zoom-in-95 duration-100">
             <div className="flex items-center px-4 py-3 bg-white shrink-0 border-b border-gray-200">
-              <button type="button"
+              <button
+                type="button"
                 onClick={() => setIsThemeModalOpen(false)}
                 className="mr-2.5 w-9 h-9 flex items-center justify-center rounded-full border border-slate-300 bg-gradient-to-b from-white via-[#f1f5f9] to-[#cbd5e1] shadow-[0_2px_0_#94a3b8,inset_0_1px_0_rgba(255,255,255,0.8)] active:translate-y-[1.5px] active:shadow-none hover:brightness-105 transition-all duration-100 cursor-pointer focus:outline-none text-black flex-shrink-0"
               >
@@ -1574,7 +1617,8 @@ export function SettingsPanel({
               ].map((themeOpt) => {
                 const isActive = themeText === themeOpt.key;
                 return (
-                  <button type="button"
+                  <button
+                    type="button"
                     key={themeOpt.key}
                     onClick={() => {
                       setThemeText(themeOpt.key);

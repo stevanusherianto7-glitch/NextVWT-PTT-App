@@ -79,7 +79,7 @@ export function WalletPanel({ onClose }: WalletPanelProps) {
 
   useEffect(() => {
     fetchTxHistory();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const handleGenerateQRIS = () => {
@@ -156,7 +156,8 @@ export function WalletPanel({ onClose }: WalletPanelProps) {
       >
         <div className="absolute top-0 left-0 right-0 h-[40%] bg-gradient-to-b from-white/35 to-transparent pointer-events-none z-10" />
 
-        <button type="button"
+        <button
+          type="button"
           onClick={onClose}
           title="Kembali"
           aria-label="Kembali"
@@ -219,7 +220,8 @@ export function WalletPanel({ onClose }: WalletPanelProps) {
 
           <div className="mt-4 pt-4 border-t border-slate-700/60 flex justify-between items-center text-[10px] text-slate-400">
             <span>ID Akun: {user?.id?.slice(0, 8)}...</span>
-            <button type="button"
+            <button
+              type="button"
               onClick={fetchCoins}
               className="flex items-center gap-1 hover:text-white cursor-pointer active:scale-95 transition-all"
             >
@@ -238,7 +240,8 @@ export function WalletPanel({ onClose }: WalletPanelProps) {
             <>
               <div className="grid grid-cols-2 gap-2">
                 {topupOptions.map((opt) => (
-                  <button type="button"
+                  <button
+                    type="button"
                     key={opt.koin}
                     onClick={() => setAmountOption(opt)}
                     className={`py-3 px-4 rounded-xl border text-left flex flex-col justify-between transition-all cursor-pointer ${
@@ -260,7 +263,8 @@ export function WalletPanel({ onClose }: WalletPanelProps) {
                 ))}
               </div>
 
-              <button type="button"
+              <button
+                type="button"
                 onClick={handleGenerateQRIS}
                 className="w-full py-3 px-4 rounded-xl text-white font-bold text-xs bg-gradient-to-b from-[#38bdf8] via-[#0ea5e9] to-[#0284c7] border-t border-white/30 border-b border-black/20 shadow-[0_3px_0_#0284c7,inset_0_1px_0_rgba(255,255,255,0.4)] active:translate-y-[2px] active:shadow-none hover:brightness-105 transition-all duration-100 flex items-center justify-center gap-1.5 focus:outline-none cursor-pointer"
               >
@@ -297,14 +301,16 @@ export function WalletPanel({ onClose }: WalletPanelProps) {
               </div>
 
               <div className="w-full flex gap-2">
-                <button type="button"
+                <button
+                  type="button"
                   disabled={isProcessing}
                   onClick={() => setQrisGenerated(false)}
                   className="flex-1 py-2 rounded-lg text-[10px] font-bold bg-white border border-gray-300 text-gray-700 cursor-pointer disabled:opacity-50"
                 >
                   Batal
                 </button>
-                <button type="button"
+                <button
+                  type="button"
                   disabled={isProcessing}
                   onClick={handleSimulatePayment}
                   className="flex-1 py-2 rounded-lg text-[10px] font-bold text-white bg-gradient-to-b from-[#4ade80] via-[#22c55e] to-[#16a34a] border-t border-white/40 border-b border-black/20 shadow-[0_2.5px_0_#15803d] active:translate-y-[2px] active:shadow-none hover:brightness-105 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1"

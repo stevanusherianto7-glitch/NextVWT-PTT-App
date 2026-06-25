@@ -125,7 +125,7 @@ export function ChatRoomPanel({ onClose }: ChatRoomPanelProps) {
         getSupabase().then((sub) => sub.removeChannel(chatChannel!));
       }
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId]);
 
   // Scroll to bottom when new messages arrive
@@ -244,7 +244,8 @@ export function ChatRoomPanel({ onClose }: ChatRoomPanelProps) {
       <div className="w-full h-[90px] flex items-center px-5 z-20 relative overflow-hidden shrink-0 bg-white border-b border-gray-200 shadow-sm">
         <div className="absolute top-0 left-0 right-0 h-[40%] bg-gradient-to-b from-slate-100/50 to-transparent pointer-events-none z-10" />
 
-        <button type="button"
+        <button
+          type="button"
           onClick={onClose}
           title="Kembali"
           aria-label="Kembali"

@@ -68,7 +68,8 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
                 Internal details are logged via componentDidCatch above. */}
             Terjadi gangguan tak terduga pada aplikasi. Silakan coba lagi atau restart aplikasi.
           </p>
-          <button type="button"
+          <button
+            type="button"
             onClick={this.handleReset}
             style={{
               padding: '12px 32px',

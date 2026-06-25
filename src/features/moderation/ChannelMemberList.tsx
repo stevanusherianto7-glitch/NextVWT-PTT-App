@@ -27,7 +27,6 @@ import {
 import { USER_PROFILES } from '../../app/components/UserListModal';
 import iconVoice from '../../assets/icon_voice.png';
 
-
 interface MemberRoleStatus {
   user_id: string;
   role: ChannelRole;
@@ -280,7 +279,8 @@ export function ChannelMemberList({ roomId, actorRole, actorId }: ChannelMemberL
     <div className="flex flex-col h-full gap-3">
       {/* Sub tabs for Online vs Banned */}
       <div className="flex gap-2 border-b border-white/5 pb-2">
-        <button type="button"
+        <button
+          type="button"
           onClick={() => setActiveTab('online')}
           className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
             activeTab === 'online'
@@ -291,7 +291,8 @@ export function ChannelMemberList({ roomId, actorRole, actorId }: ChannelMemberL
           Online ({filteredOnlineUsers.length})
         </button>
         {canPerformAction(actorRole, 'BAN_USER') && (
-          <button type="button"
+          <button
+            type="button"
             onClick={() => setActiveTab('banned')}
             className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
               activeTab === 'banned'
@@ -323,7 +324,9 @@ export function ChannelMemberList({ roomId, actorRole, actorId }: ChannelMemberL
                 type="button"
                 onClick={() => setShowAddForm(!showAddForm)}
                 className={`p-2 rounded-lg transition-colors ${
-                  showAddForm ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                  showAddForm
+                    ? 'bg-indigo-600 text-white'
+                    : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
                 }`}
                 title="Tambah Warga Tetap"
               >
@@ -420,7 +423,8 @@ export function ChannelMemberList({ roomId, actorRole, actorId }: ChannelMemberL
                     </div>
 
                     {canModerate && (
-                      <button type="button"
+                      <button
+                        type="button"
                         onClick={() => handleOpenActions(u.userId, u.displayName)}
                         title="Tindakan Moderasi"
                         aria-label={`Tindakan moderasi untuk ${u.displayName}`}
@@ -452,7 +456,8 @@ export function ChannelMemberList({ roomId, actorRole, actorId }: ChannelMemberL
                     Banned oleh: {bu.banned_by} | {new Date(bu.banned_at).toLocaleString()}
                   </span>
                 </div>
-                <button type="button"
+                <button
+                  type="button"
                   onClick={() => unbanUser(bu.user_id)}
                   className="px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/30 rounded text-[11px] text-emerald-400 hover:bg-emerald-500 hover:text-slate-950 transition-all font-semibold"
                 >
@@ -473,7 +478,8 @@ export function ChannelMemberList({ roomId, actorRole, actorId }: ChannelMemberL
                 <span className="text-xs text-slate-400">Moderatir Menu</span>
                 <span className="font-bold text-white text-base">{selectedUser.displayName}</span>
               </div>
-              <button type="button"
+              <button
+                type="button"
                 onClick={() => {
                   setShowActionModal(false);
                   setSelectedUser(null);
@@ -542,7 +548,8 @@ export function ChannelMemberList({ roomId, actorRole, actorId }: ChannelMemberL
                       <VolumeX className="h-3.5 w-3.5" /> Mute Suara
                     </span>
                     {selectedUser.status === 'muted' ? (
-                      <button type="button"
+                      <button
+                        type="button"
                         onClick={() =>
                           handleAction(
                             () => unmuteUser(selectedUser.userId, selectedUser.role),
@@ -568,7 +575,8 @@ export function ChannelMemberList({ roomId, actorRole, actorId }: ChannelMemberL
                           <option value={1440}>24 Jam</option>
                           <option value={0}>Permanen</option>
                         </select>
-                        <button type="button"
+                        <button
+                          type="button"
                           onClick={() =>
                             handleAction(
                               () => muteUser(selectedUser.userId, selectedUser.role, muteMinutes),
@@ -591,7 +599,8 @@ export function ChannelMemberList({ roomId, actorRole, actorId }: ChannelMemberL
                       <MicOff className="h-3.5 w-3.5" /> Blokir PTT
                     </span>
                     {selectedUser.status === 'ptt_blocked' ? (
-                      <button type="button"
+                      <button
+                        type="button"
                         onClick={() =>
                           handleAction(
                             () => unblockPTT(selectedUser.userId, selectedUser.role),
@@ -617,7 +626,8 @@ export function ChannelMemberList({ roomId, actorRole, actorId }: ChannelMemberL
                           <option value={1440}>24 Jam</option>
                           <option value={0}>Permanen</option>
                         </select>
-                        <button type="button"
+                        <button
+                          type="button"
                           onClick={() =>
                             handleAction(
                               () => blockPTT(selectedUser.userId, selectedUser.role, blockMinutes),
@@ -640,7 +650,8 @@ export function ChannelMemberList({ roomId, actorRole, actorId }: ChannelMemberL
                       <MessageSquareOff className="h-3.5 w-3.5" /> Blokir Chat
                     </span>
                     {selectedUser.status === 'chat_blocked' ? (
-                      <button type="button"
+                      <button
+                        type="button"
                         onClick={() =>
                           handleAction(
                             () => unblockChat(selectedUser.userId, selectedUser.role),
@@ -666,7 +677,8 @@ export function ChannelMemberList({ roomId, actorRole, actorId }: ChannelMemberL
                           <option value={1440}>24 Jam</option>
                           <option value={0}>Permanen</option>
                         </select>
-                        <button type="button"
+                        <button
+                          type="button"
                           onClick={() =>
                             handleAction(
                               () => blockChat(selectedUser.userId, selectedUser.role, blockMinutes),
@@ -693,7 +705,8 @@ export function ChannelMemberList({ roomId, actorRole, actorId }: ChannelMemberL
                         Keluarkan user paksa dari room. User bisa join kembali.
                       </span>
                     </div>
-                    <button type="button"
+                    <button
+                      type="button"
                       onClick={() =>
                         handleAction(
                           () => kickUser(selectedUser.userId, selectedUser.role),
@@ -722,7 +735,8 @@ export function ChannelMemberList({ roomId, actorRole, actorId }: ChannelMemberL
                       onChange={(e) => setBanReason(e.target.value)}
                       className="moderation-input text-xs"
                     />
-                    <button type="button"
+                    <button
+                      type="button"
                       onClick={() =>
                         handleAction(
                           () => banUser(selectedUser.userId, selectedUser.role, banReason, 0),

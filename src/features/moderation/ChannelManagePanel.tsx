@@ -26,7 +26,11 @@ export function ChannelManagePanel({
   onOpenPrivate,
 }: ChannelManagePanelProps) {
   const { role, status, loading: roleLoading } = useChannelRole(roomId, userId);
-  const { settings, loading: settingsLoading, updateSettings } = useChannelSettings(roomId, initialChannelName);
+  const {
+    settings,
+    loading: settingsLoading,
+    updateSettings,
+  } = useChannelSettings(roomId, initialChannelName);
 
   const [localName, setLocalName] = useState(settings?.channel_name || initialChannelName || '');
   const [localDesc, setLocalDesc] = useState(settings?.channel_description || '');
@@ -92,7 +96,8 @@ export function ChannelManagePanel({
             <Shield className="h-5 w-5 text-emerald-400" />
             <h2>Kelola Channel</h2>
           </div>
-          <button type="button"
+          <button
+            type="button"
             onClick={onClose}
             title="Tutup"
             aria-label="Tutup"
@@ -105,7 +110,8 @@ export function ChannelManagePanel({
         {/* Tab selector */}
         <div className="moderation-tabs">
           {tabs.map((tab) => (
-            <button type="button"
+            <button
+              type="button"
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`moderation-tab-btn ${activeTab === tab.id ? 'active' : ''}`}
@@ -200,8 +206,8 @@ export function ChannelManagePanel({
                         <Shield className="h-3.5 w-3.5 text-emerald-400" />
                       </div>
                       <span className="text-emerald-400 font-bold tracking-wide">
-                        {settings?.pjc_user_id 
-                          ? settings.pjc_user_id.replace(/_/g, ' ').toUpperCase() 
+                        {settings?.pjc_user_id
+                          ? settings.pjc_user_id.replace(/_/g, ' ').toUpperCase()
                           : 'ADMINISTRATOR VWT'}
                       </span>
                     </div>

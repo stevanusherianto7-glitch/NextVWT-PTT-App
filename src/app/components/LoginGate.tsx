@@ -178,12 +178,12 @@ export function LoginGate({ onLogin }: LoginGateProps) {
             transform="translate(1.2, 1.5)"
             opacity="0.45"
           />
-          <image 
-            href={vintageMic} 
-            x="14" 
-            y="14" 
-            width="72" 
-            height="72" 
+          <image
+            href={vintageMic}
+            x="14"
+            y="14"
+            width="72"
+            height="72"
             clipPath="url(#micClip)"
             preserveAspectRatio="xMidYMid slice"
           />
@@ -202,14 +202,14 @@ export function LoginGate({ onLogin }: LoginGateProps) {
 
         <div className="w-full bg-black/35 rounded-xl p-3 border border-white/5 mb-6 text-center">
           <p className="text-[11px] text-gray-400 leading-normal">
-            Hubungkan ke aplikasi NextVWT. Masuk dengan Google untuk
-            sinkronisasi profil instan.
+            Hubungkan ke aplikasi NextVWT. Masuk dengan Google untuk sinkronisasi profil instan.
           </p>
         </div>
 
         <div className="w-full flex flex-col gap-3">
           {/* Google Login Button */}
-          <button type="button"
+          <button
+            type="button"
             onClick={() => handleLogin('google')}
             disabled={loadingProvider !== null}
             className="w-full h-12 bg-[#171a26]/80 backdrop-blur-md text-white font-semibold rounded-full flex items-center justify-center gap-3 transition-all duration-300 active:scale-95 border border-white/10 hover:border-white/20 hover:bg-[#1e2233]/90 hover:shadow-[0_0_15px_rgba(255,255,255,0.25)] cursor-pointer disabled:opacity-50"
@@ -240,7 +240,6 @@ export function LoginGate({ onLogin }: LoginGateProps) {
               </>
             )}
           </button>
-
         </div>
       </div>
 
