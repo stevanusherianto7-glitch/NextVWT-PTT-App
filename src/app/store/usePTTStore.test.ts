@@ -18,21 +18,24 @@ vi.mock('../utils/supabase', () => {
     unsubscribe: vi.fn(),
   };
 
-  return {
-    supabase: {
-      channel: vi.fn(() => mockChannel),
-      auth: {
-        getSession: vi.fn(() => Promise.resolve({ data: { session: null } })),
-        onAuthStateChange: vi.fn(() => ({ data: { subscription: { unsubscribe: vi.fn() } } })),
-        signInWithOAuth: vi.fn(() => Promise.resolve({ error: null })),
-        signOut: vi.fn(() => Promise.resolve({ error: null })),
-      },
-      from: vi.fn(() => ({
-        select: vi.fn(() => ({
-          order: vi.fn(() => Promise.resolve({ data: [], error: null })),
-        })),
-      })),
+  const mockSupabase = {
+    channel: vi.fn(() => mockChannel),
+    auth: {
+      getSession: vi.fn(() => Promise.resolve({ data: { session: null } })),
+      onAuthStateChange: vi.fn(() => ({ data: { subscription: { unsubscribe: vi.fn() } } })),
+      signInWithOAuth: vi.fn(() => Promise.resolve({ error: null })),
+      signOut: vi.fn(() => Promise.resolve({ error: null })),
     },
+    from: vi.fn(() => ({
+      select: vi.fn(() => ({
+        order: vi.fn(() => Promise.resolve({ data: [], error: null })),
+      })),
+    })),
+  };
+
+  return {
+    supabase: mockSupabase,
+    getSupabase: vi.fn(() => Promise.resolve(mockSupabase)),
   };
 });
 

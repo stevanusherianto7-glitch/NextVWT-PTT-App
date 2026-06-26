@@ -4,6 +4,8 @@ import { BRAND, CHANNELS, fetchChannels as fetchChannelsFromConfig } from '../..
 import { getChannelUUID, safeSetStorage, clearChannelOverrides } from '../storeUtils';
 import { channelSwitchRateLimiter } from '../../utils/rateLimiter';
 
+let channelSwitchTimeout: NodeJS.Timeout | null = null;
+
 export const createChannelSlice: StateCreator<
   PTTState,
   [],
@@ -62,9 +64,16 @@ export const createChannelSlice: StateCreator<
       clearChannelOverrides(state.channelNumber);
     }
 
+    if (channelSwitchTimeout) {
+      clearTimeout(channelSwitchTimeout);
+    }
+
     // Subscribe to the new channel (Fast Click configures immediate or debounced delay reconnect)
     const delay = state.fastClick ? 0 : 800;
-    setTimeout(() => state.subscribeToChannel(clamped), delay);
+    channelSwitchTimeout = setTimeout(() => {
+      state.subscribeToChannel(clamped);
+      channelSwitchTimeout = null;
+    }, delay);
 
     // Persist channel selection for offline recovery
     safeSetStorage({ channelNumber: clamped });

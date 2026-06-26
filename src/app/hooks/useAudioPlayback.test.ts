@@ -21,9 +21,8 @@ import {
 } from './useAudioPlayback';
 import { usePTTStore } from '../store/usePTTStore';
 
-// ─── Mock Supabase (offline-capable) ─────────────────────────────────────────
-vi.mock('../utils/supabase', () => ({
-  supabase: {
+vi.mock('../utils/supabase', () => {
+  const mockSupabase = {
     channel: vi.fn(() => ({
       on: vi.fn().mockReturnThis(),
       track: vi.fn(() => Promise.resolve()),
@@ -41,8 +40,13 @@ vi.mock('../utils/supabase', () => ({
     from: vi.fn(() => ({
       select: vi.fn(() => ({ order: vi.fn(() => Promise.resolve({ data: [], error: null })) })),
     })),
-  },
-}));
+  };
+
+  return {
+    supabase: mockSupabase,
+    getSupabase: vi.fn(() => Promise.resolve(mockSupabase)),
+  };
+});
 
 // ─── Mock localStorage ────────────────────────────────────────────────────────
 const localStorageMock = (() => {

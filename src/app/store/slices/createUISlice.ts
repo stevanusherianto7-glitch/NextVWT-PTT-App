@@ -6,6 +6,8 @@ import { safeSetStorage } from '../storeUtils';
 import { startBackgroundService, stopBackgroundService } from '../../utils/backgroundSurvival';
 import { toast } from 'sonner';
 
+let localTransmissionTimeout: NodeJS.Timeout | null = null;
+
 export const createUISlice: StateCreator<
   PTTState,
   [],
@@ -57,6 +59,10 @@ export const createUISlice: StateCreator<
       stopBackgroundService().catch((err) =>
         console.warn('Failed to stop background service:', err)
       );
+      if (localTransmissionTimeout) {
+        clearTimeout(localTransmissionTimeout);
+        localTransmissionTimeout = null;
+      }
       set({
         isPowerOn: false,
         isConnected: false,
@@ -93,6 +99,16 @@ export const createUISlice: StateCreator<
         toast.warning('Frekuensi sedang sibuk (COR aktif)! Transmisi ditolak.');
         return;
       }
+
+      // Start local watchdog timer to auto-stop transmission after 60 seconds
+      if (localTransmissionTimeout) {
+        clearTimeout(localTransmissionTimeout);
+      }
+      localTransmissionTimeout = setTimeout(() => {
+        console.warn('[Watchdog] Local transmission exceeded 60s limit. Force stopping.');
+        get().setTransmitting(false);
+        toast.info('Transmisi otomatis berhenti setelah 60 detik.');
+      }, 60000);
 
       // Stateful Floor Control & Priority check
       // [F-06] Role is derived from the Zustand store (server-authoritative via useChannelRole),
@@ -161,6 +177,13 @@ export const createUISlice: StateCreator<
           role: myRole,
         },
       });
+    }
+
+    if (!transmitting) {
+      if (localTransmissionTimeout) {
+        clearTimeout(localTransmissionTimeout);
+        localTransmissionTimeout = null;
+      }
     }
 
     set({ isTransmitting: transmitting, progress: transmitting ? 50 : 0 });

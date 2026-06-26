@@ -41,10 +41,45 @@ export {
 // [F-04] Inline payload interfaces replaced by Zod schemas in ./schemas/realtimePayloads.ts
 // Types are now inferred from the schemas: PttStatePayload, PresenceMeta, etc.
 
-import { activeChannelSubscription, setActiveChannelSubscription } from './subscription';
+import {
+  activeChannelSubscription,
+  setActiveChannelSubscription,
+  heartbeatState,
+  cleanupHeartbeat,
+} from './subscription';
 // ─── Supabase Channel Subscription ───────────────────────────────────────────
 
+let activeTransmitterTimeout: NodeJS.Timeout | null = null;
+let subscribingChannelNum: number | null = null;
+
+function startActiveTransmitterWatchdog(userId: string, displayName: string) {
+  if (activeTransmitterTimeout) {
+    clearTimeout(activeTransmitterTimeout);
+  }
+  activeTransmitterTimeout = setTimeout(() => {
+    const state = usePTTStore.getState();
+    if (state.activeTransmitter && state.activeTransmitter.userId === userId) {
+      console.warn(`[Watchdog] Transmission from ${displayName} exceeded 60s limit. Force clearing.`);
+      usePTTStore.setState({ activeTransmitter: null });
+      if (userId === state.userId && state.isTransmitting) {
+        state.setTransmitting(false);
+      }
+    }
+    activeTransmitterTimeout = null;
+  }, 60000);
+}
+
+function clearActiveTransmitterWatchdog() {
+  if (activeTransmitterTimeout) {
+    clearTimeout(activeTransmitterTimeout);
+    activeTransmitterTimeout = null;
+  }
+}
+
 function subscribeToChannel(channelNum: number, retryCount = 0) {
+  subscribingChannelNum = channelNum;
+  cleanupHeartbeat();
+
   (async () => {
     try {
       if (activeChannelSubscription) {
@@ -68,13 +103,28 @@ function subscribeToChannel(channelNum: number, retryCount = 0) {
 
       const store = usePTTStore.getState();
       const supabase = await getSupabase();
+
+      // Check if we were preempted by a newer subscription call during the await
+      if (subscribingChannelNum !== channelNum) {
+        console.log(`[Supabase] Aborting subscription to CH ${channelNum} because target changed to CH ${subscribingChannelNum}`);
+        return;
+      }
+
       const channelInstance = supabase.channel(`${BRAND.supabaseRoomPrefix}${channelNum}`, {
         config: {
           presence: {
             key: store.userId || 'anonymous',
           },
+          broadcast: {
+            self: true, // receive our own broadcasts for loopback Ping-Pong
+          },
         },
       });
+
+      if (subscribingChannelNum !== channelNum) {
+        return;
+      }
+
       setActiveChannelSubscription(channelInstance);
 
       channelInstance
@@ -120,6 +170,17 @@ function subscribeToChannel(channelNum: number, retryCount = 0) {
           });
           const users = Array.from(uniqueUsersMap.values());
           usePTTStore.setState({ activeUsers: users });
+
+          // Watchdog: If the active transmitter is no longer present in presence list, clear it
+          const currentTx = usePTTStore.getState().activeTransmitter;
+          if (currentTx) {
+            const isTxStillPresent = users.some((u) => u.userId === currentTx.userId);
+            if (!isTxStillPresent) {
+              console.warn(`[Watchdog] Active transmitter ${currentTx.displayName} left the channel (presence drop). Clearing activeTransmitter.`);
+              usePTTStore.setState({ activeTransmitter: null });
+              clearActiveTransmitterWatchdog();
+            }
+          }
         })
         .on(
           'broadcast',
@@ -143,10 +204,12 @@ function subscribeToChannel(channelNum: number, retryCount = 0) {
                   isNewUser: payload.isNewUser,
                 },
               });
+              startActiveTransmitterWatchdog(payload.userId, payload.displayName);
             } else {
               const currentTx = usePTTStore.getState().activeTransmitter;
               if (currentTx && currentTx.userId === payload.userId) {
                 usePTTStore.setState({ activeTransmitter: null });
+                clearActiveTransmitterWatchdog();
               }
             }
           }
@@ -207,6 +270,7 @@ function subscribeToChannel(channelNum: number, retryCount = 0) {
           const currentTx = state.activeTransmitter;
           if (currentTx && currentTx.userId === payload.targetUserId) {
             usePTTStore.setState({ activeTransmitter: null, progress: 0 });
+            clearActiveTransmitterWatchdog();
           }
         })
         .on('broadcast', { event: 'reaction' }, ({ payload: rawPayload }: { payload: unknown }) => {
@@ -345,6 +409,22 @@ function subscribeToChannel(channelNum: number, retryCount = 0) {
                 .catch((err) => console.warn('Failed to update presence on status sync:', err));
             }
           }
+        )
+        .on(
+          'broadcast',
+          { event: 'heartbeat_ping' },
+          ({ payload }: { payload: any }) => {
+            if (activeChannelSubscription !== channelInstance) return;
+            const state = usePTTStore.getState();
+            if (payload && payload.userId === state.userId && payload.pingId === heartbeatState.expectedPingId) {
+              heartbeatState.expectedPingId = null;
+              heartbeatState.missedPings = 0;
+              if (heartbeatState.heartbeatTimeout) {
+                clearTimeout(heartbeatState.heartbeatTimeout);
+                heartbeatState.heartbeatTimeout = null;
+              }
+            }
+          }
         );
 
       channelInstance.subscribe((status: string) => {
@@ -352,6 +432,50 @@ function subscribeToChannel(channelNum: number, retryCount = 0) {
         const isSubscribed = status === 'SUBSCRIBED';
         if (isSubscribed) {
           usePTTStore.setState({ isConnected: true });
+
+          // Start Loopback Ping-Pong Heartbeat
+          heartbeatState.missedPings = 0;
+          heartbeatState.expectedPingId = null;
+          if (heartbeatState.heartbeatInterval) {
+            clearInterval(heartbeatState.heartbeatInterval);
+          }
+
+          heartbeatState.heartbeatInterval = setInterval(() => {
+            const state = usePTTStore.getState();
+            if (activeChannelSubscription === channelInstance && state.isConnected) {
+              if (heartbeatState.expectedPingId) {
+                heartbeatState.missedPings++;
+                console.warn(`[Heartbeat] Missed loopback pong count: ${heartbeatState.missedPings}`);
+                if (heartbeatState.missedPings >= 2) {
+                  console.error(`[Heartbeat] Missed ${heartbeatState.missedPings} consecutive pongs. Force reconnecting CH ${channelNum}...`);
+                  cleanupHeartbeat();
+                  subscribeToChannel(channelNum, 0);
+                  return;
+                }
+              }
+
+              const pingId = generateUUID();
+              heartbeatState.expectedPingId = pingId;
+
+              channelInstance.send({
+                type: 'broadcast',
+                event: 'heartbeat_ping',
+                payload: {
+                  userId: state.userId,
+                  pingId: pingId,
+                },
+              }).catch((err) => {
+                console.warn('[Heartbeat] Send ping failed:', err);
+              });
+
+              if (heartbeatState.heartbeatTimeout) {
+                clearTimeout(heartbeatState.heartbeatTimeout);
+              }
+              heartbeatState.heartbeatTimeout = setTimeout(() => {
+                // Ping timeout check
+              }, 5000);
+            }
+          }, 10000); // Check every 10 seconds
         }
 
         if (status === 'CHANNEL_ERROR' && retryCount < 3) {
