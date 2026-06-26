@@ -94,7 +94,6 @@ import { canUsePTT } from '../../features/moderation/permissions';
 import { getSupabase } from '../utils/supabase';
 import { WalletPanel } from '../../features/payment/WalletPanel';
 import { ROIPBridgePanel } from '../../features/roip/ROIPBridgePanel';
-import { QuickActionDock } from './QuickActionDock';
 import { ChatRoomPanel } from '../../features/chat/ChatRoomPanel';
 import { KaraokeQueuePanel } from '../../features/karaoke-queue/KaraokeQueuePanel';
 import { PrivateChannelPanel } from '../../features/moderation/PrivateChannelPanel';
@@ -109,7 +108,7 @@ import kissAnimation from '../../assets/reactions/kiss.json';
 import bartSvg from '../../assets/reactions/bart.svg';
 import foxSvg from '../../assets/reactions/fox.svg';
 
-const reactionTimeouts: Record<string, ReturnType<typeof setTimeout>> = {};
+
 
 const playReactionSound = (kind: string) => {
   if (kind === 'ketawa_nular') {
@@ -223,6 +222,8 @@ const FloatingKaraokePlayer = lazyRetry<
     >,
   };
 });
+
+
 
 export function RadioLayout() {
   const {

@@ -571,6 +571,11 @@ export function UserListModal({
   channelName: _channelName,
   users,
   hasVideoBackground,
+  onOpenChat,
+  onOpenQueue,
+  onSendReaction,
+  isPowerOn,
+  themeKey,
 }: UserListModalProps) {
   const isTransmitting = usePTTStore((state) => state.isTransmitting);
   const activeTransmitter = usePTTStore((state) => state.activeTransmitter);
