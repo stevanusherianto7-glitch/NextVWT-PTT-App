@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { usePTTStore } from '../store/usePTTStore';
 import { ChannelRole } from '../../features/moderation/permissions';
 import iconVoice from '../../assets/icon_voice.png';
-import iconOperator from '../../assets/icon_operator.png';
+import iconOperator from '../../assets/components/icon_star_operator.svg';
 import iconModerator from '../../assets/icon_moderator.png';
 import iconControlled from '../../assets/icon_controlled.png';
 import iconSilent from '../../assets/icon_silent.png';
