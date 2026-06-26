@@ -164,7 +164,7 @@ export function RadioLayout() {
   const [isQueueOpen, setIsQueueOpen] = useState(false);
   const [isPrivateOpen, setIsPrivateOpen] = useState(false);
   const [floatingReactions, setFloatingReactions] = useState<
-    Array<{ id: string; category?: string; reaction: string; x: number }>
+    Array<{ id: string; category?: string; reaction: string; x: number; senderName?: string }>
   >([]);
   const [txStartTime, setTxStartTime] = useState<number>(0);
   const [waitTimer, setWaitTimer] = useState<number | null>(null);
@@ -530,9 +530,10 @@ export function RadioLayout() {
       if (isPowerOn) {
         const id = payload.id || Math.random().toString();
         const x = 30 + Math.random() * 40;
+        const senderName = (payload as { senderName?: string }).senderName || 'User';
         setFloatingReactions((prev) => [
           ...prev,
-          { id, category: payload.category, reaction: payload.reaction, x },
+          { id, category: payload.category, reaction: payload.reaction, x, senderName },
         ]);
         if (payload.category === 'sound') playReactionSound(payload.reaction);
         setTimeout(() => {
@@ -550,10 +551,16 @@ export function RadioLayout() {
   const handleSendReaction = (category: 'animation' | 'sound' | 'gift', reactionType: string) => {
     if (!isPowerOn) return;
 
+    // Resolve local user's display name
+    const localDisplayName = infoText || 'Saya';
+
     // Trigger local animation instantly (optimistic)
     const localId = Math.random().toString();
     const x = 30 + Math.random() * 40;
-    setFloatingReactions((prev) => [...prev, { id: localId, category, reaction: reactionType, x }]);
+    setFloatingReactions((prev) => [
+      ...prev,
+      { id: localId, category, reaction: reactionType, x, senderName: localDisplayName },
+    ]);
     if (category === 'sound') playReactionSound(reactionType);
     setTimeout(() => {
       setFloatingReactions((prev) => prev.filter((r) => r.id !== localId));
@@ -913,13 +920,16 @@ export function RadioLayout() {
                     return (
                       <div
                         key={r.id}
-                        className="w-[60px] h-[60px] flex items-center justify-center pointer-events-none"
+                        className="flex flex-col items-center gap-0.5 pointer-events-none"
                         style={posStyle}
                       >
-                        <div className={`${floatAnim} w-full h-full flex items-center justify-center opacity-80`}>
-                          <span className="text-[32px]">
-                            {soundEmojis[r.reaction] || '🎵'}
-                          </span>
+                        <div className={`${floatAnim} flex flex-col items-center gap-0.5 opacity-80`}>
+                          <span className="text-[32px]">{soundEmojis[r.reaction] || '🎵'}</span>
+                          {r.senderName && (
+                            <span className="text-[9px] font-bold text-white px-1.5 py-0.5 rounded-full bg-black/60 backdrop-blur-sm leading-none whitespace-nowrap max-w-[80px] truncate">
+                              {r.senderName}
+                            </span>
+                          )}
                         </div>
                       </div>
                     );
@@ -948,15 +958,16 @@ export function RadioLayout() {
                     return (
                       <div
                         key={r.id}
-                        className="w-[110px] h-[110px] flex items-center justify-center"
+                        className="flex flex-col items-center gap-0.5 pointer-events-none"
                         style={posStyle}
                       >
-                        <div className={`${floatAnim} w-full h-full flex items-center justify-center`}>
-                          <img
-                            src={bartSvg}
-                            className="w-[110px] h-[110px] object-contain"
-                            alt="Bart Simpson"
-                          />
+                        <div className={`${floatAnim} flex flex-col items-center gap-0.5`}>
+                          <img src={bartSvg} className="w-[110px] h-[110px] object-contain" alt="Bart Simpson" />
+                          {r.senderName && (
+                            <span className="text-[9px] font-bold text-white px-1.5 py-0.5 rounded-full bg-black/60 backdrop-blur-sm leading-none whitespace-nowrap max-w-[110px] truncate">
+                              {r.senderName}
+                            </span>
+                          )}
                         </div>
                       </div>
                     );
@@ -966,15 +977,16 @@ export function RadioLayout() {
                     return (
                       <div
                         key={r.id}
-                        className="w-[180px] h-[180px] flex items-center justify-center"
+                        className="flex flex-col items-center gap-0.5 pointer-events-none"
                         style={posStyle}
                       >
-                        <div className={`${floatAnim} w-full h-full flex items-center justify-center`}>
-                          <img
-                            src={foxSvg}
-                            className="w-[180px] h-[180px] object-contain"
-                            alt="Cute Fox"
-                          />
+                        <div className={`${floatAnim} flex flex-col items-center gap-0.5`}>
+                          <img src={foxSvg} className="w-[180px] h-[180px] object-contain" alt="Cute Fox" />
+                          {r.senderName && (
+                            <span className="text-[9px] font-bold text-white px-1.5 py-0.5 rounded-full bg-black/60 backdrop-blur-sm leading-none whitespace-nowrap max-w-[120px] truncate">
+                              {r.senderName}
+                            </span>
+                          )}
                         </div>
                       </div>
                     );
@@ -984,21 +996,25 @@ export function RadioLayout() {
                     return (
                       <div
                         key={r.id}
-                        className="w-[80px] h-[80px] flex items-center justify-center"
+                        className="flex flex-col items-center gap-0.5 pointer-events-none"
                         style={posStyle}
                       >
-                        <div className={`${isUserListOpen ? 'animate-float-center-up' : 'animate-rocket-launch'} w-full h-full flex items-center justify-center`}>
+                        <div className={`${isUserListOpen ? 'animate-float-center-up' : 'animate-rocket-launch'} flex flex-col items-center gap-0.5`}>
                           <span
                             className="text-[52px] select-none"
                             style={{
                               display: 'inline-block',
                               animation: isUserListOpen ? undefined : 'rocket3d 4s ease-out forwards',
-                              filter:
-                                'drop-shadow(0 0 10px rgba(255,140,0,0.9)) drop-shadow(0 6px 12px rgba(0,0,0,0.5))',
+                              filter: 'drop-shadow(0 0 10px rgba(255,140,0,0.9)) drop-shadow(0 6px 12px rgba(0,0,0,0.5))',
                             }}
                           >
                             🚀
                           </span>
+                          {r.senderName && (
+                            <span className="text-[9px] font-bold text-white px-1.5 py-0.5 rounded-full bg-black/60 backdrop-blur-sm leading-none whitespace-nowrap max-w-[90px] truncate">
+                              {r.senderName}
+                            </span>
+                          )}
                         </div>
                       </div>
                     );
@@ -1007,21 +1023,25 @@ export function RadioLayout() {
                     return (
                       <div
                         key={r.id}
-                        className="w-[70px] h-[100px] flex items-center justify-center"
+                        className="flex flex-col items-center gap-0.5 pointer-events-none"
                         style={posStyle}
                       >
-                        <div className={`${isUserListOpen ? 'animate-float-center-up' : ''} w-full h-full flex items-center justify-center`}>
+                        <div className={`${isUserListOpen ? 'animate-float-center-up' : ''} flex flex-col items-center gap-0.5`}>
                           <span
                             className="text-[58px] select-none"
                             style={{
                               display: 'inline-block',
                               animation: isUserListOpen ? undefined : 'lightning3d 4s ease-out forwards',
-                              filter:
-                                'drop-shadow(0 0 16px rgba(255,255,60,1)) drop-shadow(0 0 32px rgba(255,200,0,0.7))',
+                              filter: 'drop-shadow(0 0 16px rgba(255,255,60,1)) drop-shadow(0 0 32px rgba(255,200,0,0.7))',
                             }}
                           >
                             ⚡
                           </span>
+                          {r.senderName && (
+                            <span className="text-[9px] font-bold text-white px-1.5 py-0.5 rounded-full bg-black/60 backdrop-blur-sm leading-none whitespace-nowrap max-w-[90px] truncate">
+                              {r.senderName}
+                            </span>
+                          )}
                         </div>
                       </div>
                     );
@@ -1031,21 +1051,25 @@ export function RadioLayout() {
                     return (
                       <div
                         key={r.id}
-                        className="w-[90px] h-[90px] flex items-center justify-center"
+                        className="flex flex-col items-center gap-0.5 pointer-events-none"
                         style={posStyle}
                       >
-                        <div className={`${isUserListOpen ? 'animate-float-center-up' : ''} w-full h-full flex items-center justify-center`}>
+                        <div className={`${isUserListOpen ? 'animate-float-center-up' : ''} flex flex-col items-center gap-0.5`}>
                           <span
                             className="text-[56px] select-none"
                             style={{
                               display: 'inline-block',
                               animation: isUserListOpen ? undefined : 'star3dSpin 4.5s ease-out forwards',
-                              filter:
-                                'drop-shadow(0 0 14px rgba(255,220,0,0.95)) drop-shadow(0 0 28px rgba(255,180,0,0.6))',
+                              filter: 'drop-shadow(0 0 14px rgba(255,220,0,0.95)) drop-shadow(0 0 28px rgba(255,180,0,0.6))',
                             }}
                           >
                             🌟
                           </span>
+                          {r.senderName && (
+                            <span className="text-[9px] font-bold text-white px-1.5 py-0.5 rounded-full bg-black/60 backdrop-blur-sm leading-none whitespace-nowrap max-w-[90px] truncate">
+                              {r.senderName}
+                            </span>
+                          )}
                         </div>
                       </div>
                     );
@@ -1064,10 +1088,10 @@ export function RadioLayout() {
                   return (
                     <div
                       key={r.id}
-                      className="w-[110px] h-[110px] flex items-center justify-center"
+                      className="flex flex-col items-center gap-0.5 pointer-events-none"
                       style={posStyle}
                     >
-                      <div className={`${floatAnim} w-full h-full flex items-center justify-center`}>
+                      <div className={`${floatAnim} flex flex-col items-center gap-0.5`}>
                         {animData ? (
                           <Player
                             autoplay
@@ -1077,6 +1101,11 @@ export function RadioLayout() {
                           />
                         ) : (
                           <span className="text-4xl">🔥</span>
+                        )}
+                        {r.senderName && (
+                          <span className="text-[9px] font-bold text-white px-1.5 py-0.5 rounded-full bg-black/60 backdrop-blur-sm leading-none whitespace-nowrap max-w-[110px] truncate">
+                            {r.senderName}
+                          </span>
                         )}
                       </div>
                     </div>
