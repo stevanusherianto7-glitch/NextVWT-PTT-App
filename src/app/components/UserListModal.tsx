@@ -10,7 +10,6 @@ import iconWait from '../../assets/icon_wait.png';
 import iconWaitControlled from '../../assets/icon_wait_controlled.png';
 import iconUserBaru from '../../assets/components/icon_tag_baru.svg';
 import iconNoc from '../../assets/icon_noc.png';
-import { QuickActionDock } from './QuickActionDock';
 
 interface UserListModalProps {
   channel: number;
@@ -34,11 +33,6 @@ interface UserListModalProps {
   >;
   onClose: () => void;
   hasVideoBackground?: boolean;
-  onOpenChat: () => void;
-  onOpenQueue: () => void;
-  onSendReaction: (category: 'animation' | 'sound' | 'gift', reaction: string) => void;
-  isPowerOn: boolean;
-  themeKey: string;
 }
 
 export interface UserProfile {
@@ -571,11 +565,6 @@ export function UserListModal({
   channelName: _channelName,
   users,
   hasVideoBackground,
-  onOpenChat,
-  onOpenQueue,
-  onSendReaction,
-  isPowerOn,
-  themeKey,
 }: UserListModalProps) {
   const isTransmitting = usePTTStore((state) => state.isTransmitting);
   const activeTransmitter = usePTTStore((state) => state.activeTransmitter);
@@ -791,7 +780,7 @@ export function UserListModal({
   return (
     <div
       onClick={(e) => e.stopPropagation()}
-      className={`w-full max-w-[340px] user-list-modal flex flex-col overflow-visible relative animate-in fade-in duration-200 ${
+      className={`w-full max-w-[340px] user-list-modal flex flex-col overflow-hidden relative animate-in fade-in duration-200 ${
         hasVideoBackground ? 'border-none' : 'bg-white border-x-2 border-b-2 border-gray-400'
       }`}
       style={
@@ -1267,21 +1256,6 @@ export function UserListModal({
           </div>
         </div>
       )}
-
-      {/* Quick Action Dock - Only rendered inside UserListModal */}
-      <div
-        className="w-full flex justify-center z-20 mt-2.5 mb-1 px-3 shrink-0"
-      >
-        <QuickActionDock
-          onOpenChat={onOpenChat}
-          onOpenQueue={onOpenQueue}
-          onSendReaction={onSendReaction}
-          isPowerOn={isPowerOn}
-          showSocialFeatures={isPowerOn}
-          themeKey={themeKey}
-        />
-      </div>
-
       {/* Toast Notification for User Joins/Leaves */}
       <div className="absolute bottom-16 left-4 right-4 flex flex-col gap-2 pointer-events-none z-[60]">
         {notifications.map((notif) => (

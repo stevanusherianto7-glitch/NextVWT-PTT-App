@@ -994,11 +994,6 @@ export function RadioLayout() {
                       (r) => r.reaction === 'lion' || r.reaction === 'aquarium'
                     )
                   }
-                  onOpenChat={() => setIsChatOpen(true)}
-                  onOpenQueue={() => setIsQueueOpen(true)}
-                  onSendReaction={handleSendReaction}
-                  isPowerOn={isPowerOn}
-                  themeKey={getThemeClass(themeText)}
                 />
               </div>
             ) : (
@@ -1355,6 +1350,21 @@ export function RadioLayout() {
                 })}
               </div>
             )}
+
+            {/* Quick Action Dock - Moved outside to ensure visibility during UserListModal */}
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className={`w-full flex justify-center z-20 ${isUserListOpen ? 'mt-3' : 'mt-0'}`}
+            >
+              <QuickActionDock
+                onOpenChat={() => setIsChatOpen(true)}
+                onOpenQueue={() => setIsQueueOpen(true)}
+                onSendReaction={handleSendReaction}
+                isPowerOn={isPowerOn}
+                showSocialFeatures={isPowerOn}
+                themeKey={getThemeClass(themeText)}
+              />
+            </div>
 
             {/* PTT Button */}
             {showPTT && (
