@@ -240,7 +240,7 @@ export function SettingsPanel({
         {/* Brand Logo */}
         <svg
           viewBox="0 0 100 100"
-          className="w-[52px] h-[52px] relative z-25 mr-[-8px]"
+          className="w-[52px] h-[52px] relative z-25 mr-0"
           style={{ filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.25))' }}
         >
           <image
