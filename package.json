@@ -18,7 +18,12 @@
     "test:integration": "vitest run --reporter=verbose",
     "test:e2e:playwright": "playwright test --workers=1",
     "test:e2e:cypress": "cypress run",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "build:pwa": "vite build",
+    "cap:sync": "npx cap sync android",
+    "cap:build": "npm run build && npx cap sync android",
+    "android:open": "npx cap open android",
+    "android:build-debug": "npm run build && npx cap sync android && cd android && gradlew.bat assembleDebug && cd .."
   },
   "dependencies": {
     "@capacitor/android": "^8.4.0",
