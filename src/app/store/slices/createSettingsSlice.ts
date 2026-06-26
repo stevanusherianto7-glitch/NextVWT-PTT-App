@@ -52,7 +52,7 @@ export const createSettingsSlice: StateCreator<
   >
 > = (set, get) => ({
   infoText: '',
-  locationText: 'BANDUNG, JAWA BARAT',
+  locationText: 'BANDUNG, JABAR',
   showMyPhoto: true,
   showOtherPhotos: true,
   showPhotosInList: true,

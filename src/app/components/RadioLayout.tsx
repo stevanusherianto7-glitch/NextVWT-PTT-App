@@ -584,7 +584,7 @@ export function RadioLayout() {
   const dynamicUserCount = dynamicUserList.length;
 
   const displayUser = infoText ? infoText.toUpperCase() : 'USER';
-  const displayLoc = locationText ? locationText.toUpperCase() : 'BANDUNG, JAWA BARAT';
+  const displayLoc = locationText ? locationText.toUpperCase() : 'BANDUNG, JABAR';
   const channelNameStr = activeChannelObj ? activeChannelObj.name.toUpperCase() : 'STANDBY CHANNEL';
   const programName = channelSettings?.channel_description;
   const marqueeText = programName
