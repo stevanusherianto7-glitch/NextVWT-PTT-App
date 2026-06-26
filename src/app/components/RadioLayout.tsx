@@ -867,199 +867,6 @@ export function RadioLayout() {
                       isPowerOn={isPowerOn}
                       onUserCountClick={() => setIsUserListOpen(true)}
                     />
-
-                    {/* Floating Reactions Overlay (di depan LCD Panel, tidak menutupi D-pad & PTT) */}
-                    {isPowerOn && (
-                      <div className="absolute w-[280px] h-[135px] pointer-events-none z-30 rounded-[14px] top-[10px] left-1/2 -translate-x-1/2">
-                        {floatingReactions.map((r) => {
-                          if (r.category === 'sound') {
-                            const soundEmojis: Record<string, string> = {
-                              laugh: '🤣',
-                              buzzer: '❌',
-                              drum: '🥁',
-                              horn: '🎺',
-                            };
-                            return (
-                              <div
-                                key={r.id}
-                                className="absolute bottom-0 -translate-x-1/2 w-[60px] h-[60px] flex items-center justify-center pointer-events-none"
-                                style={{ left: `${r.x}%` }}
-                              >
-                                <div className="animate-float-up w-full h-full flex items-center justify-center opacity-80">
-                                  <span className="text-[32px]">
-                                    {soundEmojis[r.reaction] || '🎵'}
-                                  </span>
-                                </div>
-                              </div>
-                            );
-                          }
-
-                          if (r.category === 'gift') {
-                            const giftEmojis: Record<string, string> = {
-                              giftbox: '🎁',
-                              rose: '🌹',
-                              diamond: '💎',
-                              coffee: '☕',
-                            };
-                            return (
-                              <div
-                                key={r.id}
-                                className="fixed inset-0 m-auto w-[150px] h-[150px] flex items-center justify-center animate-bounce z-[100] pointer-events-none drop-shadow-2xl"
-                              >
-                                <span className="text-[120px] filter drop-shadow-[0_0_20px_rgba(255,255,255,0.8)]">
-                                  {giftEmojis[r.reaction] || '🎁'}
-                                </span>
-                              </div>
-                            );
-                          }
-
-                          if (r.reaction === 'bart') {
-                            return (
-                              <div
-                                key={r.id}
-                                className="absolute bottom-0 -translate-x-1/2 w-[110px] h-[110px] flex items-center justify-center"
-                                style={{
-                                  left: `${r.x}%`,
-                                }}
-                              >
-                                <div className="animate-float-up w-full h-full flex items-center justify-center">
-                                  <img
-                                    src={bartSvg}
-                                    className="w-[110px] h-[110px] object-contain"
-                                    alt="Bart Simpson"
-                                  />
-                                </div>
-                              </div>
-                            );
-                          }
-
-                          if (r.reaction === 'fox') {
-                            return (
-                              <div
-                                key={r.id}
-                                className="absolute bottom-0 -translate-x-1/2 w-[180px] h-[180px] flex items-center justify-center"
-                                style={{
-                                  left: `${r.x}%`,
-                                }}
-                              >
-                                <div className="animate-float-up w-full h-full flex items-center justify-center">
-                                  <img
-                                    src={foxSvg}
-                                    className="w-[180px] h-[180px] object-contain"
-                                    alt="Cute Fox"
-                                  />
-                                </div>
-                              </div>
-                            );
-                          }
-
-                          if (r.reaction === 'rocket') {
-                            return (
-                              <div
-                                key={r.id}
-                                className="absolute bottom-0 -translate-x-1/2 w-[80px] h-[80px] flex items-center justify-center"
-                                style={{ left: `${r.x}%` }}
-                              >
-                                <div className="animate-rocket-launch w-full h-full flex items-center justify-center">
-                                  <span
-                                    className="text-[52px] select-none"
-                                    style={{
-                                      display: 'inline-block',
-                                      animation: 'rocket3d 4s ease-out forwards',
-                                      filter:
-                                        'drop-shadow(0 0 10px rgba(255,140,0,0.9)) drop-shadow(0 6px 12px rgba(0,0,0,0.5))',
-                                    }}
-                                  >
-                                    🚀
-                                  </span>
-                                </div>
-                              </div>
-                            );
-                          }
-
-                          if (r.reaction === 'lightning') {
-                            return (
-                              <div
-                                key={r.id}
-                                className="absolute bottom-0 -translate-x-1/2 w-[70px] h-[100px] flex items-center justify-center"
-                                style={{ left: `${r.x}%` }}
-                              >
-                                <div className="w-full h-full flex items-center justify-center">
-                                  <span
-                                    className="text-[58px] select-none"
-                                    style={{
-                                      display: 'inline-block',
-                                      animation: 'lightning3d 4s ease-out forwards',
-                                      filter:
-                                        'drop-shadow(0 0 16px rgba(255,255,60,1)) drop-shadow(0 0 32px rgba(255,200,0,0.7))',
-                                    }}
-                                  >
-                                    ⚡
-                                  </span>
-                                </div>
-                              </div>
-                            );
-                          }
-
-                          if (r.reaction === 'star3d') {
-                            return (
-                              <div
-                                key={r.id}
-                                className="absolute bottom-0 -translate-x-1/2 w-[90px] h-[90px] flex items-center justify-center"
-                                style={{ left: `${r.x}%` }}
-                              >
-                                <div className="w-full h-full flex items-center justify-center">
-                                  <span
-                                    className="text-[56px] select-none"
-                                    style={{
-                                      display: 'inline-block',
-                                      animation: 'star3dSpin 4.5s ease-out forwards',
-                                      filter:
-                                        'drop-shadow(0 0 14px rgba(255,220,0,0.95)) drop-shadow(0 0 28px rgba(255,180,0,0.6))',
-                                    }}
-                                  >
-                                    🌟
-                                  </span>
-                                </div>
-                              </div>
-                            );
-                          }
-
-                          const animationMap: Record<string, unknown> = {
-                            applause: applauseAnimation,
-                            love: loveAnimation,
-                            kiss: kissAnimation,
-                            wow: wowAnimation,
-                            fire: fireAnimation,
-                            crown: crownAnimation,
-                            confetti: confettiAnimation,
-                          };
-                          const animData = animationMap[r.reaction];
-                          return (
-                            <div
-                              key={r.id}
-                              className="absolute bottom-0 -translate-x-1/2 w-[110px] h-[110px] flex items-center justify-center"
-                              style={{
-                                left: `${r.x}%`,
-                              }}
-                            >
-                              <div className="animate-float-up w-full h-full flex items-center justify-center">
-                                {animData ? (
-                                  <Player
-                                    autoplay
-                                    loop={false}
-                                    src={animData}
-                                    style={{ width: '110px', height: '110px' }}
-                                  />
-                                ) : (
-                                  <span className="text-4xl">🔥</span>
-                                )}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
                   </div>
 
                   {/* Progress Bar */}
@@ -1084,6 +891,197 @@ export function RadioLayout() {
                     />
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* Floating Reactions Overlay — rendered on top of both UserListModal and faceplate */}
+            {isPowerOn && floatingReactions.length > 0 && (
+              <div className={`absolute inset-x-0 top-[14px] w-full max-w-[340px] mx-auto h-[426px] pointer-events-none z-30 overflow-hidden ${isUserListOpen ? 'flex items-center justify-center' : ''}`}>
+                {floatingReactions.map((r) => {
+                  const floatAnim = isUserListOpen ? 'animate-float-center-up' : 'animate-float-up';
+                  const posStyle = isUserListOpen
+                    ? { position: 'absolute' as const, left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }
+                    : { position: 'absolute' as const, bottom: 0, left: `${r.x}%`, transform: 'translateX(-50%)' };
+
+                  if (r.category === 'sound') {
+                    const soundEmojis: Record<string, string> = {
+                      laugh: '🤣',
+                      buzzer: '❌',
+                      drum: '🥁',
+                      horn: '🎺',
+                    };
+                    return (
+                      <div
+                        key={r.id}
+                        className="w-[60px] h-[60px] flex items-center justify-center pointer-events-none"
+                        style={posStyle}
+                      >
+                        <div className={`${floatAnim} w-full h-full flex items-center justify-center opacity-80`}>
+                          <span className="text-[32px]">
+                            {soundEmojis[r.reaction] || '🎵'}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  if (r.category === 'gift') {
+                    const giftEmojis: Record<string, string> = {
+                      giftbox: '🎁',
+                      rose: '🌹',
+                      diamond: '💎',
+                      coffee: '☕',
+                    };
+                    return (
+                      <div
+                        key={r.id}
+                        className="fixed inset-0 m-auto w-[150px] h-[150px] flex items-center justify-center animate-bounce z-[100] pointer-events-none drop-shadow-2xl"
+                      >
+                        <span className="text-[120px] filter drop-shadow-[0_0_20px_rgba(255,255,255,0.8)]">
+                          {giftEmojis[r.reaction] || '🎁'}
+                        </span>
+                      </div>
+                    );
+                  }
+
+                  if (r.reaction === 'bart') {
+                    return (
+                      <div
+                        key={r.id}
+                        className="w-[110px] h-[110px] flex items-center justify-center"
+                        style={posStyle}
+                      >
+                        <div className={`${floatAnim} w-full h-full flex items-center justify-center`}>
+                          <img
+                            src={bartSvg}
+                            className="w-[110px] h-[110px] object-contain"
+                            alt="Bart Simpson"
+                          />
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  if (r.reaction === 'fox') {
+                    return (
+                      <div
+                        key={r.id}
+                        className="w-[180px] h-[180px] flex items-center justify-center"
+                        style={posStyle}
+                      >
+                        <div className={`${floatAnim} w-full h-full flex items-center justify-center`}>
+                          <img
+                            src={foxSvg}
+                            className="w-[180px] h-[180px] object-contain"
+                            alt="Cute Fox"
+                          />
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  if (r.reaction === 'rocket') {
+                    return (
+                      <div
+                        key={r.id}
+                        className="w-[80px] h-[80px] flex items-center justify-center"
+                        style={posStyle}
+                      >
+                        <div className={`${isUserListOpen ? 'animate-float-center-up' : 'animate-rocket-launch'} w-full h-full flex items-center justify-center`}>
+                          <span
+                            className="text-[52px] select-none"
+                            style={{
+                              display: 'inline-block',
+                              animation: isUserListOpen ? undefined : 'rocket3d 4s ease-out forwards',
+                              filter:
+                                'drop-shadow(0 0 10px rgba(255,140,0,0.9)) drop-shadow(0 6px 12px rgba(0,0,0,0.5))',
+                            }}
+                          >
+                            🚀
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  }
+                  if (r.reaction === 'lightning') {
+                    return (
+                      <div
+                        key={r.id}
+                        className="w-[70px] h-[100px] flex items-center justify-center"
+                        style={posStyle}
+                      >
+                        <div className={`${isUserListOpen ? 'animate-float-center-up' : ''} w-full h-full flex items-center justify-center`}>
+                          <span
+                            className="text-[58px] select-none"
+                            style={{
+                              display: 'inline-block',
+                              animation: isUserListOpen ? undefined : 'lightning3d 4s ease-out forwards',
+                              filter:
+                                'drop-shadow(0 0 16px rgba(255,255,60,1)) drop-shadow(0 0 32px rgba(255,200,0,0.7))',
+                            }}
+                          >
+                            ⚡
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  if (r.reaction === 'star3d') {
+                    return (
+                      <div
+                        key={r.id}
+                        className="w-[90px] h-[90px] flex items-center justify-center"
+                        style={posStyle}
+                      >
+                        <div className={`${isUserListOpen ? 'animate-float-center-up' : ''} w-full h-full flex items-center justify-center`}>
+                          <span
+                            className="text-[56px] select-none"
+                            style={{
+                              display: 'inline-block',
+                              animation: isUserListOpen ? undefined : 'star3dSpin 4.5s ease-out forwards',
+                              filter:
+                                'drop-shadow(0 0 14px rgba(255,220,0,0.95)) drop-shadow(0 0 28px rgba(255,180,0,0.6))',
+                            }}
+                          >
+                            🌟
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  const animationMap: Record<string, unknown> = {
+                    applause: applauseAnimation,
+                    love: loveAnimation,
+                    kiss: kissAnimation,
+                    wow: wowAnimation,
+                    fire: fireAnimation,
+                    crown: crownAnimation,
+                    confetti: confettiAnimation,
+                  };
+                  const animData = animationMap[r.reaction];
+                  return (
+                    <div
+                      key={r.id}
+                      className="w-[110px] h-[110px] flex items-center justify-center"
+                      style={posStyle}
+                    >
+                      <div className={`${floatAnim} w-full h-full flex items-center justify-center`}>
+                        {animData ? (
+                          <Player
+                            autoplay
+                            loop={false}
+                            src={animData}
+                            style={{ width: '110px', height: '110px' }}
+                          />
+                        ) : (
+                          <span className="text-4xl">🔥</span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
 

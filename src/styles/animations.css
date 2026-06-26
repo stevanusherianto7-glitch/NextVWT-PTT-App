@@ -103,6 +103,38 @@
   animation: floatUp 4.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
+/* ── Float from center, hold, then rise and fade (for UserListModal) ── */
+@keyframes floatCenterUp {
+  0% {
+    transform: translateY(0) scale(0.5);
+    opacity: 0;
+  }
+  8% {
+    transform: translateY(0) scale(1.2);
+    opacity: 1;
+  }
+  15% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  65% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  85% {
+    transform: translateY(-60px) scale(0.85);
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(-110px) scale(0.7);
+    opacity: 0;
+  }
+}
+
+.animate-float-center-up {
+  animation: floatCenterUp 3s ease-in-out forwards;
+}
+
 /* ── 3D Rocket Launch ── */
 @keyframes rocket3d {
   0% {

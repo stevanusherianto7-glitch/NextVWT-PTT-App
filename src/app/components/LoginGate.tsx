@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import vintageMic from '../../assets/vintage_mic.png';
-type LoginProvider = 'google';
+type LoginProvider = 'google' | 'guest';
 
 interface LoginGateProps {
   onLogin: (provider: LoginProvider) => Promise<void>;
@@ -238,6 +238,20 @@ export function LoginGate({ onLogin }: LoginGateProps) {
                 </svg>
                 <span>Masuk dengan Google</span>
               </>
+            )}
+          </button>
+
+          {/* Guest Login Button */}
+          <button
+            type="button"
+            onClick={() => handleLogin('guest')}
+            disabled={loadingProvider !== null}
+            className="w-full h-12 bg-white/5 backdrop-blur-md text-gray-300 font-semibold rounded-full flex items-center justify-center gap-3 transition-all duration-300 active:scale-95 border border-white/5 hover:border-white/15 hover:bg-white/10 hover:text-white cursor-pointer disabled:opacity-50"
+          >
+            {loadingProvider === 'guest' ? (
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <span>Masuk sebagai Tamu</span>
             )}
           </button>
         </div>

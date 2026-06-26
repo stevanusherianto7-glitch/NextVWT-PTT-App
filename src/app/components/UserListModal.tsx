@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { usePTTStore } from '../store/usePTTStore';
 import { ChannelRole } from '../../features/moderation/permissions';
 import iconVoice from '../../assets/icon_voice.png';
@@ -47,6 +47,7 @@ export interface UserProfile {
   isControlled?: boolean;
   isWait?: boolean;
   isWaitControlled?: boolean;
+  badges?: string[];
 }
 
 export const USER_PROFILES: Record<string, UserProfile> = {
@@ -57,6 +58,7 @@ export const USER_PROFILES: Record<string, UserProfile> = {
     avatarColor: '#3F51B5',
     avatarUrl: 'https://randomuser.me/api/portraits/women/2.jpg',
     role: 'operator',
+    badges: ['❤️', '☕'],
   },
   'Pebe Herianto': {
     displayName: 'Pebe Herianto',
@@ -73,6 +75,7 @@ export const USER_PROFILES: Record<string, UserProfile> = {
     avatarColor: '#4CAF50',
     avatarUrl: 'https://randomuser.me/api/portraits/women/4.jpg',
     role: 'operator',
+    badges: ['💛', '😊'],
   },
   budi_santoso: {
     displayName: 'Budi',
@@ -81,6 +84,7 @@ export const USER_PROFILES: Record<string, UserProfile> = {
     avatarColor: '#F44336',
     avatarUrl: 'https://randomuser.me/api/portraits/men/5.jpg',
     isMuted: true,
+    badges: ['☕'],
   },
   citra_kirana: {
     displayName: 'Citra',
@@ -89,6 +93,7 @@ export const USER_PROFILES: Record<string, UserProfile> = {
     avatarColor: '#9C27B0',
     avatarUrl: 'https://randomuser.me/api/portraits/women/6.jpg',
     isControlled: true,
+    badges: ['💙', '🌟'],
   },
   dedi_pratama: {
     displayName: 'Dedi',
@@ -129,6 +134,7 @@ export const USER_PROFILES: Record<string, UserProfile> = {
     avatarColor: '#3F51B5',
     avatarUrl: 'https://randomuser.me/api/portraits/women/10.jpg',
     role: 'noc',
+    badges: ['🔥', '💻'],
   },
   sys_admin_vwt: {
     displayName: 'SysAdmin VWT',
@@ -137,6 +143,7 @@ export const USER_PROFILES: Record<string, UserProfile> = {
     avatarColor: '#009688',
     avatarUrl: 'https://randomuser.me/api/portraits/men/11.jpg',
     role: 'sys_admin',
+    badges: ['👑', '🛡️'],
   },
   pjc_room_manager: {
     displayName: 'PJC Room Mgr',
@@ -145,6 +152,7 @@ export const USER_PROFILES: Record<string, UserProfile> = {
     avatarColor: '#E91E63',
     avatarUrl: 'https://randomuser.me/api/portraits/women/12.jpg',
     role: 'pjc',
+    badges: ['💜', '🍵'],
   },
   operator_otomatis: {
     displayName: 'Operator Auto',
@@ -472,7 +480,7 @@ function AvatarImage({
         className="w-full h-full rounded-none flex items-center justify-center shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)] border border-white/20"
         style={{ backgroundColor: avatarColor || '#3F51B5' }}
       >
-        <img src={fallbackIconUrl} alt={displayName} className="w-[50%] h-[50%] object-contain" />
+        <img src={fallbackIconUrl} alt={displayName} className="w-[35px] h-[35px] object-contain" />
       </div>
     );
   }
@@ -603,6 +611,7 @@ export function UserListModal({ channel, channelName: _channelName, users }: Use
           isControlled: user.isControlled || matchedProfile?.isControlled || false,
           isWait: user.isWait || matchedProfile?.isWait || false,
           isWaitControlled: user.isWaitControlled || matchedProfile?.isWaitControlled || false,
+          badges: matchedProfile?.badges,
         };
       }
 
@@ -632,6 +641,70 @@ export function UserListModal({ channel, channelName: _channelName, users }: Use
     setModalUsers(mapUsers(users));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [users, channel]);
+
+  const [notifications, setNotifications] = useState<
+    Array<{ id: string; displayName: string; type: 'join' | 'leave' }>
+  >([]);
+  const prevUserIdsRef = useRef<string[]>([]);
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    const currentIds = users.map((u) => (typeof u === 'string' ? u : u.userId));
+
+    if (isFirstRender.current) {
+      prevUserIdsRef.current = currentIds;
+      isFirstRender.current = false;
+      return;
+    }
+
+    const prevUserIds = prevUserIdsRef.current;
+
+    const joinedIds = currentIds.filter((id) => !prevUserIds.includes(id));
+    const leftIds = prevUserIds.filter((id) => !currentIds.includes(id));
+
+    if (joinedIds.length > 0 || leftIds.length > 0) {
+      const newNotifs: Array<{ id: string; displayName: string; type: 'join' | 'leave' }> = [];
+
+      joinedIds.forEach((id) => {
+        const userObj = users.find((u) => (typeof u === 'string' ? u === id : u.userId === id));
+        let name = 'User';
+        if (userObj) {
+          if (typeof userObj === 'string') {
+            name = USER_PROFILES[userObj]?.displayName || userObj;
+          } else {
+            name = userObj.displayName || userObj.userId;
+          }
+        }
+        const notifId = Math.random().toString();
+        newNotifs.push({
+          id: notifId,
+          displayName: name,
+          type: 'join',
+        });
+        setTimeout(() => {
+          setNotifications((prev) => prev.filter((n) => n.id !== notifId));
+        }, 3600);
+      });
+
+      leftIds.forEach((id) => {
+        const name = USER_PROFILES[id]?.displayName || id;
+        const notifId = Math.random().toString();
+        newNotifs.push({
+          id: notifId,
+          displayName: name,
+          type: 'leave',
+        });
+        setTimeout(() => {
+          setNotifications((prev) => prev.filter((n) => n.id !== notifId));
+        }, 3600);
+      });
+
+      if (newNotifs.length > 0) {
+        setNotifications((prev) => [...prev, ...newNotifs]);
+      }
+      prevUserIdsRef.current = currentIds;
+    }
+  }, [users]);
 
   const [activeZoomedAvatar, setActiveZoomedAvatar] = useState<(typeof modalUsers)[0] | null>(null);
 
@@ -709,7 +782,7 @@ export function UserListModal({ channel, channelName: _channelName, users }: Use
   return (
     <div
       onClick={(e) => e.stopPropagation()}
-      className="w-full max-w-[340px] user-list-modal -mt-[14px] bg-white border-x-2 border-b-2 border-gray-400 flex flex-col overflow-hidden animate-in fade-in duration-200"
+      className="w-full max-w-[340px] user-list-modal -mt-[14px] bg-white border-x-2 border-b-2 border-gray-400 flex flex-col overflow-hidden relative animate-in fade-in duration-200"
     >
       <style>{`
         .user-list-modal {
@@ -740,6 +813,48 @@ export function UserListModal({ channel, channelName: _channelName, users }: Use
         }
         .active-user-glow {
           animation: activeUserPulse 1.5s infinite ease-in-out;
+        }
+        @keyframes joinSlideIn {
+          0% {
+            transform: translateX(-110%);
+            opacity: 0;
+          }
+          15% {
+            transform: translateX(0);
+            opacity: 1;
+          }
+          75% {
+            transform: translateX(0);
+            opacity: 1;
+          }
+          100% {
+            transform: translateX(-110%);
+            opacity: 0;
+          }
+        }
+        @keyframes leaveSlideOut {
+          0% {
+            transform: translateX(-110%);
+            opacity: 0;
+          }
+          15% {
+            transform: translateX(0);
+            opacity: 1;
+          }
+          75% {
+            transform: translateX(0);
+            opacity: 1;
+          }
+          100% {
+            transform: translateX(110%);
+            opacity: 0;
+          }
+        }
+        .animate-join-slide {
+          animation: joinSlideIn 3.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+        .animate-leave-slide {
+          animation: leaveSlideOut 3.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
         }
       `}</style>
 
@@ -811,10 +926,7 @@ export function UserListModal({ channel, channelName: _channelName, users }: Use
                   <div className="text-[14px] font-medium text-gray-800 truncate leading-snug">
                     <span className="truncate">{profile.displayName}</span>
                   </div>
-                  <div className="flex items-center text-[11px] mt-0.5 truncate gap-1 font-medium leading-none">
-                    <span className="text-[#00C853] font-medium tracking-wide">
-                      {profile.callSign}
-                    </span>
+                  <div className="flex items-center text-[11px] mt-0.5 truncate gap-px font-medium leading-none">
                     {isNewUserJoined(profile) && (
                       <img
                         src={iconUserBaru}
@@ -824,6 +936,14 @@ export function UserListModal({ channel, channelName: _channelName, users }: Use
                         draggable={false}
                       />
                     )}
+                    {profile.badges && profile.badges.map((badge, idx) => (
+                      <span key={idx} className="text-[11px] select-none" title="Lencana">
+                        {badge}
+                      </span>
+                    ))}
+                    <span className="text-[#00C853] font-medium tracking-wide">
+                      {profile.callSign}
+                    </span>
                     <span className="text-gray-500 font-normal uppercase">{profile.location}</span>
                   </div>
                 </div>
@@ -878,10 +998,7 @@ export function UserListModal({ channel, channelName: _channelName, users }: Use
             <h3 className="mt-4 text-lg font-bold text-gray-900 text-center truncate w-full">
               {activeZoomedAvatar.displayName}
             </h3>
-            <div className="flex items-center justify-center gap-1 mt-1">
-              <span className="text-sm font-semibold text-[#00C853] tracking-wider">
-                {activeZoomedAvatar.callSign}
-              </span>
+            <div className="flex items-center justify-center gap-1.5 mt-1">
               {isNewUserJoined(activeZoomedAvatar) && (
                 <img
                   src={iconUserBaru}
@@ -891,6 +1008,14 @@ export function UserListModal({ channel, channelName: _channelName, users }: Use
                   draggable={false}
                 />
               )}
+              {activeZoomedAvatar.badges && activeZoomedAvatar.badges.map((badge, idx) => (
+                <span key={idx} className="text-sm select-none" title="Lencana">
+                  {badge}
+                </span>
+              ))}
+              <span className="text-sm font-semibold text-[#00C853] tracking-wider">
+                {activeZoomedAvatar.callSign}
+              </span>
             </div>
             <div className="text-xs text-gray-500 mt-0.5 uppercase tracking-wide">
               {activeZoomedAvatar.location}
@@ -1083,6 +1208,27 @@ export function UserListModal({ channel, channelName: _channelName, users }: Use
           </div>
         </div>
       )}
+
+      {/* Toast Notification for User Joins/Leaves */}
+      <div className="absolute bottom-16 left-4 right-4 flex flex-col gap-2 pointer-events-none z-[60]">
+        {notifications.map((notif) => (
+          <div
+            key={notif.id}
+            className={`px-3 py-2 rounded-lg text-xs font-semibold shadow-lg flex items-center gap-2 border pointer-events-auto transition-all ${
+              notif.type === 'join'
+                ? 'bg-[#e6fffa] border-[#b2f5ea] text-[#006d5b] animate-join-slide'
+                : 'bg-[#fff5f5] border-[#feb2b2] text-[#9b2c2c] animate-leave-slide'
+            }`}
+          >
+            <span className={`w-2 h-2 rounded-full ${notif.type === 'join' ? 'bg-[#319795]' : 'bg-[#e53e3e]'} animate-pulse`} />
+            <span>
+              {notif.type === 'join'
+                ? `${notif.displayName} bergabung`
+                : `${notif.displayName} keluar`}
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

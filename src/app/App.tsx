@@ -12,6 +12,10 @@ import { performSecurityAudit } from './utils/appSecurity';
 export default function App() {
   const { initializeSession, user, setUser, updateSettings, signInWithGoogle } = usePTTStore();
 
+  if (typeof window !== 'undefined') {
+    (window as any).usePTTStore = usePTTStore;
+  }
+
   useEffect(() => {
     performSecurityAudit()
       .then((audit) => {
@@ -93,6 +97,17 @@ export default function App() {
               onLogin={async (provider) => {
                 if (provider === 'google') {
                   await signInWithGoogle();
+                } else if (provider === 'guest') {
+                  const guestUser = {
+                    id: 'guest-' + Math.random().toString(36).substring(2, 11),
+                    isGuest: true as const,
+                    email: 'guest@example.com',
+                    user_metadata: { full_name: 'Tamu Peb' },
+                    app_metadata: { provider: 'guest' },
+                    aud: 'authenticated',
+                    created_at: new Date().toISOString(),
+                  };
+                  setUser(guestUser);
                 }
               }}
             />

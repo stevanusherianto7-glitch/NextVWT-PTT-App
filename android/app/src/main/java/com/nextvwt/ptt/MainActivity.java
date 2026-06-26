@@ -14,6 +14,10 @@ import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import java.security.MessageDigest;
 
+import android.Manifest;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 public class MainActivity extends BridgeActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +27,12 @@ public class MainActivity extends BridgeActivity {
             WindowManager.LayoutParams.FLAG_SECURE,
             WindowManager.LayoutParams.FLAG_SECURE
         );
+        
+        // Request Microphone permission natively so Capacitor WebView can use WebRTC getUserMedia
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 1);
+        }
+
         registerPlugin(AppSecurityPlugin.class);
         registerPlugin(BackgroundSurvivalPlugin.class);
     }
