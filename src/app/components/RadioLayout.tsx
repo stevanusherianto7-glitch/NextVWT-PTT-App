@@ -114,20 +114,10 @@ const reactionTimeouts: Record<string, ReturnType<typeof setTimeout>> = {};
 const playReactionSound = (kind: string) => {
   if (kind === 'ketawa_nular') {
     try {
-      const iframe = document.getElementById('youtube-player-ketawa-nular') as HTMLIFrameElement | null;
-      if (iframe && iframe.contentWindow) {
-        if (reactionTimeouts['ketawa_nular']) {
-          clearTimeout(reactionTimeouts['ketawa_nular']);
-        }
-        iframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
-        iframe.contentWindow.postMessage('{"event":"command","func":"seekTo","args":[0,true]}', '*');
-        iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-
-        reactionTimeouts['ketawa_nular'] = setTimeout(() => {
-          if (iframe.contentWindow) {
-            iframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
-          }
-        }, 12000);
+      const audio = document.getElementById('audio-player-ketawa-nular') as HTMLAudioElement | null;
+      if (audio) {
+        audio.currentTime = 0;
+        audio.play().catch(err => console.warn('Failed to play audio-player-ketawa-nular:', err));
       }
     } catch (err) {
       console.warn('Failed to play ketawa_nular:', err);
@@ -136,20 +126,10 @@ const playReactionSound = (kind: string) => {
   }
   if (kind === 'ketawa_anjay') {
     try {
-      const iframe = document.getElementById('youtube-player-ketawa-anjay') as HTMLIFrameElement | null;
-      if (iframe && iframe.contentWindow) {
-        if (reactionTimeouts['ketawa_anjay']) {
-          clearTimeout(reactionTimeouts['ketawa_anjay']);
-        }
-        iframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
-        iframe.contentWindow.postMessage('{"event":"command","func":"seekTo","args":[0,true]}', '*');
-        iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-
-        reactionTimeouts['ketawa_anjay'] = setTimeout(() => {
-          if (iframe.contentWindow) {
-            iframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
-          }
-        }, 12000);
+      const audio = document.getElementById('audio-player-ketawa-anjay') as HTMLAudioElement | null;
+      if (audio) {
+        audio.currentTime = 0;
+        audio.play().catch(err => console.warn('Failed to play audio-player-ketawa-anjay:', err));
       }
     } catch (err) {
       console.warn('Failed to play ketawa_anjay:', err);
@@ -1440,20 +1420,8 @@ export function RadioLayout() {
       )}
 
       {/* Preloaded Sound Reaction Players */}
-      <iframe
-        id="youtube-player-ketawa-nular"
-        src="https://www.youtube.com/embed/EwydqM4dNQE?enablejsapi=1&autoplay=0&controls=0"
-        title="Preloaded Ketawa Nular"
-        className="absolute w-0 h-0 opacity-0 pointer-events-none"
-        style={{ border: 'none' }}
-      />
-      <iframe
-        id="youtube-player-ketawa-anjay"
-        src="https://www.youtube.com/embed/1wmyPH1jUU4?enablejsapi=1&autoplay=0&controls=0"
-        title="Preloaded Ketawa Anjay"
-        className="absolute w-0 h-0 opacity-0 pointer-events-none"
-        style={{ border: 'none' }}
-      />
+      <audio id="audio-player-ketawa-nular" src="/sounds/ketawa_nular.mp3" preload="auto" />
+      <audio id="audio-player-ketawa-anjay" src="/sounds/ketawa_anjay.mp3" preload="auto" />
 
       {/* In-App Feedback Modal */}
       <FeedbackModal />
