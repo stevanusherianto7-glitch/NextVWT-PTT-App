@@ -17,7 +17,7 @@ export function NextVWTPremiumLogo() {
           preserveAspectRatio="xMidYMid meet"
         />
       </svg>
-      <div className="flex flex-col justify-center relative z-20 ml-2">
+      <div className="flex flex-col justify-center relative z-20 ml-[-8px]">
         <span
           className="text-[18px] leading-none tracking-wide select-none"
           style={{
