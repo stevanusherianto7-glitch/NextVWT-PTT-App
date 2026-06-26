@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { usePTTStore } from '../store/usePTTStore';
 import { ChannelRole } from '../../features/moderation/permissions';
 import iconVoice from '../../assets/icon_voice.png';
-import iconOperator from '../../assets/icon_moderator.png';
+import iconOperator from '../../assets/icon_operator_otomatis.png';
 import iconModerator from '../../assets/icon_moderator.png';
 import iconControlled from '../../assets/icon_controlled.png';
 import iconSilent from '../../assets/icon_silent.png';
@@ -926,7 +926,7 @@ export function UserListModal({
                           mode === 'operator'
                             ? {
                                 filter:
-                                  'brightness(0) invert(1) drop-shadow(0px 1px 1.5px rgba(0,0,0,0.75))',
+                                  'drop-shadow(0px 1px 1.5px rgba(0,0,0,0.75))',
                               }
                             : undefined
                         }
@@ -1189,7 +1189,7 @@ export function UserListModal({
                       className="w-3.5 h-3.5 object-contain"
                       style={{
                         filter:
-                          'brightness(0) invert(1) drop-shadow(0px 1px 1.5px rgba(0,0,0,0.75))',
+                          'drop-shadow(0px 1px 1.5px rgba(0,0,0,0.75))',
                       }}
                       alt="Operator"
                     />
