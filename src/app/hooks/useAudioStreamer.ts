@@ -505,7 +505,9 @@ export function useAudioStreamer() {
 
           try {
             const mimeType = getSupportedMimeType();
-            const options = mimeType ? { mimeType, audioBitsPerSecond: 64000 } : undefined;
+            const isMusicMode = usePTTStore.getState().audioMode === 'music';
+            const audioBitsPerSecond = isMusicMode ? 128000 : 24000;
+            const options = mimeType ? { mimeType, audioBitsPerSecond } : undefined;
             const recorder = new MediaRecorder(streamRef.current, options);
             mediaRecorderRef.current = recorder;
 
@@ -521,10 +523,10 @@ export function useAudioStreamer() {
               }
             };
 
-            // Start with a 250ms timeslice.
-            // The recorder will automatically fire ondataavailable every 250ms natively
+            // Start with a 500ms timeslice.
+            // The recorder will automatically fire ondataavailable every 500ms natively
             // WITHOUT needing to be destroyed and recreated, saving massive mobile CPU.
-            recorder.start(250);
+            recorder.start(500);
           } catch (err) {
             console.error('Failed to create robust MediaRecorder:', err);
           }

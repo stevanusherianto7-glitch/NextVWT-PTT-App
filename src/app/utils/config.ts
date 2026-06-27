@@ -76,6 +76,12 @@ export const BRAND: BrandConfig = {
 const BASE_CHANNELS: ChannelConfigItem[] = [
   { number: 0, name: 'DUKUNGAN & BANTUAN', type: 'green', users: [] },
   {
+    number: 99,
+    name: 'AI OPERATOR COMPANION',
+    type: 'violet',
+    users: ['AI Operator'],
+  },
+  {
     number: 100,
     name: 'LANDING-ECHO CHANNEL',
     type: 'violet',

@@ -863,6 +863,75 @@ export function RadioLayout() {
     };
   }, [isTransmitting, isPowerOn, user, setIsTransmitting]);
 
+  // AI Operator automated responder (Channel 99)
+  const wasTransmittingRef = useRef(false);
+  useEffect(() => {
+    const wasTransmitting = wasTransmittingRef.current;
+    wasTransmittingRef.current = isTransmitting;
+
+    if (wasTransmitting && !isTransmitting && channel === 99 && isPowerOn) {
+      const aiResponseTimer = setTimeout(() => {
+        playChirpSound(true);
+
+        const responses = [
+          "Ganti. Laporan cuaca Posko SAR Satu terpantau aman dan kondusif. Gunung Cereme berawan tebal, angin barat dua belas knot. Tetap waspada. Ganti.",
+          "Ganti. Saldo koin Anda saat ini masih mencukupi untuk transmisi jangka panjang. Tetap monitor frekuensi untuk info selanjutnya. Ganti.",
+          "Ganti. Kami mendeteksi sebanyak tiga stasiun aktif di sekitar koordinat Anda. Silakan lanjutkan komunikasi patroli Anda. Ganti.",
+          "Ganti. Panggilan darurat NOC global standby. Harap laporkan jika ada kendala modulasi atau gangguan frekuensi di lapangan. Ganti.",
+          "Ganti. Selamat siang rekan-rekan. AI Operator NextVWT siap membantu pemantauan dan koordinasi Off-Grid Anda. Monitor standby. Ganti."
+        ];
+        const randomText = responses[Math.floor(Math.random() * responses.length)];
+
+        usePTTStore.setState({
+          activeTransmitter: {
+            userId: 'sim_ai_operator',
+            displayName: 'AI Operator',
+            callSign: 'AI-OPS',
+            role: 'operator',
+          }
+        });
+
+        let prog = 45;
+        const progInterval = setInterval(() => {
+          prog = 35 + Math.floor(Math.random() * 45);
+          setProgress(prog);
+        }, 150);
+
+        if ('speechSynthesis' in window) {
+          const utterance = new SpeechSynthesisUtterance(randomText);
+          utterance.lang = 'id-ID';
+          utterance.rate = 0.95;
+          utterance.pitch = 1.0;
+          
+          utterance.onend = () => {
+            clearInterval(progInterval);
+            setProgress(0);
+            usePTTStore.setState({ activeTransmitter: null });
+            playChirpSound(false);
+          };
+
+          utterance.onerror = () => {
+            clearInterval(progInterval);
+            setProgress(0);
+            usePTTStore.setState({ activeTransmitter: null });
+            playChirpSound(false);
+          };
+
+          window.speechSynthesis.speak(utterance);
+        } else {
+          setTimeout(() => {
+            clearInterval(progInterval);
+            setProgress(0);
+            usePTTStore.setState({ activeTransmitter: null });
+            playChirpSound(false);
+          }, 4000);
+        }
+      }, 1200);
+
+      return () => clearTimeout(aiResponseTimer);
+    }
+  }, [isTransmitting, channel, isPowerOn, setProgress]);
+
   const handleSet = () => {
     if (isPowerOn) {
       setIsSettingsOpen(true);
