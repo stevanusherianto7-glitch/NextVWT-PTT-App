@@ -248,6 +248,7 @@ export function RadioLayout() {
     isKaraokePlayerOpen,
     setKaraokePlayerOpen: setIsKaraokePlayerOpen,
     userId,
+    user,
   } = usePTTStore();
 
   const activeChannelObj = STATIC_CHANNELS.find((ch) => ch.number === channel);
@@ -777,6 +778,90 @@ export function RadioLayout() {
     // Broadcast to other peers on the channel
     broadcastReaction(category, reactionType);
   };
+
+  // Online/Offline network event listener for auto-reconnection and state resync
+  useEffect(() => {
+    const handleOnline = () => {
+      toast.success('Koneksi internet terhubung kembali. Menghubungkan radio...');
+      const store = usePTTStore.getState();
+      store.setConnected(true);
+      if (store.isPowerOn) {
+        store.subscribeToChannel(store.channelNumber);
+      }
+    };
+
+    const handleOffline = () => {
+      toast.error('Koneksi internet terputus. Radio offline.');
+      const store = usePTTStore.getState();
+      store.setConnected(false);
+      usePTTStore.setState({
+        activeUsers: [],
+        activeTransmitter: null,
+        progress: 0,
+        isTransmitting: false,
+      });
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    if (!navigator.onLine) {
+      handleOffline();
+    }
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  // Coin deduction watchdog during active PTT transmission
+  useEffect(() => {
+    let intervalId: ReturnType<typeof setInterval> | null = null;
+
+    if (isTransmitting && isPowerOn && user) {
+      const store = usePTTStore.getState();
+      
+      if (store.coins <= 0) {
+        toast.error('Koin Anda habis! Silakan lakukan pengisian koin.');
+        setIsTransmitting(false);
+        return;
+      }
+
+      intervalId = setInterval(async () => {
+        const currentStore = usePTTStore.getState();
+        if (currentStore.coins <= 0) {
+          toast.error('Koin Anda habis! Transmisi dihentikan.');
+          setIsTransmitting(false);
+          return;
+        }
+
+        try {
+          const supabase = await getSupabase();
+          const newCoins = Math.max(0, currentStore.coins - 1);
+          const { error } = await supabase
+            .from('user_profiles_extended')
+            .update({ coins: newCoins })
+            .eq('user_id', currentStore.userId);
+
+          if (error) throw error;
+          
+          if (newCoins <= 0) {
+            toast.error('Koin Anda habis! Transmisi dihentikan.');
+            setIsTransmitting(false);
+          }
+        } catch (err) {
+          console.warn('Failed to deduct coin during transmission:', err);
+        }
+      }, 5000);
+    }
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [isTransmitting, isPowerOn, user, setIsTransmitting]);
 
   const handleSet = () => {
     if (isPowerOn) {

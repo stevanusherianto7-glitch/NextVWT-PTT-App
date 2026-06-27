@@ -17,6 +17,7 @@ import {
   UpdateStatusPayloadSchema,
   safeParseRealtimePayload,
 } from './schemas/realtimePayloads';
+import { toast } from 'sonner';
 
 import {
   safeGetStorage,
@@ -195,6 +196,55 @@ function subscribeToChannel(channelNum: number, retryCount = 0) {
             );
             if (!payload) return;
             if (payload.isTransmitting) {
+              const state = usePTTStore.getState();
+              const isOtherDevice = payload.userId !== state.userId || payload.callSign !== state.callSign;
+
+              if (isOtherDevice) {
+                const ROLE_PRIORITY: Record<string, number> = {
+                  noc: 5,
+                  sys_admin: 4,
+                  pjc: 3,
+                  operator: 2,
+                  member: 1.5,
+                  guest: 1,
+                };
+                
+                const roomId = `ptt-room-${state.channelNumber}`;
+                const myRole = state.user
+                  ? localStorage.getItem(`channel-role:${roomId}:${state.userId}`) || 'guest'
+                  : 'guest';
+                const myPriority = ROLE_PRIORITY[myRole] || 1;
+                const incomingPriority = ROLE_PRIORITY[payload.role || 'guest'] || 1;
+
+                if (state.isTransmitting) {
+                  // 1. Moderator Override (Pre-emption)
+                  if (incomingPriority > myPriority) {
+                    usePTTStore.setState({ isTransmitting: false, progress: 0 });
+                    toast.error(
+                      `Transmisi Anda dihentikan: Jalur diambil alih oleh Moderator/Operator (${payload.displayName}).`
+                    );
+                  } 
+                  // 2. PTT Collision Detection (Deterministic Tie-Breaker)
+                  else {
+                    const localTime = state.lastTransmitTime;
+                    const remoteTime = payload.timestamp || 0;
+                    
+                    // If we started later, or started at same time but have lower ID / priority
+                    const lostCollision = 
+                      localTime > remoteTime || 
+                      (localTime === remoteTime && state.userId > payload.userId);
+
+                    if (lostCollision) {
+                      usePTTStore.setState({ isTransmitting: false, progress: 0 });
+                      toast.warning(
+                        `Jalur sibuk! Transmisi bertabrakan dengan ${payload.displayName}.`
+                      );
+                      // In this case, we abort and listen to them instead
+                    }
+                  }
+                }
+              }
+
               usePTTStore.setState({
                 activeTransmitter: {
                   userId: payload.userId,

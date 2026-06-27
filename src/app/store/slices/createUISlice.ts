@@ -17,6 +17,7 @@ export const createUISlice: StateCreator<
     | 'isPowerOn'
     | 'isConnected'
     | 'isTransmitting'
+    | 'lastTransmitTime'
     | 'isScanning'
     | 'progress'
     | 'error'
@@ -42,6 +43,7 @@ export const createUISlice: StateCreator<
   isPowerOn: true,
   isConnected: false,
   isTransmitting: false,
+  lastTransmitTime: 0,
   isScanning: false,
   progress: 0,
   error: null,
@@ -87,6 +89,12 @@ export const createUISlice: StateCreator<
     const state = get();
     if (!state.isPowerOn) return;
 
+    const roomId = `ptt-room-${state.channelNumber}`;
+    const myRole =
+      (state as { _channelRole?: string })._channelRole ??
+      localStorage.getItem(`channel-role:${roomId}:${state.userId}`) ??
+      'guest';
+
     if (transmitting) {
       if (!pttRateLimiter.canProceed()) {
         console.warn('[Rate Limit] PTT transmission toggle ignored due to flood control');
@@ -100,28 +108,7 @@ export const createUISlice: StateCreator<
         return;
       }
 
-      // Start local watchdog timer to auto-stop transmission after 60 seconds
-      if (localTransmissionTimeout) {
-        clearTimeout(localTransmissionTimeout);
-      }
-      localTransmissionTimeout = setTimeout(() => {
-        console.warn('[Watchdog] Local transmission exceeded 60s limit. Force stopping.');
-        get().setTransmitting(false);
-        toast.info('Transmisi otomatis berhenti setelah 60 detik.');
-      }, 60000);
-
-      // Stateful Floor Control & Priority check
-      // [F-06] Role is derived from the Zustand store (server-authoritative via useChannelRole),
-      // NOT from localStorage which can be tampered by the user to escalate privileges.
       const activeTx = state.activeTransmitter;
-      const roomId = `ptt-room-${state.channelNumber}`;
-      // Read from store state as fallback — the definitive role is set by useChannelRole hook
-      // from the Supabase channel_roles table.
-      const myRole =
-        (state as { _channelRole?: string })._channelRole ??
-        localStorage.getItem(`channel-role:${roomId}:${state.userId}`) ??
-        'guest';
-
       const ROLE_PRIORITY: Record<string, number> = {
         noc: 5,
         sys_admin: 4,
@@ -156,15 +143,11 @@ export const createUISlice: StateCreator<
       }
     }
 
+    const nextTransmitTime = transmitting ? Date.now() : state.lastTransmitTime;
+
     if (activeChannelSubscription && state.isConnected) {
       const userMeta = state.user;
       const displayName = state.infoText || userMeta?.user_metadata?.full_name || 'User';
-      const roomId = `ptt-room-${state.channelNumber}`;
-      // [F-06] Prefer the store-cached role over localStorage for broadcast metadata
-      const myRole =
-        (state as { _channelRole?: string })._channelRole ??
-        localStorage.getItem(`channel-role:${roomId}:${state.userId}`) ??
-        'guest';
 
       activeChannelSubscription.send({
         type: 'broadcast',
@@ -175,18 +158,34 @@ export const createUISlice: StateCreator<
           callSign: state.callSign || '2DYUA',
           isTransmitting: transmitting,
           role: myRole,
+          timestamp: nextTransmitTime,
         },
       });
     }
 
-    if (!transmitting) {
+    if (transmitting) {
+      if (localTransmissionTimeout) {
+        clearTimeout(localTransmissionTimeout);
+      }
+      localTransmissionTimeout = setTimeout(() => {
+        const s = get();
+        if (s.isTransmitting) {
+          s.setTransmitting(false);
+          toast.warning('Waktu transmisi habis (maksimal 60 detik).');
+        }
+      }, 60000);
+    } else {
       if (localTransmissionTimeout) {
         clearTimeout(localTransmissionTimeout);
         localTransmissionTimeout = null;
       }
     }
 
-    set({ isTransmitting: transmitting, progress: transmitting ? 50 : 0 });
+    set({
+      isTransmitting: transmitting,
+      lastTransmitTime: nextTransmitTime,
+      progress: transmitting ? 50 : 0,
+    });
   },
 
   hangUpUser: (targetUserId: string) => {

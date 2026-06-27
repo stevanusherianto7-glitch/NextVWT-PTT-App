@@ -33,6 +33,7 @@ export interface PTTState {
   isPowerOn: boolean;
   isConnected: boolean;
   isTransmitting: boolean;
+  lastTransmitTime: number;
   isScanning: boolean;
   progress: number;
   channelNumber: number;

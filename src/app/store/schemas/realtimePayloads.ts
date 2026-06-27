@@ -25,6 +25,7 @@ export const PttStatePayloadSchema = z.object({
   isTransmitting: z.boolean(),
   role: ChannelRoleSchema.optional(),
   isNewUser: z.boolean().optional(),
+  timestamp: z.number().optional(),
 });
 export type PttStatePayload = z.infer<typeof PttStatePayloadSchema>;
 
