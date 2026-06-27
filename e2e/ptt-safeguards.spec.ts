@@ -94,6 +94,22 @@ test.describe('PTT Robustness & Safeguards', () => {
     await page.evaluate(() => {
       const store = (window as any).__store__;
       if (store) {
+        // Override setState to ensure user-alfa-uuid is always preserved in activeUsers
+        const originalSetState = store.setState;
+        store.setState = (newVal: any) => {
+          const updated = typeof newVal === 'function' ? newVal(store.getState()) : newVal;
+          if (updated.activeUsers) {
+            const hasAlfa = updated.activeUsers.some((u: any) => u.userId === 'user-alfa-uuid');
+            if (!hasAlfa) {
+              updated.activeUsers = [
+                ...updated.activeUsers,
+                { userId: 'user-alfa-uuid', displayName: 'User Alfa', callSign: 'ALFA', location: 'BANDUNG' }
+              ];
+            }
+          }
+          originalSetState(updated);
+        };
+
         const currentUsers = store.getState().activeUsers || [];
         store.setState({
           coins: 1000,

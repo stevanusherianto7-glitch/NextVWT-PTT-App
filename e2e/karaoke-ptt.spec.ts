@@ -48,7 +48,7 @@ test.describe('PTT Resilience in Karaoke / Music Mode', () => {
 
     // Set channel to a normal non-isolated channel (Channel 16) and set coins balance via store
     await page.evaluate(() => {
-      (window as any).__store__.setState({ coins: 1000 });
+      (window as any).__store__.setState({ coins: 1000, isConnected: true });
       (window as any).__store__.getState().setChannelNumber(16);
     });
 
