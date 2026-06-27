@@ -23,7 +23,7 @@ export function ProgressBar({ progress }: ProgressBarProps) {
       {/* The moving mask */}
       <div
         className="h-full transition-all duration-75 relative z-10"
-        style={{ width: `${progress}%`, overflow: 'hidden' }}
+        style={{ width: `${progress}%`, overflow: 'hidden', transition: 'none' }}
       >
         {/* The static laser spectrum */}
         <div
@@ -46,6 +46,7 @@ export function ProgressBar({ progress }: ProgressBarProps) {
             background: '#fff',
             boxShadow: `0 0 12px #fff, 0 0 25px ${headGlow}, 0 0 42px ${headGlow}`,
             borderRadius: '2px',
+            transition: 'none',
           }}
         />
       )}

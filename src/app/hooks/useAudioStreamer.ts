@@ -512,7 +512,7 @@ export function useAudioStreamer() {
             mediaRecorderRef.current = recorder;
 
             recorder.ondataavailable = async (event) => {
-              if (event.data && event.data.size > 0 && isRecordingRef.current) {
+              if (event.data && event.data.size > 0) {
                 try {
                   const arrayBuffer = await event.data.arrayBuffer();
                   const base64 = arrayBufferToBase64(arrayBuffer);
