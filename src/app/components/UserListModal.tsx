@@ -983,7 +983,12 @@ export function UserListModal({
                   <div
                     className={`text-[14px] font-medium truncate leading-snug ${hasVideoBackground ? 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]' : 'text-gray-800'}`}
                   >
-                    <span className="truncate">{profile.displayName}</span>
+                    <span className="truncate inline-flex items-center gap-1">
+                      {profile.role === 'noc' && (
+                        <span className="text-[#E53935] font-bold" title="NOC (Red Star)">★</span>
+                      )}
+                      {profile.displayName}
+                    </span>
                   </div>
                   <div className="flex items-center text-[11px] mt-0.5 truncate gap-px font-medium leading-none">
                     {isNewUserJoined(profile) && (
