@@ -1061,8 +1061,8 @@ export function RadioLayout() {
               </div>
             )}
 
-            {/* Floating Reactions Overlay — rendered on top of both UserListModal and faceplate */}
-            {isPowerOn && floatingReactions.length > 0 && (
+            {/* Floating Reactions Overlay — rendered only when UserListModal is open */}
+            {isPowerOn && isUserListOpen && floatingReactions.length > 0 && (
               <div
                 className={`absolute inset-x-0 top-[14px] w-full max-w-[340px] mx-auto h-[426px] pointer-events-none z-30 overflow-hidden ${isUserListOpen ? 'flex items-center justify-center' : ''}`}
               >
