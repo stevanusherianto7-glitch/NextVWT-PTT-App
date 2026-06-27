@@ -28,7 +28,20 @@ export const createAuthSlice: StateCreator<
   coins: 0,
 
   setUser: (user) => {
-    set({ user });
+    const state = _get() as PTTState;
+    const oldUserId = state.userId;
+    const newUserId = user ? user.id : oldUserId;
+
+    set({ user, userId: newUserId });
+
+    // If userId changed and we are connected, re-subscribe to update presence
+    if (newUserId !== oldUserId && state.isConnected) {
+      setTimeout(() => {
+        const s = _get() as PTTState;
+        s.subscribeToChannel(s.channelNumber);
+      }, 0);
+    }
+
     if (coinsSubscription) {
       coinsSubscription.unsubscribe();
       coinsSubscription = null;
@@ -113,8 +126,10 @@ export const createAuthSlice: StateCreator<
       await supabase.auth.signOut();
 
       // [F-08] Step 4: Reset all user-related state atomically
+      const { generateUUID } = await import('../storeUtils');
       set({
         user: null,
+        userId: generateUUID(),
         coins: 0,
         activeUsers: [],
         activeTransmitter: null,

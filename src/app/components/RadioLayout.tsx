@@ -283,7 +283,9 @@ export function RadioLayout() {
   const echoChunksRef = useRef<string[]>([]);
 
   const isReceiving =
-    activeTransmitter && activeTransmitter.userId !== usePTTStore.getState().userId;
+    activeTransmitter &&
+    (activeTransmitter.userId !== usePTTStore.getState().userId ||
+     activeTransmitter.callSign !== usePTTStore.getState().callSign);
   const isFullDuplexActive = fullDuplex || audioMode === 'music';
   const isBusy = !isFullDuplexActive && !!isReceiving;
 

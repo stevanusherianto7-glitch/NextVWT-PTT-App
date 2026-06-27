@@ -573,6 +573,7 @@ export function UserListModal({
   const localUser = usePTTStore((state) => state.user);
   const localInfoText = usePTTStore((state) => state.infoText);
   const localName = localUser?.user_metadata?.full_name || localInfoText || 'Pebe Herianto';
+  const localCallSign = usePTTStore((state) => state.callSign);
 
   const profilePhotoOption = usePTTStore((state) => state.profilePhotoOption);
   const customPhotoUrl = usePTTStore((state) => state.customPhotoUrl);
@@ -721,7 +722,7 @@ export function UserListModal({
   // Check if current logged-in user holds Moderator/Operator/NOC/SysAdmin position
   const roomId = `ptt-room-${channel}`;
   const localProfile = modalUsers.find(
-    (u) => u.userId === localUserId || u.displayName === localName || u.callSign === '2DYUA'
+    (u) => u.userId === localUserId && u.callSign === localCallSign
   );
   const localRole =
     (localUserId
@@ -911,9 +912,8 @@ export function UserListModal({
         {modalUsers.length > 0 ? (
           modalUsers.map((profile, idx) => {
             const isLocalUser =
-              profile.userId === localUserId ||
-              profile.displayName === localName ||
-              profile.callSign === '2DYUA';
+              profile.userId === localUserId &&
+              profile.callSign === localCallSign;
             const isSpeaking =
               (isTransmitting && isLocalUser) ||
               (activeTransmitter && activeTransmitter.userId === profile.userId);

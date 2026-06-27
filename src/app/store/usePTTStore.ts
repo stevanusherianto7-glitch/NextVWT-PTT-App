@@ -113,7 +113,7 @@ function subscribeToChannel(channelNum: number, retryCount = 0) {
       const channelInstance = supabase.channel(`${BRAND.supabaseRoomPrefix}${channelNum}`, {
         config: {
           presence: {
-            key: store.userId || 'anonymous',
+            key: `${store.userId || 'anonymous'}_${store.callSign || ''}`,
           },
           broadcast: {
             self: true, // receive our own broadcasts for loopback Ping-Pong
@@ -153,14 +153,14 @@ function subscribeToChannel(channelNum: number, retryCount = 0) {
           rawList.forEach((raw) => {
             const p = safeParseRealtimePayload(PresenceMetaSchema, raw, 'presence');
             if (p && p.userId) {
-              uniqueUsersMap.set(p.userId, {
+              uniqueUsersMap.set(`${p.userId}_${p.callSign || ''}`, {
                 userId: p.userId,
                 displayName: p.displayName || 'Anonim',
                 callSign: p.callSign || '2DYUA',
                 location: p.location || 'BANDUNG, JABAR',
                 avatarUrl: p.avatarUrl || '',
-                isNewUser: checkIfNewUser(p.createdAt),
-                role: p.role,
+                isNewUser: checkIfNewUser(p.createdAt || undefined),
+                role: (p.role as ChannelRole) || undefined,
                 isMuted: p.status === 'muted',
                 isControlled: p.status === 'controlled',
                 isWait: p.status === 'wait',
@@ -226,9 +226,12 @@ function subscribeToChannel(channelNum: number, retryCount = 0) {
               'voice_chunk'
             );
             if (!payload) return;
-            const state = usePTTStore.getState();
-            // Ignore our own broadcasted voice chunks to avoid feedback loop
-            if (payload.userId !== state.userId && state.onVoiceChunkReceived) {
+             const state = usePTTStore.getState();
+            // Ignore our own broadcasted voice chunks (matching both userId and callSign) to avoid feedback loop
+            const isSelf =
+              payload.userId === state.userId &&
+              (!payload.callSign || payload.callSign === state.callSign);
+            if (!isSelf && state.onVoiceChunkReceived) {
               state.onVoiceChunkReceived(payload.base64);
             }
           }
@@ -246,7 +249,13 @@ function subscribeToChannel(channelNum: number, retryCount = 0) {
             );
             if (!payload) return;
             const state = usePTTStore.getState();
-            if (payload.senderUserId !== state.userId && state.onWebRTCSignalingReceived) {
+            const isSelf =
+              payload.senderUserId === state.userId &&
+              (!payload.senderCallSign || payload.senderCallSign === state.callSign);
+            if (!isSelf && state.onWebRTCSignalingReceived) {
+              // Ensure the signal is intended for us (if targeted)
+              if (payload.targetUserId && payload.targetUserId !== state.userId) return;
+              if (payload.targetCallSign && payload.targetCallSign !== state.callSign) return;
               state.onWebRTCSignalingReceived(payload as WebRTCSignalingPayload);
             }
           }

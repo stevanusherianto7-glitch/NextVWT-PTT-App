@@ -22,7 +22,9 @@ export interface ChannelItem {
 
 export interface WebRTCSignalingPayload {
   senderUserId: string;
+  senderCallSign?: string;
   targetUserId?: string;
+  targetCallSign?: string;
   type: 'offer' | 'answer' | 'candidate';
   data: RTCSessionDescriptionInit | RTCIceCandidateInit;
 }

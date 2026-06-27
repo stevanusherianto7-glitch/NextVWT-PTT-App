@@ -71,6 +71,12 @@ Untuk arsitektur target, roadmap pengembangan, KPI teknis, dan template kode mod
 
 ---
 
+## Prerequisites & Environment
+- **Google Cloud SDK**: Terinstal & Terautentikasi.
+  - Path Instalasi: `C:\Users\ASUS\AppData\Local\Google\Cloud SDK\google-cloud-sdk\bin`
+  - Perintah refresh path di terminal saat ini:
+    `$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")`
+
 ## Quick Start
 
 ```bash

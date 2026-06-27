@@ -31,6 +31,7 @@ export const createWebRTCSlice: StateCreator<
         event: 'voice_chunk',
         payload: {
           userId: state.userId,
+          callSign: state.callSign,
           base64: base64Chunk,
         },
       });
@@ -45,7 +46,10 @@ export const createWebRTCSlice: StateCreator<
       activeChannelSubscription.send({
         type: 'broadcast',
         event: 'webrtc_signaling',
-        payload,
+        payload: {
+          ...payload,
+          senderCallSign: state.callSign,
+        },
       });
     }
   },

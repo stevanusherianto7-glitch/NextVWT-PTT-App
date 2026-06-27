@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { MeteredProvider } from "./providers/metered.ts";
@@ -10,21 +11,48 @@ const ALLOWED_ORIGINS = [
   'https://nextvwt.vercel.app',
   'https://nextvwt.id',
   'https://www.nextvwt.id',
+  'https://app.nextvwt.id',
+  'capacitor://localhost',
+  'http://localhost',
 ];
 
-function getCorsHeaders(req: Request) {
-  const origin = req.headers.get('Origin') || '';
-  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+function handleCors(req: Request): Response | { headers: Record<string, string> } {
+  const origin = req.headers.get('Origin');
+  
+  if (!origin) {
+    return {
+      headers: {
+        'Access-Control-Allow-Origin': ALLOWED_ORIGINS[0],
+        'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+        'Vary': 'Origin',
+      }
+    };
+  }
+
+  if (!ALLOWED_ORIGINS.includes(origin)) {
+    return new Response(JSON.stringify({ error: 'Origin not allowed' }), {
+      status: 403,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
   return {
-    'Access-Control-Allow-Origin': allowedOrigin,
-    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-    'Vary': 'Origin',
+    headers: {
+      'Access-Control-Allow-Origin': origin,
+      'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+      'Vary': 'Origin',
+    }
   };
 }
 
-serve(async (req) => {
+serve(async (req: Request) => {
   const startTime = Date.now();
-  const corsHeaders = getCorsHeaders(req);
+  const corsResult = handleCors(req);
+  
+  if (corsResult instanceof Response) {
+    return corsResult;
+  }
+  const corsHeaders = corsResult.headers;
 
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
@@ -126,7 +154,8 @@ serve(async (req) => {
     try {
       iceServers = await provider.getIceServers();
     } catch (providerError) {
-      console.error(`[TURN_ERROR] Provider ${providerName} failed:`, providerError.message || providerError);
+      const errMsg = providerError instanceof Error ? providerError.message : String(providerError);
+      console.error(`[TURN_ERROR] Provider ${providerName} failed:`, errMsg);
       // Fallback to static if main provider fails
       const staticProvider = new StaticProvider();
       iceServers = await staticProvider.getIceServers();

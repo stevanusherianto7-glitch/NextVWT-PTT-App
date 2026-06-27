@@ -8,18 +8,39 @@ const ALLOWED_ORIGINS = [
   'https://nextvwt.vercel.app',
   'https://nextvwt.id',
   'https://www.nextvwt.id',
+  'https://app.nextvwt.id',
   'capacitor://localhost',
   'http://localhost',
 ];
 
-function getCorsHeaders(req: Request) {
-  const origin = req.headers.get('Origin') || '';
-  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+function handleCors(req: Request): Response | { headers: Record<string, string> } {
+  const origin = req.headers.get('Origin');
+  
+  if (!origin) {
+    return {
+      headers: {
+        'Access-Control-Allow-Origin': ALLOWED_ORIGINS[0],
+        'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Vary': 'Origin',
+      }
+    };
+  }
+
+  if (!ALLOWED_ORIGINS.includes(origin)) {
+    return new Response(JSON.stringify({ error: 'Origin not allowed' }), {
+      status: 403,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
   return {
-    'Access-Control-Allow-Origin': allowedOrigin,
-    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Vary': 'Origin',
+    headers: {
+      'Access-Control-Allow-Origin': origin,
+      'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Vary': 'Origin',
+    }
   };
 }
 
@@ -76,7 +97,12 @@ function canPerformAction(role: ChannelRole, action: string): boolean {
 }
 
 serve(async (req: Request) => {
-  const corsHeaders = getCorsHeaders(req);
+  const corsResult = handleCors(req);
+  
+  if (corsResult instanceof Response) {
+    return corsResult;
+  }
+  const corsHeaders = corsResult.headers;
 
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {

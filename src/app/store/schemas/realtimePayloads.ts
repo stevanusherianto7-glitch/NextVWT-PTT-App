@@ -31,6 +31,7 @@ export type PttStatePayload = z.infer<typeof PttStatePayloadSchema>;
 // ─── Voice chunk broadcast (voice_chunk event) ──────────────────────────────
 export const VoiceChunkPayloadSchema = z.object({
   userId: UserIdSchema,
+  callSign: z.string().optional().nullable(),
   // base64 audio — max ~750KB per chunk (255ms Opus @ 128kbps)
   base64: z.string().min(1).max(1_100_000),
 });
@@ -50,7 +51,9 @@ const RTCIceCandidateSchema = z.object({
 
 export const WebRTCSignalingPayloadSchema = z.object({
   senderUserId: UserIdSchema,
-  targetUserId: UserIdSchema.optional(),
+  senderCallSign: z.string().optional().nullable(),
+  targetUserId: UserIdSchema.optional().nullable(),
+  targetCallSign: z.string().optional().nullable(),
   type: z.enum(['offer', 'answer', 'candidate']),
   data: z.union([RTCSessionDescriptionSchema, RTCIceCandidateSchema]),
 });
@@ -84,14 +87,14 @@ export type KickPayload = z.infer<typeof KickPayloadSchema>;
 
 // ─── Presence metadata (Supabase presence sync) ─────────────────────────────
 export const PresenceMetaSchema = z.object({
-  userId: UserIdSchema.optional(),
-  displayName: DisplayNameSchema.optional(),
-  callSign: z.string().max(10).optional(),
-  location: z.string().max(100).optional(),
-  avatarUrl: z.string().url().or(z.literal('')).optional(),
-  createdAt: z.string().optional(),
-  role: ChannelRoleSchema.optional(),
-  status: z.enum(['normal', 'muted', 'controlled', 'wait', 'wait_controlled']).optional(),
+  userId: z.string().min(1).max(200).optional().nullable(),
+  displayName: z.string().max(100).optional().nullable(),
+  callSign: z.string().max(20).optional().nullable(),
+  location: z.string().max(200).optional().nullable(),
+  avatarUrl: z.string().max(1000).optional().nullable(),
+  createdAt: z.string().optional().nullable(),
+  role: z.string().optional().nullable(),
+  status: z.string().optional().nullable(),
 });
 export type PresenceMeta = z.infer<typeof PresenceMetaSchema>;
 
