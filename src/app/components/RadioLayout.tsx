@@ -483,39 +483,18 @@ export function RadioLayout() {
       // Playback recorded chunks on Channel 100 after PTT released (Parrot Echo Test)
       const currentChannel = usePTTStore.getState().channelNumber;
       if (currentChannel === 100) {
-        setTimeout(() => {
+        setTimeout(async () => {
           if (echoChunksRef.current.length > 0) {
             try {
               const chunksToPlay = [...echoChunksRef.current];
               echoChunksRef.current = [];
 
-              // Combine all base64 chunks into a single ArrayBuffer (full WebM file)
-              let totalLength = 0;
-              const byteArrays = chunksToPlay.map((b64) => {
-                const binary = window.atob(b64);
-                const bytes = new Uint8Array(binary.length);
-                for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-                totalLength += bytes.length;
-                return bytes;
-              });
-
-              const combinedBuffer = new Uint8Array(totalLength);
-              let offset = 0;
-              for (const bytes of byteArrays) {
-                combinedBuffer.set(bytes, offset);
-                offset += bytes.length;
+              // Play each chunk sequentially via the Web Audio scheduling timeline
+              for (const chunk of chunksToPlay) {
+                await playAudioChunk(chunk);
               }
-
-              let combinedBinary = '';
-              for (let i = 0; i < combinedBuffer.length; i++) {
-                combinedBinary += String.fromCharCode(combinedBuffer[i]);
-              }
-              const combinedBase64 = window.btoa(combinedBinary);
-
-              // Local loopback offline fallback triggers the playAudioChunk
-              playAudioChunk(combinedBase64);
             } catch (err) {
-              console.error('Failed to combine parrot chunks:', err);
+              console.error('Failed to play back parrot echo chunks:', err);
             }
           }
         }, 500); // Wait long enough for MediaRecorder.stop() to flush the final async chunk

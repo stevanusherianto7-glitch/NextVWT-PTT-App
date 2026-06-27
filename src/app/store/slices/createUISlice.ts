@@ -252,10 +252,11 @@ export const createUISlice: StateCreator<
     const state = get();
     if (!state.isPowerOn) return;
 
-    // Guard: ignore non-zero progress values if we are neither transmitting nor receiving
+    // Guard: ignore non-zero progress values if we are neither transmitting nor receiving (except on Echo Channel 100)
     const isTransmitting = state.isTransmitting;
     const isReceiving = !!state.activeTransmitter;
-    if (!isTransmitting && !isReceiving && progress > 0) {
+    const isChannel100 = state.channelNumber === 100;
+    if (!isTransmitting && !isReceiving && !isChannel100 && progress > 0) {
       if (state.progress !== 0) {
         set({ progress: 0 });
       }

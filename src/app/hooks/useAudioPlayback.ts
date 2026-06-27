@@ -54,7 +54,7 @@ export function useAudioPlayback() {
 
   // Play an incoming Base64 voice chunk smoothly (used when WebRTC is not active)
   const playAudioChunk = useCallback(
-    async (base64Chunk: string, hasActivePeer: (userId: string) => boolean) => {
+    async (base64Chunk: string, hasActivePeer?: (userId: string) => boolean) => {
       const store = usePTTStore.getState();
 
       // Half-duplex constraint: Mute playback when we are actively transmitting
@@ -64,7 +64,7 @@ export function useAudioPlayback() {
 
       // Receiver-side deduplication: Mute/Ignore Base64 stream when we have an active WebRTC stream from the active transmitter
       const activeTx = store.activeTransmitter;
-      if (store.isConnected && activeTx && hasActivePeer(activeTx.userId)) {
+      if (store.isConnected && activeTx && hasActivePeer && hasActivePeer(activeTx.userId)) {
         return;
       }
 
