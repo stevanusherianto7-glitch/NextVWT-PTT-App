@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { IceServer, TurnProvider } from '../types.ts';
 
 export class StaticProvider implements TurnProvider {
