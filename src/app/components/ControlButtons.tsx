@@ -150,6 +150,7 @@ export function ControlButtons({
       {/* Scan Button */}
       <button
         type="button"
+        data-testid="scan-button"
         onClick={onScan}
         onMouseDown={() => setPressedBtn('scan')}
         onMouseUp={() => setPressedBtn(null)}
@@ -251,6 +252,7 @@ export function ControlButtons({
       {/* Set Button */}
       <button
         type="button"
+        data-testid="settings-button"
         onClick={onSet}
         onMouseDown={() => setPressedBtn('set')}
         onMouseUp={() => setPressedBtn(null)}

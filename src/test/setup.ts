@@ -65,7 +65,7 @@ global.RTCPeerConnection = vi.fn(() => ({
   removeEventListener: vi.fn(),
   connectionState: 'new',
   iceConnectionState: 'new',
-})) as any;
+})) as unknown as typeof RTCPeerConnection;
 
 // Mock MediaDevices / getUserMedia
 Object.defineProperty(global.navigator, 'mediaDevices', {
@@ -94,12 +94,12 @@ global.AudioContext = vi.fn(() => ({
   resume: vi.fn().mockResolvedValue(undefined),
   close: vi.fn(),
   state: 'running',
-})) as any;
+})) as unknown as typeof AudioContext;
 
 // Silence console.error for expected errors in tests
 const originalError = console.error;
 beforeAll(() => {
-  console.error = (...args: any[]) => {
+  console.error = (...args: unknown[]) => {
     if (typeof args[0] === 'string' && args[0].includes('Warning:')) return;
     originalError(...args);
   };

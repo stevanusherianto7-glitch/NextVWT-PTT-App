@@ -5,9 +5,9 @@ import type { RealtimeChannel } from '@supabase/supabase-js';
 export let activeChannelSubscription: RealtimeChannel | null = null;
 
 export const heartbeatState = {
-  heartbeatInterval: null as any,
-  heartbeatTimeout: null as any,
-  activeTransmitterTimeout: null as any,
+  heartbeatInterval: null as ReturnType<typeof setInterval> | null,
+  heartbeatTimeout: null as ReturnType<typeof setTimeout> | null,
+  activeTransmitterTimeout: null as ReturnType<typeof setTimeout> | null,
   expectedPingId: null as string | null,
   missedPings: 0,
 };

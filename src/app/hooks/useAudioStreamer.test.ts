@@ -109,8 +109,7 @@ class MockMediaRecorder {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-global.MediaRecorder = MockMediaRecorder as any;
+global.MediaRecorder = MockMediaRecorder as unknown as typeof MediaRecorder;
 
 describe('useAudioStreamer – Hook Unit Tests', () => {
   beforeEach(() => {

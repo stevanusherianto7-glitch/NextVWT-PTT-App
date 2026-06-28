@@ -19,8 +19,7 @@ export const FeedbackModal: React.FC = () => {
     setIsSubmitting(true);
     try {
       // TODO: Kirim data analitik ke PostHog atau Supabase di sini
-      // eslint-disable-next-line no-console
-      console.log('Feedback submitted:', isPositive ? 'Thumbs Up' : 'Thumbs Down');
+      console.warn('Feedback submitted:', isPositive ? 'Thumbs Up' : 'Thumbs Down');
 
       // Simulasi delay jaringan
       await new Promise((resolve) => setTimeout(resolve, 800));

@@ -111,7 +111,7 @@ export const createSettingsSlice: StateCreator<
           localStatus === 'wait' ||
           localStatus === 'wait_controlled'
         ) {
-          presenceStatus = localStatus as any;
+          presenceStatus = localStatus as typeof presenceStatus;
         }
 
         activeChannelSubscription

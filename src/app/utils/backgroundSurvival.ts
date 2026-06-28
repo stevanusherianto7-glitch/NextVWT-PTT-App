@@ -16,8 +16,7 @@ export async function startBackgroundService(channelInfo: string): Promise<void>
   if (!Capacitor.isNativePlatform()) return;
   try {
     await BackgroundSurvival.startService({ channelInfo });
-    // eslint-disable-next-line no-console
-    console.log('[BackgroundService] Service started successfully.');
+    console.warn('[BackgroundService] Service started successfully.');
   } catch (err) {
     console.error('[BackgroundService] Failed to start service:', err);
   }
@@ -30,8 +29,7 @@ export async function stopBackgroundService(): Promise<void> {
   if (!Capacitor.isNativePlatform()) return;
   try {
     await BackgroundSurvival.stopService();
-    // eslint-disable-next-line no-console
-    console.log('[BackgroundService] Service stopped successfully.');
+    console.warn('[BackgroundService] Service stopped successfully.');
   } catch (err) {
     console.error('[BackgroundService] Failed to stop service:', err);
   }
@@ -58,8 +56,7 @@ export async function requestBatteryWhitelist(): Promise<string> {
   if (!Capacitor.isNativePlatform()) return 'not_native';
   try {
     const res = await BackgroundSurvival.requestBatteryWhitelist();
-    // eslint-disable-next-line no-console
-    console.log('[BackgroundService] Battery whitelist requested:', res.status);
+    console.warn('[BackgroundService] Battery whitelist requested:', res.status);
     return res.status;
   } catch (err) {
     console.error('[BackgroundService] Failed to request battery whitelist:', err);

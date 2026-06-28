@@ -37,7 +37,11 @@ export function RadioHeader({ isUserListOpen, setIsUserListOpen, marqueeText }: 
         <div className="relative flex items-center justify-center h-full">
           <div className="relative flex items-center justify-center">
             {isTransmitting && (
-              <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+              <div
+                data-testid="transmitting-indicator"
+                className="absolute inset-0 pointer-events-none flex items-center justify-center"
+              >
+                <span className="sr-only">ON AIR</span>
                 <div className="logo-transmitting-bg" style={{ width: '100px', height: '100px' }}>
                   <div className="extra-ripple"></div>
                 </div>

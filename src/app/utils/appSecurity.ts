@@ -187,8 +187,7 @@ export async function performSecurityAudit(): Promise<{
           issues.push('INVALID_SIGNATURE');
           score -= 100; // Penalty fatal: aplikasi dimodifikasi
         }
-        // eslint-disable-next-line no-console
-        console.log('[AppSecurity] Signing certificate verification passed successfully.');
+        console.warn('[AppSecurity] Signing certificate verification passed successfully.');
       } catch (err) {
         issues.push('SIGNING_HASH_FETCH_FAILED');
         score -= 20;

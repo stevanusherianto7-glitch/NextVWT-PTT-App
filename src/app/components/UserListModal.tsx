@@ -639,7 +639,9 @@ export function UserListModal({
           role: isPebeUser ? 'noc' : localRole || profileData.role || 'guest',
           isMuted: localStatus === 'muted' || (localStatus ? false : profileData.isMuted) || false,
           isControlled:
-            localStatus === 'controlled' || (localStatus ? false : profileData.isControlled) || false,
+            localStatus === 'controlled' ||
+            (localStatus ? false : profileData.isControlled) ||
+            false,
           isWait: localStatus === 'wait' || (localStatus ? false : profileData.isWait) || false,
           isWaitControlled:
             localStatus === 'wait_controlled' ||

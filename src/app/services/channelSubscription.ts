@@ -376,7 +376,7 @@ export function subscribeToChannel(channelNum: number, retryCount = 0) {
                 localStatus === 'wait' ||
                 localStatus === 'wait_controlled'
               ) {
-                presenceStatus = localStatus as any;
+                presenceStatus = localStatus as typeof presenceStatus;
               }
 
               activeChannelSubscription
@@ -446,22 +446,26 @@ export function subscribeToChannel(channelNum: number, retryCount = 0) {
             }
           }
         )
-        .on('broadcast', { event: 'heartbeat_ping' }, ({ payload }: { payload: any }) => {
-          if (activeChannelSubscription !== channelInstance) return;
-          const state = usePTTStore.getState();
-          if (
-            payload &&
-            payload.userId === state.userId &&
-            payload.pingId === heartbeatState.expectedPingId
-          ) {
-            heartbeatState.expectedPingId = null;
-            heartbeatState.missedPings = 0;
-            if (heartbeatState.heartbeatTimeout) {
-              clearTimeout(heartbeatState.heartbeatTimeout);
-              heartbeatState.heartbeatTimeout = null;
+        .on(
+          'broadcast',
+          { event: 'heartbeat_ping' },
+          ({ payload }: { payload: { userId?: string; pingId?: string } }) => {
+            if (activeChannelSubscription !== channelInstance) return;
+            const state = usePTTStore.getState();
+            if (
+              payload &&
+              payload.userId === state.userId &&
+              payload.pingId === heartbeatState.expectedPingId
+            ) {
+              heartbeatState.expectedPingId = null;
+              heartbeatState.missedPings = 0;
+              if (heartbeatState.heartbeatTimeout) {
+                clearTimeout(heartbeatState.heartbeatTimeout);
+                heartbeatState.heartbeatTimeout = null;
+              }
             }
           }
-        });
+        );
 
       channelInstance.subscribe((status: string) => {
         if (activeChannelSubscription !== channelInstance) return;
@@ -572,7 +576,7 @@ export function subscribeToChannel(channelNum: number, retryCount = 0) {
               localStatus === 'wait' ||
               localStatus === 'wait_controlled'
             ) {
-              presenceStatus = localStatus as any;
+              presenceStatus = localStatus as typeof presenceStatus;
             }
 
             usePTTStore.setState({ myChannelRole: localRole, myChannelStatus: presenceStatus });

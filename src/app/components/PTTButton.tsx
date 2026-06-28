@@ -51,6 +51,7 @@ export function PTTButton({
     >
       <button
         type="button"
+        data-testid="ptt-button"
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseLeave}

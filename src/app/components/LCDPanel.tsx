@@ -194,9 +194,10 @@ export function LCDPanel({
                 </span>
               </div>
 
-              {/* OFFLINE Badge */}
-              {isOffline && (
+              {/* Connection Status & OFFLINE Badge */}
+              {isOffline ? (
                 <div
+                  data-testid="connection-status"
                   className="absolute left-1/2 -translate-x-1/2 top-1 px-2 py-0.5 rounded-full bg-[#E53935] flex items-center gap-1"
                   style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.3)', border: '1px solid #d32f2f' }}
                 >
@@ -219,6 +220,10 @@ export function LCDPanel({
                     Offline
                   </span>
                 </div>
+              ) : (
+                <span data-testid="connection-status" className="sr-only">
+                  ONLINE
+                </span>
               )}
 
               {/* BUSY Badge */}
