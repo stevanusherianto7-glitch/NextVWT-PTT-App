@@ -154,6 +154,17 @@ test.describe('Real-time Voice Streaming & Delivery', () => {
     await pageAlfa.evaluate(mockUserMediaScript);
     await pageBeta.evaluate(mockUserMediaScript);
 
+    // Expose a bridge function to pipe voice chunks from Alfa to Beta
+    await pageAlfa.exposeFunction('onVoiceChunkBroadcasted', async (base64: string) => {
+      await pageBeta.evaluate((chunk) => {
+        const store = (window as any).__store__;
+        if (store) {
+          const callback = store.getState().onVoiceChunkReceived;
+          if (callback) callback(chunk);
+        }
+      }, base64);
+    });
+
     // Set up interceptor/spy for voice chunk broadcast on Alfa
     await pageAlfa.evaluate(() => {
       (window as any).recordedVoiceChunks = [];
@@ -162,6 +173,7 @@ test.describe('Real-time Voice Streaming & Delivery', () => {
       store.getState().broadcastVoiceChunk = (base64: string) => {
         (window as any).recordedVoiceChunks.push(base64);
         originalBroadcast(base64);
+        (window as any).onVoiceChunkBroadcasted(base64).catch(() => {});
       };
     });
 

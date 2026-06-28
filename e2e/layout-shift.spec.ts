@@ -95,7 +95,7 @@ test.describe('Cumulative Layout Shift (CLS) Verification', () => {
     // Action G: Open User List Modal (Click User Count Icon on LCD)
     const userCountIcon = page.locator('img[alt="User Count Icon"]');
     await userCountIcon.click();
-    await page.waitForSelector('text=Tamu', { timeout: 3_000 });
+    await page.waitForSelector('.user-list-modal', { timeout: 3_000 });
 
     // Action H: Close User List Modal using backdrop click or click outside
     const backdrop = page.getByTestId('modal-backdrop');
