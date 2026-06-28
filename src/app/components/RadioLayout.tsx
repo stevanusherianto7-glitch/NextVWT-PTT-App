@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { Suspense } from 'react';
 import { toast } from 'sonner';
 import { KaraokePlayerSkeleton } from './SkeletonLoaders';
 import { ChannelListModal } from './ChannelListModal';
@@ -10,32 +10,7 @@ import { RadioBody } from './radio/RadioBody';
 import { RadioFooter, RadioQuickDock } from './radio/RadioFooter';
 import { RadioPanels } from './radio/RadioPanels';
 
-const lazyRetry = <Props extends object>(
-  importFn: () => Promise<{ default: React.ComponentType<Props> }>
-) => {
-  return lazy(async () => {
-    try {
-      return await importFn();
-    } catch (error) {
-      console.error('Dynamic chunk loading failed, triggering page reload:', error);
-      if (typeof window !== 'undefined') {
-        window.location.reload();
-      }
-      throw error;
-    }
-  }) as React.LazyExoticComponent<React.ComponentType<Props>>;
-};
-
-const FloatingKaraokePlayer = lazyRetry<
-  import('./FloatingKaraokePlayer').FloatingKaraokePlayerProps
->(async () => {
-  const m = await import('./FloatingKaraokePlayer');
-  return {
-    default: m.FloatingKaraokePlayer as React.ComponentType<
-      import('./FloatingKaraokePlayer').FloatingKaraokePlayerProps
-    >,
-  };
-});
+import { FloatingKaraokePlayer } from './LazyFloatingKaraokePlayer';
 
 export function RadioLayout() {
   const {
