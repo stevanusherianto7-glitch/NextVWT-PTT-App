@@ -10,6 +10,7 @@ import { useChannelRole } from '../../features/moderation/useChannelRole';
 import { useChannelSettings } from '../../features/moderation/useChannelSettings';
 import { canUsePTT } from '../../features/moderation/permissions';
 import { getSupabase } from '../utils/supabase';
+import { UserListModalProps } from './UserListModal';
 
 // Sub-components
 import { RadioHeader, RadioLCD } from './radio/RadioHeader';
@@ -123,7 +124,7 @@ export function RadioLayout() {
   >([]);
   const txStartTimeRef = useRef<number>(0);
   const [waitTimer, setWaitTimer] = useState<number | null>(null);
-  const [simulatedUsers, setSimulatedUsers] = useState<any[]>([]);
+  const [simulatedUsers, setSimulatedUsers] = useState<UserListModalProps['users']>([]);
 
   const { startRecording, stopRecording, playAudioChunk, flushAudioQueue } = useAudioStreamer();
 
@@ -146,7 +147,7 @@ export function RadioLayout() {
   const isFullDuplexActive = fullDuplex || audioMode === 'music';
   const isBusy = !isFullDuplexActive && !!isReceiving;
 
-  const isPebeOrPebri = (u: any) => {
+  const isPebeOrPebri = (u: UserListModalProps['users'][number]) => {
     if (typeof u === 'string') {
       return u.toLowerCase() === 'pebe herianto' || u.toLowerCase() === 'pebri haryanto';
     }

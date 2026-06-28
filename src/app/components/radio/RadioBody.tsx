@@ -1,7 +1,7 @@
 import { Player } from '@lottiefiles/react-lottie-player';
 import { PTTButton } from '../PTTButton';
 import { ProgressBar } from '../ProgressBar';
-import { UserListModal } from '../UserListModal';
+import { UserListModal, UserListModalProps } from '../UserListModal';
 import { usePTTStore } from '../../store/usePTTStore';
 
 import applauseAnimation from '../../../assets/reactions/applause.json';
@@ -29,7 +29,7 @@ interface RadioBodyProps {
   waitTimer: number | null;
   isBusy: boolean;
   status: string;
-  dynamicUserList: any[];
+  dynamicUserList: UserListModalProps['users'];
   channelNameStr: string;
   onPressStart: () => void;
   onPressEnd: () => void;

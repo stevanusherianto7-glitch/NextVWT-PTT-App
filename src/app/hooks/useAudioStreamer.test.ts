@@ -80,12 +80,12 @@ vi.mock('./useAudioPlayback', () => ({
 // ─── Mock MediaRecorder ───────────────────────────────────────────────────────
 class MockMediaRecorder {
   state = 'inactive';
-  ondataavailable: ((e: any) => void) | null = null;
+  ondataavailable: ((e: { data: Blob }) => void) | null = null;
   onstop: (() => void) | null = null;
 
   constructor(
-    public stream: any,
-    public options: any
+    public stream: unknown,
+    public options?: unknown
   ) {}
 
   start(_timeslice?: number) {
@@ -109,6 +109,7 @@ class MockMediaRecorder {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 global.MediaRecorder = MockMediaRecorder as any;
 
 describe('useAudioStreamer – Hook Unit Tests', () => {

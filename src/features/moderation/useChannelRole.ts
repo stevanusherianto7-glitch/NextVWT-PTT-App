@@ -194,7 +194,7 @@ export function useChannelRole(roomId: string, userId: string) {
         });
       }
     };
-  }, [roomId, userId]);
+  }, [roomId, userId, isPebe]);
 
   return {
     role,

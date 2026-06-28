@@ -16,6 +16,7 @@
     "lint": "eslint \"src/**/*.{ts,tsx}\"",
     "lint:fix": "eslint \"src/**/*.{ts,tsx}\" --fix",
     "test:integration": "vitest run --reporter=verbose",
+    "test:e2e": "playwright test --workers=1",
     "test:e2e:playwright": "playwright test --workers=1",
     "test:e2e:cypress": "cypress run",
     "type-check": "tsc --noEmit",
@@ -107,7 +108,8 @@
     "typescript-eslint": "^8.60.1",
     "vite": "6.3.5",
     "vite-plugin-pwa": "^1.3.0",
-    "vitest": "^4.1.8"
+    "vitest": "^4.1.8",
+    "wait-on": "^9.0.10"
   },
   "peerDependencies": {
     "react": "18.3.1",

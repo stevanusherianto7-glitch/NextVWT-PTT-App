@@ -85,7 +85,7 @@ export function subscribeToChannel(channelNum: number, retryCount = 0) {
 
       // Check if we were preempted by a newer subscription call during the await
       if (subscribingChannelNum !== channelNum) {
-        console.log(
+        console.warn(
           `[Supabase] Aborting subscription to CH ${channelNum} because target changed to CH ${subscribingChannelNum}`
         );
         return;

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { usePTTStore } from '../store/usePTTStore';
 import { activeChannelSubscription } from '../store/subscription';
 import { ChannelRole, canModerateRole } from '../../features/moderation/permissions';
@@ -12,7 +12,7 @@ import iconWaitControlled from '../../assets/icon_wait_controlled.png';
 import iconUserBaru from '../../assets/components/icon_tag_baru.svg';
 import iconNoc from '../../assets/icon_noc.png';
 
-interface UserListModalProps {
+export interface UserListModalProps {
   channel: number;
   channelName: string;
   users: Array<
@@ -590,71 +590,73 @@ export function UserListModal({
   const showPhotosInList = usePTTStore((s) => s.showPhotosInList ?? true);
 
   // Map user list or generate dynamic fallback, including local overrides
-  const mapUsers = (list: typeof users) => {
-    return list.map((user) => {
-      const uId = typeof user === 'string' ? user : user.userId;
-      const roomId = `ptt-room-${channel}`;
-      const localRole = sessionStorage.getItem(
-        `channel-role:${roomId}:${uId}`
-      ) as ChannelRole | null;
-      const localStatus = sessionStorage.getItem(`channel-status:${roomId}:${uId}`);
+  const mapUsers = useCallback(
+    (list: typeof users) => {
+      return list.map((user) => {
+        const uId = typeof user === 'string' ? user : user.userId;
+        const roomId = `ptt-room-${channel}`;
+        const localRole = sessionStorage.getItem(
+          `channel-role:${roomId}:${uId}`
+        ) as ChannelRole | null;
+        const localStatus = sessionStorage.getItem(`channel-status:${roomId}:${uId}`);
 
-      let profileData: UserProfile;
-      if (typeof user === 'string') {
-        profileData = { ...(USER_PROFILES[user] || getDeterministicProfile(user)) };
-      } else {
-        const matchedProfile =
-          USER_PROFILES[user.userId] ||
-          USER_PROFILES[user.displayName] ||
-          Object.values(USER_PROFILES).find((p) => p.callSign === user.callSign);
+        let profileData: UserProfile;
+        if (typeof user === 'string') {
+          profileData = { ...(USER_PROFILES[user] || getDeterministicProfile(user)) };
+        } else {
+          const matchedProfile =
+            USER_PROFILES[user.userId] ||
+            USER_PROFILES[user.displayName] ||
+            Object.values(USER_PROFILES).find((p) => p.callSign === user.callSign);
 
-        profileData = {
-          displayName: user.displayName,
-          callSign: matchedProfile?.callSign || user.callSign,
-          location: user.location,
-          avatarColor: '#3F51B5',
-          avatarUrl: user.avatarUrl || matchedProfile?.avatarUrl || '',
-          isNewUser: user.isNewUser || matchedProfile?.isNewUser,
-          joinedAt: user.joinedAt || matchedProfile?.joinedAt,
-          role: user.role || matchedProfile?.role || 'guest',
-          isMuted: user.isMuted || matchedProfile?.isMuted || false,
-          isControlled: user.isControlled || matchedProfile?.isControlled || false,
-          isWait: user.isWait || matchedProfile?.isWait || false,
-          isWaitControlled: user.isWaitControlled || matchedProfile?.isWaitControlled || false,
-          badges: matchedProfile?.badges,
+          profileData = {
+            displayName: user.displayName,
+            callSign: matchedProfile?.callSign || user.callSign,
+            location: user.location,
+            avatarColor: '#3F51B5',
+            avatarUrl: user.avatarUrl || matchedProfile?.avatarUrl || '',
+            isNewUser: user.isNewUser || matchedProfile?.isNewUser,
+            joinedAt: user.joinedAt || matchedProfile?.joinedAt,
+            role: user.role || matchedProfile?.role || 'guest',
+            isMuted: user.isMuted || matchedProfile?.isMuted || false,
+            isControlled: user.isControlled || matchedProfile?.isControlled || false,
+            isWait: user.isWait || matchedProfile?.isWait || false,
+            isWaitControlled: user.isWaitControlled || matchedProfile?.isWaitControlled || false,
+            badges: matchedProfile?.badges,
+          };
+        }
+
+        const isLocalUser = uId === localUserId || profileData.displayName === localName;
+        const isPebeUser =
+          uId === 'Pebe Herianto' ||
+          profileData.displayName.toLowerCase() === 'pebe herianto' ||
+          profileData.displayName.toLowerCase() === 'pebri haryanto';
+
+        return {
+          ...profileData,
+          avatarUrl: isLocalUser && localAvatar ? localAvatar : profileData.avatarUrl,
+          userId: uId,
+          role: isPebeUser ? 'noc' : localRole || profileData.role || 'guest',
+          isMuted: localStatus === 'muted' || (localStatus ? false : profileData.isMuted) || false,
+          isControlled:
+            localStatus === 'controlled' || (localStatus ? false : profileData.isControlled) || false,
+          isWait: localStatus === 'wait' || (localStatus ? false : profileData.isWait) || false,
+          isWaitControlled:
+            localStatus === 'wait_controlled' ||
+            (localStatus ? false : profileData.isWaitControlled) ||
+            false,
         };
-      }
-
-      const isLocalUser = uId === localUserId || profileData.displayName === localName;
-      const isPebeUser =
-        uId === 'Pebe Herianto' ||
-        profileData.displayName.toLowerCase() === 'pebe herianto' ||
-        profileData.displayName.toLowerCase() === 'pebri haryanto';
-
-      return {
-        ...profileData,
-        avatarUrl: isLocalUser && localAvatar ? localAvatar : profileData.avatarUrl,
-        userId: uId,
-        role: isPebeUser ? 'noc' : localRole || profileData.role || 'guest',
-        isMuted: localStatus === 'muted' || (localStatus ? false : profileData.isMuted) || false,
-        isControlled:
-          localStatus === 'controlled' || (localStatus ? false : profileData.isControlled) || false,
-        isWait: localStatus === 'wait' || (localStatus ? false : profileData.isWait) || false,
-        isWaitControlled:
-          localStatus === 'wait_controlled' ||
-          (localStatus ? false : profileData.isWaitControlled) ||
-          false,
-      };
-    });
-  };
+      });
+    },
+    [channel, localUserId, localName, localAvatar]
+  );
 
   const [modalUsers, setModalUsers] = useState(() => mapUsers(users));
 
   // Sync state if users or channel changes
   useEffect(() => {
     setModalUsers(mapUsers(users));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [users, channel]);
+  }, [users, mapUsers]);
 
   useEffect(() => {
     const handleRoleChanged = () => {
@@ -664,12 +666,12 @@ export function UserListModal({
     return () => {
       window.removeEventListener('channel-role-changed', handleRoleChanged);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [users, channel]);
+  }, [users, mapUsers]);
+
   const [notifications, setNotifications] = useState<
     Array<{ id: string; displayName: string; type: 'join' | 'leave' }>
   >([]);
-  const prevModalUsersRef = useRef<any[]>([]);
+  const prevModalUsersRef = useRef<ReturnType<typeof mapUsers>>([]);
   const isFirstRender = useRef(true);
 
   useEffect(() => {
@@ -729,7 +731,7 @@ export function UserListModal({
       }
       prevModalUsersRef.current = currentMapped;
     }
-  }, [users]);
+  }, [users, mapUsers]);
   const [activeZoomedAvatar, setActiveZoomedAvatar] = useState<(typeof modalUsers)[0] | null>(null);
 
   // Check if current logged-in user holds Moderator/Operator/NOC/SysAdmin position
