@@ -405,12 +405,9 @@ export function AquariumCanvas({ theme }: AquariumCanvasProps) {
         const pulseCycle = Math.sin(time * 2.2 + fish.id * 1.7);
         const isGliding = pulseCycle < -0.15; // Gliding / coasting phase
 
-        let targetSpeed = fish.maxSpeed;
-        if (isGliding) {
-          targetSpeed = fish.maxSpeed * 0.22; // Slow glide coast
-        } else {
-          targetSpeed = fish.maxSpeed * (1.15 + Math.abs(pulseCycle) * 0.45); // Active burst sweep
-        }
+        const targetSpeed = isGliding
+          ? fish.maxSpeed * 0.22 // Slow glide coast
+          : fish.maxSpeed * (1.15 + Math.abs(pulseCycle) * 0.45); // Active burst sweep
 
         const speedMultiplier = distToTarget < 40 ? 0.35 : 1.0;
         const currentTargetSpeed = targetSpeed * speedMultiplier;
@@ -457,7 +454,7 @@ export function AquariumCanvas({ theme }: AquariumCanvasProps) {
 
         const speed = Math.hypot(fish.vx, fish.vy);
         // Tail wiggle speed matches velocity, drops to near zero when gliding
-        const wiggleFactor = speed > fish.maxSpeed * 0.35 ? (speed / fish.maxSpeed) : 0.05;
+        const wiggleFactor = speed > fish.maxSpeed * 0.35 ? speed / fish.maxSpeed : 0.05;
         fish.wigglePhase += fish.wiggleSpeed * wiggleFactor * 1.75;
 
         // --- DRAW FISH (Skeletal Joint bending for maximum flexibility) ---

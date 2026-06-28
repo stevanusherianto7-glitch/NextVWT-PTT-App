@@ -90,7 +90,8 @@ export const createUISlice: StateCreator<
     const state = get();
     if (!state.isPowerOn) return;
 
-    const myRole = (state as { _channelRole?: string })._channelRole ?? state.myChannelRole ?? 'guest';
+    const myRole =
+      (state as { _channelRole?: string })._channelRole ?? state.myChannelRole ?? 'guest';
 
     if (transmitting) {
       if (!pttRateLimiter.canProceed()) {
@@ -183,8 +184,14 @@ export const createUISlice: StateCreator<
 
     // Hardcode Guard: Never allow hanging up a NOC
     const targetUser = state.activeUsers.find((u) => u.userId === targetUserId);
-    const targetLocalRole = localStorage.getItem(`channel-role:ptt-room-${state.channelNumber}:${targetUserId}`);
-    if (targetUser?.role === 'noc' || targetLocalRole === 'noc' || targetUserId === 'Pebe Herianto') {
+    const targetLocalRole = localStorage.getItem(
+      `channel-role:ptt-room-${state.channelNumber}:${targetUserId}`
+    );
+    if (
+      targetUser?.role === 'noc' ||
+      targetLocalRole === 'noc' ||
+      targetUserId === 'Pebe Herianto'
+    ) {
       console.warn('Cannot hang up NOC user');
       return;
     }
@@ -222,8 +229,14 @@ export const createUISlice: StateCreator<
 
     // Hardcode Guard: Never allow kicking a NOC
     const targetUser = state.activeUsers.find((u) => u.userId === targetUserId);
-    const targetLocalRole = localStorage.getItem(`channel-role:ptt-room-${state.channelNumber}:${targetUserId}`);
-    if (targetUser?.role === 'noc' || targetLocalRole === 'noc' || targetUserId === 'Pebe Herianto') {
+    const targetLocalRole = localStorage.getItem(
+      `channel-role:ptt-room-${state.channelNumber}:${targetUserId}`
+    );
+    if (
+      targetUser?.role === 'noc' ||
+      targetLocalRole === 'noc' ||
+      targetUserId === 'Pebe Herianto'
+    ) {
       console.warn('Cannot kick NOC user');
       return;
     }

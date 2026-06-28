@@ -1,5 +1,5 @@
-import '@testing-library/jest-dom'
-import { vi, beforeAll, afterAll } from 'vitest'
+import '@testing-library/jest-dom';
+import { vi, beforeAll, afterAll } from 'vitest';
 
 // Mock Capacitor (not available in jsdom)
 vi.mock('@capacitor/core', () => ({
@@ -11,7 +11,7 @@ vi.mock('@capacitor/core', () => ({
     startBackgroundService: vi.fn(() => Promise.resolve()),
     stopBackgroundService: vi.fn(() => Promise.resolve()),
   })),
-}))
+}));
 
 // Mock Supabase client
 vi.mock('@/app/utils/supabase', () => {
@@ -50,7 +50,7 @@ vi.mock('@/app/utils/supabase', () => {
     supabase: mockSupabase,
     getSupabase: vi.fn(() => Promise.resolve(mockSupabase)),
   };
-})
+});
 
 // Mock WebRTC APIs
 global.RTCPeerConnection = vi.fn(() => ({
@@ -65,7 +65,7 @@ global.RTCPeerConnection = vi.fn(() => ({
   removeEventListener: vi.fn(),
   connectionState: 'new',
   iceConnectionState: 'new',
-})) as any
+})) as any;
 
 // Mock MediaDevices / getUserMedia
 Object.defineProperty(global.navigator, 'mediaDevices', {
@@ -74,12 +74,14 @@ Object.defineProperty(global.navigator, 'mediaDevices', {
       getTracks: vi.fn(() => [{ stop: vi.fn(), kind: 'audio' }]),
       getAudioTracks: vi.fn(() => [{ stop: vi.fn(), enabled: true }]),
     }),
-    enumerateDevices: vi.fn().mockResolvedValue([
-      { kind: 'audioinput', deviceId: 'default', label: 'Default Microphone' },
-    ]),
+    enumerateDevices: vi
+      .fn()
+      .mockResolvedValue([
+        { kind: 'audioinput', deviceId: 'default', label: 'Default Microphone' },
+      ]),
   },
   configurable: true,
-})
+});
 
 // Mock AudioContext
 global.AudioContext = vi.fn(() => ({
@@ -92,16 +94,16 @@ global.AudioContext = vi.fn(() => ({
   resume: vi.fn().mockResolvedValue(undefined),
   close: vi.fn(),
   state: 'running',
-})) as any
+})) as any;
 
 // Silence console.error for expected errors in tests
-const originalError = console.error
+const originalError = console.error;
 beforeAll(() => {
   console.error = (...args: any[]) => {
-    if (typeof args[0] === 'string' && args[0].includes('Warning:')) return
-    originalError(...args)
-  }
-})
+    if (typeof args[0] === 'string' && args[0].includes('Warning:')) return;
+    originalError(...args);
+  };
+});
 afterAll(() => {
-  console.error = originalError
-})
+  console.error = originalError;
+});

@@ -9,11 +9,7 @@ interface RadioHeaderProps {
   marqueeText: string;
 }
 
-export function RadioHeader({
-  isUserListOpen,
-  setIsUserListOpen,
-  marqueeText,
-}: RadioHeaderProps) {
+export function RadioHeader({ isUserListOpen, setIsUserListOpen, marqueeText }: RadioHeaderProps) {
   const { isPowerOn, isTransmitting, setPower } = usePTTStore();
 
   return (
@@ -42,10 +38,7 @@ export function RadioHeader({
           <div className="relative flex items-center justify-center">
             {isTransmitting && (
               <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-                <div
-                  className="logo-transmitting-bg"
-                  style={{ width: '100px', height: '100px' }}
-                >
+                <div className="logo-transmitting-bg" style={{ width: '100px', height: '100px' }}>
                   <div className="extra-ripple"></div>
                 </div>
               </div>
@@ -65,9 +58,7 @@ export function RadioHeader({
               />
             </svg>
           </div>
-          <div
-            className="flex flex-col justify-center relative z-20 transition-all duration-300 ml-0"
-          >
+          <div className="flex flex-col justify-center relative z-20 transition-all duration-300 ml-0">
             <span
               className="text-[16px] leading-none tracking-wide select-none"
               style={{

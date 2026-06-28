@@ -11,8 +11,7 @@ interface PrivateChannelPanelProps {
 }
 
 export function PrivateChannelPanel({ onClose }: PrivateChannelPanelProps) {
-  const { channelNumber, userId, setChannelNumber, user, infoText, callSign } =
-    usePTTStore();
+  const { channelNumber, userId, setChannelNumber, user, infoText, callSign } = usePTTStore();
   const roomId = `ptt-room-${channelNumber}`;
 
   const [hasBadge, setHasBadge] = useState(false);

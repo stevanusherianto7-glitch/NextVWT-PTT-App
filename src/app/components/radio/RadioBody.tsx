@@ -77,9 +77,7 @@ export function RadioBody({
         <div className="w-full max-w-[340px] h-[426px] relative -mt-[14px] overflow-hidden">
           {/* Background Video Reaction (Lion or Aquarium) */}
           {isPowerOn &&
-            floatingReactions.some(
-              (r) => r.reaction === 'lion' || r.reaction === 'aquarium'
-            ) &&
+            floatingReactions.some((r) => r.reaction === 'lion' || r.reaction === 'aquarium') &&
             (() => {
               const activeReaction = floatingReactions.find(
                 (r) => r.reaction === 'lion' || r.reaction === 'aquarium'
@@ -112,9 +110,7 @@ export function RadioBody({
             onClose={() => setIsUserListOpen(false)}
             hasVideoBackground={
               isPowerOn &&
-              floatingReactions.some(
-                (r) => r.reaction === 'lion' || r.reaction === 'aquarium'
-              )
+              floatingReactions.some((r) => r.reaction === 'lion' || r.reaction === 'aquarium')
             }
           />
         </div>
@@ -140,7 +136,7 @@ export function RadioBody({
                   'inset 0 3px 4px rgba(100, 116, 139, 0.5), inset 3px 0 4px rgba(100, 116, 139, 0.5), inset 4px 4px 6px rgba(100, 116, 139, 0.45), inset -4px -4px 8px rgba(0, 0, 0, 0.35), inset 0 -3px 5px rgba(0, 0, 0, 0.3)',
               }}
             />
-            
+
             {/* Render LCD Panel */}
             {lcd}
 
@@ -195,9 +191,7 @@ export function RadioBody({
                   className="flex flex-col items-center gap-0.5 pointer-events-none"
                   style={posStyle}
                 >
-                  <div
-                    className={`${floatAnim} flex flex-col items-center gap-0.5 opacity-80`}
-                  >
+                  <div className={`${floatAnim} flex flex-col items-center gap-0.5 opacity-80`}>
                     <span
                       className={
                         isUserListOpen
@@ -296,9 +290,7 @@ export function RadioBody({
                       className="text-[52px] select-none"
                       style={{
                         display: 'inline-block',
-                        animation: isUserListOpen
-                          ? undefined
-                          : 'rocket3d 4s ease-out forwards',
+                        animation: isUserListOpen ? undefined : 'rocket3d 4s ease-out forwards',
                         filter:
                           'drop-shadow(0 0 10px rgba(255,140,0,0.95)) drop-shadow(0 6px 12px rgba(0,0,0,0.5))',
                       }}
@@ -328,9 +320,7 @@ export function RadioBody({
                       className="text-[58px] select-none"
                       style={{
                         display: 'inline-block',
-                        animation: isUserListOpen
-                          ? undefined
-                          : 'lightning3d 4s ease-out forwards',
+                        animation: isUserListOpen ? undefined : 'lightning3d 4s ease-out forwards',
                         filter:
                           'drop-shadow(0 0 16px rgba(255,255,60,1)) drop-shadow(0 0 32px rgba(255,200,0,0.7))',
                       }}
@@ -361,9 +351,7 @@ export function RadioBody({
                       className="text-[56px] select-none"
                       style={{
                         display: 'inline-block',
-                        animation: isUserListOpen
-                          ? undefined
-                          : 'star3dSpin 4.5s ease-out forwards',
+                        animation: isUserListOpen ? undefined : 'star3dSpin 4.5s ease-out forwards',
                         filter:
                           'drop-shadow(0 0 14px rgba(255,220,0,0.95)) drop-shadow(0 0 28px rgba(255,180,0,0.6))',
                       }}

@@ -635,7 +635,7 @@ export function UserListModal({
         ...profileData,
         avatarUrl: isLocalUser && localAvatar ? localAvatar : profileData.avatarUrl,
         userId: uId,
-        role: isPebeUser ? 'noc' : (localRole || profileData.role || 'guest'),
+        role: isPebeUser ? 'noc' : localRole || profileData.role || 'guest',
         isMuted: localStatus === 'muted' || (localStatus ? false : profileData.isMuted) || false,
         isControlled:
           localStatus === 'controlled' || (localStatus ? false : profileData.isControlled) || false,
@@ -684,7 +684,9 @@ export function UserListModal({
       return;
     }
 
-    const joined = currentMapped.filter((u) => !prevIds.includes(`${u.userId}_${u.callSign || ''}`));
+    const joined = currentMapped.filter(
+      (u) => !prevIds.includes(`${u.userId}_${u.callSign || ''}`)
+    );
     const left = prevMapped.filter((u) => !currentIds.includes(`${u.userId}_${u.callSign || ''}`));
 
     if (joined.length > 0 || left.length > 0) {
@@ -692,10 +694,7 @@ export function UserListModal({
 
       joined.forEach((u) => {
         const name = u.displayName || u.userId;
-        if (
-          name.toLowerCase() === 'pebe herianto' ||
-          name.toLowerCase() === 'pebri haryanto'
-        ) {
+        if (name.toLowerCase() === 'pebe herianto' || name.toLowerCase() === 'pebri haryanto') {
           return;
         }
         const notifId = Math.random().toString();
@@ -711,10 +710,7 @@ export function UserListModal({
 
       left.forEach((u) => {
         const name = u.displayName || u.userId;
-        if (
-          name.toLowerCase() === 'pebe herianto' ||
-          name.toLowerCase() === 'pebri haryanto'
-        ) {
+        if (name.toLowerCase() === 'pebe herianto' || name.toLowerCase() === 'pebri haryanto') {
           return;
         }
         const notifId = Math.random().toString();
@@ -948,8 +944,7 @@ export function UserListModal({
         {modalUsers.length > 0 ? (
           modalUsers.map((profile, idx) => {
             const isLocalUser =
-              profile.userId === localUserId &&
-              profile.callSign === localCallSign;
+              profile.userId === localUserId && profile.callSign === localCallSign;
             const isSpeaking =
               (isTransmitting && isLocalUser) ||
               (activeTransmitter && activeTransmitter.userId === profile.userId);
@@ -1293,7 +1288,11 @@ export function UserListModal({
                           : 'bg-gray-50 border-gray-200 text-gray-500 hover:bg-gray-100'
                       }`}
                     >
-                      <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-current text-purple-600" xmlns="http://www.w3.org/2000/svg">
+                      <svg
+                        viewBox="0 0 24 24"
+                        className="w-3.5 h-3.5 fill-current text-purple-600"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
                         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
                       </svg>
                       Sys Admin

@@ -15,11 +15,7 @@ export interface SettingsPanelProps {
   onOpenRoip?: () => void;
 }
 
-export function SettingsPanel({
-  onClose,
-  onOpenModeration,
-  onOpenRoip,
-}: SettingsPanelProps) {
+export function SettingsPanel({ onClose, onOpenModeration, onOpenRoip }: SettingsPanelProps) {
   const {
     infoText,
     locationText,

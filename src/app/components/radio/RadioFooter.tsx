@@ -45,10 +45,7 @@ export function RadioQuickDock({
   if (!isUserListOpen) return null;
 
   return (
-    <div
-      onClick={(e) => e.stopPropagation()}
-      className="w-full flex justify-center z-20 mt-3"
-    >
+    <div onClick={(e) => e.stopPropagation()} className="w-full flex justify-center z-20 mt-3">
       <QuickActionDock
         onOpenChat={onOpenChat}
         onOpenQueue={onOpenQueue}

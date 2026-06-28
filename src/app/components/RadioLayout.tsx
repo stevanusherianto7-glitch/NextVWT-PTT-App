@@ -121,7 +121,7 @@ export function RadioLayout() {
   const [floatingReactions, setFloatingReactions] = useState<
     Array<{ id: string; category?: string; reaction: string; x: number; senderName?: string }>
   >([]);
-  const [txStartTime, setTxStartTime] = useState<number>(0);
+  const txStartTimeRef = useRef<number>(0);
   const [waitTimer, setWaitTimer] = useState<number | null>(null);
   const [simulatedUsers, setSimulatedUsers] = useState<any[]>([]);
 
@@ -142,7 +142,7 @@ export function RadioLayout() {
   const isReceiving =
     activeTransmitter &&
     (activeTransmitter.userId !== usePTTStore.getState().userId ||
-     activeTransmitter.callSign !== usePTTStore.getState().callSign);
+      activeTransmitter.callSign !== usePTTStore.getState().callSign);
   const isFullDuplexActive = fullDuplex || audioMode === 'music';
   const isBusy = !isFullDuplexActive && !!isReceiving;
 
@@ -248,13 +248,22 @@ export function RadioLayout() {
 
     if (isTransmitting || isReceiving) {
       const interval = setInterval(() => {
-        // Generate dynamic fluctuation simulating speech amplitude
-        const base = 25;
-        const wave = Math.sin(Date.now() / 80) * 15;
-        const noise = Math.random() * 45;
-        const simulatedProgress = Math.max(0, Math.min(100, base + wave + noise));
+        const time = Date.now() / 1000;
+        // Speech envelope: simulate human phrases (loud peaks & pauses)
+        const speechEnvelope = Math.max(
+          0.1,
+          Math.sin(time * 1.6) * 0.45 + Math.sin(time * 0.55) * 0.55 + 0.25
+        );
+        // Rapid vocal cord vibrations
+        const voiceRipple = Math.sin(time * 24) * 12 + Math.sin(time * 48) * 8;
+        // Random white noise
+        const randomNoise = Math.random() * 14 - 7;
+
+        let simulatedProgress = speechEnvelope * 82 + voiceRipple + randomNoise;
+        // Clamp to full 0 - 100 range
+        simulatedProgress = Math.max(0, Math.min(100, simulatedProgress));
         setProgress(simulatedProgress);
-      }, 100);
+      }, 80); // Faster refresh rate for dynamic analog feeling
 
       return () => {
         clearInterval(interval);
@@ -264,7 +273,6 @@ export function RadioLayout() {
       setProgress(0);
     }
   }, [isPowerOn, isTransmitting, activeTransmitter, setProgress]);
-
 
   // Manage audio recording when transmitting
   useEffect(() => {
@@ -295,7 +303,7 @@ export function RadioLayout() {
         }
         setIsTransmitting(false);
       });
-      setTxStartTime(Date.now());
+      txStartTimeRef.current = Date.now();
     } else {
       stopRecording();
 
@@ -320,8 +328,8 @@ export function RadioLayout() {
       }
 
       // Logic untuk memicu FeedbackModal jika pengguna baru selesai transmit
-      if (txStartTime > 0) {
-        const txDuration = Date.now() - txStartTime;
+      if (txStartTimeRef.current > 0) {
+        const txDuration = Date.now() - txStartTimeRef.current;
         const lastFeedback = usePTTStore.getState().lastFeedbackTime;
         const timeSinceLastFeedback = Date.now() - lastFeedback;
         const ONE_DAY = 24 * 60 * 60 * 1000;
@@ -330,7 +338,7 @@ export function RadioLayout() {
         if (txDuration > 3000 && timeSinceLastFeedback > ONE_DAY) {
           usePTTStore.getState().setShowFeedbackModal(true);
         }
-        setTxStartTime(0);
+        txStartTimeRef.current = 0;
       }
     }
     return () => {
@@ -345,7 +353,6 @@ export function RadioLayout() {
     playAudioChunk,
     flushAudioQueue,
     setIsTransmitting,
-    txStartTime,
   ]);
 
   const resetWatchdogRef = useRef<(() => void) | null>(null);
@@ -642,11 +649,11 @@ export function RadioLayout() {
         playChirpSound(true);
 
         const responses = [
-          "Ganti. Laporan cuaca Posko SAR Satu terpantau aman dan kondusif. Gunung Cereme berawan tebal, angin barat dua belas knot. Tetap waspada. Ganti.",
-          "Ganti. Saldo koin Anda saat ini masih mencukupi untuk transmisi jangka panjang. Tetap monitor frekuensi untuk info selanjutnya. Ganti.",
-          "Ganti. Kami mendeteksi sebanyak tiga stasiun aktif di sekitar koordinat Anda. Silakan lanjutkan komunikasi patroli Anda. Ganti.",
-          "Ganti. Panggilan darurat NOC global standby. Harap laporkan jika ada kendala modulasi atau gangguan frekuensi di lapangan. Ganti.",
-          "Ganti. Selamat siang rekan-rekan. AI Operator NextVWT siap membantu pemantauan dan koordinasi Off-Grid Anda. Monitor standby. Ganti."
+          'Ganti. Laporan cuaca Posko SAR Satu terpantau aman dan kondusif. Gunung Cereme berawan tebal, angin barat dua belas knot. Tetap waspada. Ganti.',
+          'Ganti. Saldo koin Anda saat ini masih mencukupi untuk transmisi jangka panjang. Tetap monitor frekuensi untuk info selanjutnya. Ganti.',
+          'Ganti. Kami mendeteksi sebanyak tiga stasiun aktif di sekitar koordinat Anda. Silakan lanjutkan komunikasi patroli Anda. Ganti.',
+          'Ganti. Panggilan darurat NOC global standby. Harap laporkan jika ada kendala modulasi atau gangguan frekuensi di lapangan. Ganti.',
+          'Ganti. Selamat siang rekan-rekan. AI Operator NextVWT siap membantu pemantauan dan koordinasi Off-Grid Anda. Monitor standby. Ganti.',
         ];
         const randomText = responses[Math.floor(Math.random() * responses.length)];
 
@@ -656,21 +663,31 @@ export function RadioLayout() {
             displayName: 'AI Operator',
             callSign: 'AI-OPS',
             role: 'operator',
-          }
+          },
         });
 
-        let prog = 45;
+        const speechStart = Date.now();
         const progInterval = setInterval(() => {
-          prog = 35 + Math.floor(Math.random() * 45);
-          setProgress(prog);
-        }, 150);
+          const elapsed = (Date.now() - speechStart) / 1000;
+          // Speak in phrases: simulate natural cadence
+          const speechEnvelope = Math.max(
+            0.15,
+            Math.sin(elapsed * 2.0) * 0.5 + Math.sin(elapsed * 0.7) * 0.5 + 0.3
+          );
+          const voiceRipple = Math.sin(elapsed * 30) * 10 + Math.sin(elapsed * 60) * 6;
+          const randomNoise = Math.random() * 12 - 6;
+
+          let simulatedProgress = speechEnvelope * 80 + voiceRipple + randomNoise;
+          simulatedProgress = Math.max(0, Math.min(100, simulatedProgress));
+          setProgress(simulatedProgress);
+        }, 80);
 
         if ('speechSynthesis' in window) {
           const utterance = new SpeechSynthesisUtterance(randomText);
           utterance.lang = 'id-ID';
           utterance.rate = 0.95;
           utterance.pitch = 1.0;
-          
+
           utterance.onend = () => {
             clearInterval(progInterval);
             setProgress(0);
@@ -803,12 +820,7 @@ export function RadioLayout() {
                 onUserCountClick={() => setIsUserListOpen(true)}
               />
             }
-            footer={
-              <RadioFooter
-                onScan={() => setIsChannelListOpen(true)}
-                onSet={handleSet}
-              />
-            }
+            footer={<RadioFooter onScan={() => setIsChannelListOpen(true)} onSet={handleSet} />}
             quickDock={
               <RadioQuickDock
                 isUserListOpen={isUserListOpen}

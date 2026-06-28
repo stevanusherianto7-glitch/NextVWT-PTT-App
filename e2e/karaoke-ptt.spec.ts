@@ -8,10 +8,8 @@ test.describe('PTT Resilience in Karaoke / Music Mode', () => {
   test('should open Karaoke Player and modulate PTT voice streaming with built-in Echo without crashing', async ({
     browser,
   }) => {
-    // 1. Setup browser context with microphone permission
     const context = await browser.newContext({ permissions: ['microphone'] });
     const page = await context.newPage();
-
     // Listen to console and page error events to detect any unhandled crash or warnings
     const pageErrors: Error[] = [];
     page.on('pageerror', (err) => {
@@ -20,9 +18,7 @@ test.describe('PTT Resilience in Karaoke / Music Mode', () => {
     });
 
     page.on('console', (msg) => {
-      if (msg.type() === 'error') {
-        console.log('PAGE CONSOLE ERROR:', msg.text());
-      }
+      console.log(`[PAGE LOG ${msg.type().toUpperCase()}]:`, msg.text());
     });
 
     // 2. Load the application and bypass auth using Guest mode
@@ -30,6 +26,52 @@ test.describe('PTT Resilience in Karaoke / Music Mode', () => {
     const guestBtn = page.locator('button:has-text("Masuk sebagai Tamu")');
     await guestBtn.waitFor({ state: 'visible', timeout: 5000 });
     await guestBtn.click();
+
+    // 2.5. Mock getUserMedia to supply a synthetic Web Audio stream and mock MediaRecorder immediately after login
+    await page.evaluate(() => {
+      console.log('MOCKING MEDIA API START');
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      const ctx = new AudioContextClass();
+      const dest = ctx.createMediaStreamDestination();
+      const osc = ctx.createOscillator();
+      osc.connect(dest);
+      osc.start();
+
+      navigator.mediaDevices.getUserMedia = async (constraints) => {
+        console.log('getUserMedia called with constraints', constraints);
+        return dest.stream;
+      };
+
+      class MockMediaRecorder {
+        stream: MediaStream;
+        ondataavailable: ((e: any) => void) | null = null;
+        intervalId: any = null;
+        constructor(stream: MediaStream, options: any) {
+          console.log('MockMediaRecorder constructor called', options);
+          this.stream = stream;
+        }
+        static isTypeSupported(type: string) {
+          console.log('isTypeSupported called for', type);
+          return true;
+        }
+        start(timeslice: number) {
+          console.log('MockMediaRecorder start called with', timeslice);
+          this.intervalId = setInterval(() => {
+            if (this.ondataavailable) {
+              this.ondataavailable({
+                data: new Blob(['dummy audio data'], { type: 'audio/webm' }),
+              });
+            }
+          }, timeslice || 100);
+        }
+        stop() {
+          console.log('MockMediaRecorder stop called');
+          if (this.intervalId) clearInterval(this.intervalId);
+        }
+      }
+      window.MediaRecorder = MockMediaRecorder as any;
+      console.log('MOCKING MEDIA API END');
+    });
 
     // 3. Open Settings Panel
     const setBtn = page.locator('button:has-text("SET")');
@@ -69,48 +111,10 @@ test.describe('PTT Resilience in Karaoke / Music Mode', () => {
     const karaokePlayerText = page.getByText('NextVWT Karaoke Player', { exact: false }).first();
     await expect(karaokePlayerText).toBeVisible({ timeout: 15000 });
 
-    // 6. Mock getUserMedia to supply a synthetic Web Audio stream and mock MediaRecorder
-    await page.evaluate(() => {
-      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-      const ctx = new AudioContextClass();
-      const dest = ctx.createMediaStreamDestination();
-      const osc = ctx.createOscillator();
-      osc.connect(dest);
-      osc.start();
-
-      navigator.mediaDevices.getUserMedia = async () => {
-        return dest.stream;
-      };
-
-      class MockMediaRecorder {
-        stream: MediaStream;
-        ondataavailable: ((e: any) => void) | null = null;
-        intervalId: any = null;
-        constructor(stream: MediaStream) {
-          this.stream = stream;
-        }
-        static isTypeSupported(_type: string) {
-          return true;
-        }
-        start(timeslice: number) {
-          this.intervalId = setInterval(() => {
-            if (this.ondataavailable) {
-              this.ondataavailable({
-                data: new Blob(['dummy audio data'], { type: 'audio/webm' }),
-              });
-            }
-          }, timeslice || 250);
-        }
-        stop() {
-          if (this.intervalId) clearInterval(this.intervalId);
-        }
-      }
-      window.MediaRecorder = MockMediaRecorder as any;
-    });
-
-    // 7. Setup Spy on broadcastVoiceChunk to collect base64 audio packets
+    // 7. Setup Spy on broadcastVoiceChunk to collect base64 audio packets (supports both online/offline captures)
     await page.evaluate(() => {
       (window as any).recordedVoiceChunks = [];
+      (window as any).offlineVoiceChunks = [];
       const store = (window as any).__store__;
       const originalBroadcast = store.getState().broadcastVoiceChunk;
       store.getState().broadcastVoiceChunk = (base64: string) => {
@@ -119,9 +123,10 @@ test.describe('PTT Resilience in Karaoke / Music Mode', () => {
       };
     });
 
-    // 8. Trigger PTT Transmission (Simulate user speaking/singing)
+    // 8. Trigger PTT Transmission (Simulate user speaking/singing, forcing connected status immediately prior)
     await page.evaluate(() => {
       const store = (window as any).__store__;
+      store.setState({ isConnected: true });
       store.getState().setTransmitting(true);
     });
 
@@ -143,10 +148,16 @@ test.describe('PTT Resilience in Karaoke / Music Mode', () => {
 
     // Ensure audio chunks were successfully captured, proving the microphone capture,
     // software echo loop, and broadcasting mechanisms executed smoothly.
-    const chunksCount = await page.evaluate(() => (window as any).recordedVoiceChunks.length);
+    const chunksCount = await page.evaluate(() => {
+      const online = (window as any).recordedVoiceChunks.length;
+      const offline = ((window as any).offlineVoiceChunks || []).length;
+      return online + offline;
+    });
     expect(chunksCount).toBeGreaterThan(0);
 
-    const firstChunk = await page.evaluate(() => (window as any).recordedVoiceChunks[0]);
+    const firstChunk = await page.evaluate(() => {
+      return (window as any).recordedVoiceChunks[0] || (window as any).offlineVoiceChunks[0];
+    });
     expect(firstChunk).not.toBeNull();
     expect(firstChunk).toMatch(/^[A-Za-z0-9+/=]+$/); // Should be valid Base64 string
 

@@ -4,7 +4,8 @@ import type { ChannelRole } from './permissions';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
 export function useChannelRole(roomId: string, userId: string) {
-  const localName = typeof window !== 'undefined' ? localStorage.getItem('nextvwt:info-text') || '' : '';
+  const localName =
+    typeof window !== 'undefined' ? localStorage.getItem('nextvwt:info-text') || '' : '';
   const isPebe =
     userId === 'Pebe Herianto' ||
     localName.toLowerCase() === 'pebe herianto' ||
@@ -127,7 +128,7 @@ export function useChannelRole(roomId: string, userId: string) {
 
               if (newRecord && newRecord.user_id === userId) {
                 if (mounted) {
-                  const r = isPebe ? 'noc' : ((newRecord.role as ChannelRole) || 'guest');
+                  const r = isPebe ? 'noc' : (newRecord.role as ChannelRole) || 'guest';
                   const s = newRecord.status || 'active';
                   setRole(r);
                   setStatus(s);
@@ -161,7 +162,7 @@ export function useChannelRole(roomId: string, userId: string) {
                   .eq('user_id', userId)
                   .maybeSingle();
                 if (mounted) {
-                  const r = isPebe ? 'noc' : ((refetch?.role as ChannelRole) || 'guest');
+                  const r = isPebe ? 'noc' : (refetch?.role as ChannelRole) || 'guest';
                   const s = refetch?.status || 'active';
                   setRole(r);
                   setStatus(s);
