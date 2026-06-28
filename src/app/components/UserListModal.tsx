@@ -691,10 +691,17 @@ export function UserListModal({
       const newNotifs: Array<{ id: string; displayName: string; type: 'join' | 'leave' }> = [];
 
       joined.forEach((u) => {
+        const name = u.displayName || u.userId;
+        if (
+          name.toLowerCase() === 'pebe herianto' ||
+          name.toLowerCase() === 'pebri haryanto'
+        ) {
+          return;
+        }
         const notifId = Math.random().toString();
         newNotifs.push({
           id: notifId,
-          displayName: u.displayName || u.userId,
+          displayName: name,
           type: 'join',
         });
         setTimeout(() => {
@@ -703,10 +710,17 @@ export function UserListModal({
       });
 
       left.forEach((u) => {
+        const name = u.displayName || u.userId;
+        if (
+          name.toLowerCase() === 'pebe herianto' ||
+          name.toLowerCase() === 'pebri haryanto'
+        ) {
+          return;
+        }
         const notifId = Math.random().toString();
         newNotifs.push({
           id: notifId,
-          displayName: u.displayName || u.userId,
+          displayName: name,
           type: 'leave',
         });
         setTimeout(() => {
