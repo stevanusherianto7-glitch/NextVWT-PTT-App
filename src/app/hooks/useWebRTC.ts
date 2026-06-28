@@ -3,6 +3,7 @@ import { usePTTStore, type WebRTCSignalingPayload } from '../store/usePTTStore';
 import { getSupabase } from '../utils/supabase';
 import { BRAND } from '../utils/config';
 import { startStreamAnalyzer } from '../utils/audioAnalyzer';
+import { getIceServersConfig } from '../services/webrtcConfig';
 
 let ephemeralTurnCreds: { iceServers: RTCIceServer[]; expiresAt: number } | null = null;
 
@@ -12,11 +13,8 @@ export const fetchTurnCredentials = async (): Promise<RTCIceServer[]> => {
     return ephemeralTurnCreds.iceServers;
   }
 
-  // Minimal fallback: STUN Google
-  const fallbackServers: RTCIceServer[] = [
-    { urls: 'stun:stun.l.google.com:19302' },
-    { urls: 'stun:stun1.l.google.com:19302' },
-  ];
+  // Fallback: Biznet Gio TURN / STUN Google from service
+  const fallbackServers = getIceServersConfig();
 
   try {
     // Timeout 5 detik
@@ -54,7 +52,7 @@ const getIceServers = (): RTCIceServer[] => {
   if (ephemeralTurnCreds && Date.now() < ephemeralTurnCreds.expiresAt) {
     return ephemeralTurnCreds.iceServers;
   }
-  return [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }];
+  return getIceServersConfig();
 };
 
 // Helper to modify SDP to prioritize high-quality Opus stereo music stream for Karaoke mode

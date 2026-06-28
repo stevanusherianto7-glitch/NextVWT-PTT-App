@@ -539,13 +539,27 @@ export function subscribeToChannel(channelNum: number, retryCount = 0) {
           }, 10000); // Check every 10 seconds
         }
 
-        if (status === 'CHANNEL_ERROR' && retryCount < 3) {
-          const timeout = Math.pow(2, retryCount) * 1000;
+        if ((status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') && retryCount < 5) {
+          const timeout = Math.min(30000, Math.pow(2, retryCount) * 1000);
           console.warn(
-            `[Supabase] Channel error. Retrying in ${timeout}ms (attempt ${retryCount + 1})...`
+            `[Supabase] Channel status ${status}. Retrying in ${timeout}ms (attempt ${retryCount + 1}/5)...`
           );
           setTimeout(() => subscribeToChannel(channelNum, retryCount + 1), timeout);
           return;
+        } else if ((status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') && retryCount >= 5) {
+          toast.error('Koneksi terputus. Klik untuk mencoba lagi.', {
+            action: {
+              label: 'Coba Lagi',
+              onClick: () => subscribeToChannel(channelNum, 0),
+            },
+            duration: Infinity,
+          });
+          return;
+        }
+
+        if (status === 'SUBSCRIBED' && retryCount > 0) {
+          console.info(`[Supabase] Successfully reconnected after ${retryCount} attempt(s).`);
+          toast.success('Koneksi radio pulih kembali.');
         }
 
         if (isSubscribed) {
