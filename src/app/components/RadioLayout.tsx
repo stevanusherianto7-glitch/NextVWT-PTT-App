@@ -770,37 +770,37 @@ export function RadioLayout() {
               setIsTransmitting(true);
             }}
             onPressEnd={() => setIsTransmitting(false)}
-          >
-            {/* LCD Panel inside Faceplate */}
-            <RadioLCD
-              userCount={dynamicUserCount}
-              onUserCountClick={() => setIsUserListOpen(true)}
-            />
-
-            {/* D-pad Footer Buttons inside Faceplate */}
-            <RadioFooter
-              onScan={() => setIsChannelListOpen(true)}
-              onSet={handleSet}
-            />
-          </RadioBody>
-
-          {/* Quick Action Dock */}
-          <RadioQuickDock
-            isUserListOpen={isUserListOpen}
-            onOpenChat={() => setIsChatOpen(true)}
-            onOpenQueue={() => setIsQueueOpen(true)}
-            onSendReaction={handleSendReaction}
-            getThemeClass={getThemeClass}
+            lcd={
+              <RadioLCD
+                userCount={dynamicUserCount}
+                onUserCountClick={() => setIsUserListOpen(true)}
+              />
+            }
+            footer={
+              <RadioFooter
+                onScan={() => setIsChannelListOpen(true)}
+                onSet={handleSet}
+              />
+            }
+            quickDock={
+              <RadioQuickDock
+                isUserListOpen={isUserListOpen}
+                onOpenChat={() => setIsChatOpen(true)}
+                onOpenQueue={() => setIsQueueOpen(true)}
+                onSendReaction={handleSendReaction}
+                getThemeClass={getThemeClass}
+              />
+            }
+            karaokePlayer={
+              isPowerOn && audioMode === 'music' && isKaraokePlayerOpen ? (
+                <div onClick={(e) => e.stopPropagation()}>
+                  <Suspense fallback={<KaraokePlayerSkeleton />}>
+                    <FloatingKaraokePlayer onClose={() => setIsKaraokePlayerOpen(false)} />
+                  </Suspense>
+                </div>
+              ) : null
+            }
           />
-
-          {/* Floating Karaoke Player — lazy-loaded, hanya mount saat mode music aktif */}
-          {isPowerOn && audioMode === 'music' && isKaraokePlayerOpen && (
-            <div onClick={(e) => e.stopPropagation()}>
-              <Suspense fallback={<KaraokePlayerSkeleton />}>
-                <FloatingKaraokePlayer onClose={() => setIsKaraokePlayerOpen(false)} />
-              </Suspense>
-            </div>
-          )}
         </div>
       )}
 

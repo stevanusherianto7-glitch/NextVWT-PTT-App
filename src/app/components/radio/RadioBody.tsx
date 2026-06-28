@@ -33,7 +33,10 @@ interface RadioBodyProps {
   channelNameStr: string;
   onPressStart: () => void;
   onPressEnd: () => void;
-  children?: React.ReactNode; // LCD & Footer buttons inside Faceplate
+  lcd: React.ReactNode;
+  footer: React.ReactNode;
+  quickDock: React.ReactNode;
+  karaokePlayer: React.ReactNode;
 }
 
 export function RadioBody({
@@ -47,7 +50,10 @@ export function RadioBody({
   channelNameStr,
   onPressStart,
   onPressEnd,
-  children,
+  lcd,
+  footer,
+  quickDock,
+  karaokePlayer,
 }: RadioBodyProps) {
   const {
     isPowerOn,
@@ -135,8 +141,8 @@ export function RadioBody({
               }}
             />
             
-            {/* Render nested children (LCD and D-pad footer buttons) */}
-            {children}
+            {/* Render LCD Panel */}
+            {lcd}
 
             {/* Progress Bar (Modulator) */}
             {showModulator && (
@@ -146,6 +152,9 @@ export function RadioBody({
                 <ProgressBar progress={progress} />
               </div>
             )}
+
+            {/* Render Control Buttons */}
+            {footer}
           </div>
         </div>
       )}
@@ -291,7 +300,7 @@ export function RadioBody({
                           ? undefined
                           : 'rocket3d 4s ease-out forwards',
                         filter:
-                          'drop-shadow(0 0 10px rgba(255,140,0,0.9)) drop-shadow(0 6px 12px rgba(0,0,0,0.5))',
+                          'drop-shadow(0 0 10px rgba(255,140,0,0.95)) drop-shadow(0 6px 12px rgba(0,0,0,0.5))',
                       }}
                     >
                       🚀
@@ -447,6 +456,9 @@ export function RadioBody({
         </div>
       )}
 
+      {/* Render Quick Action Dock */}
+      {quickDock}
+
       {/* PTT Button */}
       {showPTT && (
         <div
@@ -469,6 +481,9 @@ export function RadioBody({
           </div>
         </div>
       )}
+
+      {/* Render Floating Karaoke Player */}
+      {karaokePlayer}
     </div>
   );
 }
