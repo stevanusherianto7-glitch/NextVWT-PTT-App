@@ -23,7 +23,10 @@ class MockMediaRecorder {
     return type === 'audio/webm;codecs=opus' || type === '';
   }
 
-  constructor(public stream: MediaStream, public options?: MediaRecorderOptions) {}
+  constructor(
+    public stream: MediaStream,
+    public options?: MediaRecorderOptions
+  ) {}
 
   start(timeslice?: number) {
     this.state = 'recording';
@@ -178,9 +181,9 @@ describe('useChannel100EchoTest', () => {
 
       const { result } = renderHook(() => useChannel100EchoTest());
 
-      await expect(
-        act(async () => result.current.startEchoCapture())
-      ).rejects.toThrow('MicPermissionDenied');
+      await expect(act(async () => result.current.startEchoCapture())).rejects.toThrow(
+        'MicPermissionDenied'
+      );
     });
 
     it('throw MicNotFound jika getUserMedia throw NotFoundError', async () => {
@@ -190,9 +193,9 @@ describe('useChannel100EchoTest', () => {
 
       const { result } = renderHook(() => useChannel100EchoTest());
 
-      await expect(
-        act(async () => result.current.startEchoCapture())
-      ).rejects.toThrow('MicNotFound');
+      await expect(act(async () => result.current.startEchoCapture())).rejects.toThrow(
+        'MicNotFound'
+      );
     });
 
     it('status kembali ke default jika getUserMedia gagal', async () => {
@@ -202,7 +205,9 @@ describe('useChannel100EchoTest', () => {
 
       try {
         await act(async () => result.current.startEchoCapture());
-      } catch { /* expected */ }
+      } catch {
+        /* expected */
+      }
 
       expect(result.current.echoStatus.isCapturing).toBe(false);
       expect(result.current.echoStatus.hasChunks).toBe(false);
@@ -286,7 +291,9 @@ describe('useChannel100EchoTest', () => {
       const { result } = renderHook(() => useChannel100EchoTest());
 
       expect(() => {
-        act(() => { result.current.stopEchoAndPlayback(); });
+        act(() => {
+          result.current.stopEchoAndPlayback();
+        });
       }).not.toThrow();
     });
   });
@@ -300,7 +307,9 @@ describe('useChannel100EchoTest', () => {
         vi.advanceTimersByTime(200);
       });
 
-      act(() => { result.current.cancelEcho(); });
+      act(() => {
+        result.current.cancelEcho();
+      });
 
       // playAudioChunk TIDAK boleh dipanggil
       await act(async () => {
@@ -319,7 +328,9 @@ describe('useChannel100EchoTest', () => {
         await result.current.startEchoCapture();
       });
 
-      act(() => { result.current.cancelEcho(); });
+      act(() => {
+        result.current.cancelEcho();
+      });
 
       expect(result.current.echoStatus.isCapturing).toBe(false);
       expect(result.current.echoStatus.isPlayingBack).toBe(false);
@@ -358,7 +369,9 @@ describe('useChannel100EchoTest', () => {
         await result.current.startEchoCapture();
       });
 
-      act(() => { result.current.cancelEcho(); });
+      act(() => {
+        result.current.cancelEcho();
+      });
 
       expect(fakeTrack.stop).toHaveBeenCalled();
     });
