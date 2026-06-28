@@ -71,7 +71,9 @@ jobs:
 
       - name: Run E2E Tests (Cypress)
         if: github.event_name == 'push'
-        run: pnpm run test:e2e:cypress
+        run: |
+          pnpm run dev &
+          pnpm run test:e2e:cypress
         env:
           CYPRESS_VERIFY_TIMEOUT: 120000
 
