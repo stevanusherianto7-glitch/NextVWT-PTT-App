@@ -558,7 +558,7 @@ export function subscribeToChannel(channelNum: number, retryCount = 0) {
         }
 
         if (status === 'SUBSCRIBED' && retryCount > 0) {
-          console.info(`[Supabase] Successfully reconnected after ${retryCount} attempt(s).`);
+          console.warn(`[Supabase] Successfully reconnected after ${retryCount} attempt(s).`);
           toast.success('Koneksi radio pulih kembali.');
         }
 

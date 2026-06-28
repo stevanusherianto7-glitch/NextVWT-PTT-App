@@ -3,7 +3,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { getSecureConfig } from './secureConfig';
 
 let _supabaseInstance: SupabaseClient | null = null;
-export let supabase: any = null;
+export let supabase: SupabaseClient | null = null;
 let _supabaseInitializationPromise: Promise<SupabaseClient> | null = null;
 
 export async function getSupabase(): Promise<SupabaseClient> {
