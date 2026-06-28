@@ -15,6 +15,8 @@ test.describe('PTT Robustness & Safeguards', () => {
     await guestBtn.waitFor({ state: 'visible', timeout: 3000 });
     await guestBtn.click();
     await page.waitForSelector('button:has-text("PTT")', { timeout: 10_000 });
+    // Allow connection and presence sync to settle down
+    await page.waitForTimeout(1500);
 
     // 1. Mock that another user (User A) is currently transmitting and set Half-Duplex state
     await page.evaluate(() => {
@@ -89,6 +91,8 @@ test.describe('PTT Robustness & Safeguards', () => {
     await guestBtn.waitFor({ state: 'visible', timeout: 3000 });
     await guestBtn.click();
     await page.waitForSelector('button:has-text("PTT")', { timeout: 10_000 });
+    // Allow connection and presence sync to settle down
+    await page.waitForTimeout(1500);
 
     // 1. Mock that another user (User A) starts transmitting and set Half-Duplex state
     await page.evaluate(() => {
