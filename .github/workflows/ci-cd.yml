@@ -18,31 +18,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # [FIX P1-4a] Node 18 sudah EOL (April 2025) → upgrade ke Node 20 LTS
-      - name: Setup Node.js 20 LTS
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
       # [FIX P1-4b] pnpm 8 → pnpm 9 (versi LTS terbaru)
+      # pnpm dipasang sebelum setup-node agar setup-node bisa mendeteksi pnpm untuk caching
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
           version: '9'
           run_install: false
 
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-      - name: Cache pnpm dependencies
-        uses: actions/cache@v4
+      # [FIX P1-4a] Node 18 sudah EOL (April 2025) → upgrade ke Node 20 LTS
+      # Menggunakan cache bawaan (native cache: 'pnpm') dari setup-node
+      - name: Setup Node.js 20 LTS
+        uses: actions/setup-node@v4
         with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          node-version: '20'
+          cache: 'pnpm'
 
       # [FIX P1-4c] --no-frozen-lockfile berbahaya di CI → gunakan --frozen-lockfile
       # Ini memastikan lock file dipatuhi dan build bersifat deterministic/reproducible
@@ -124,12 +114,6 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      # [FIX P1-4a] Node 20 LTS konsisten dengan job validate
-      - name: Setup Node.js 20 LTS
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
       # [FIX P1-4b] pnpm 9 konsisten dengan job validate
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -137,18 +121,12 @@ jobs:
           version: '9'
           run_install: false
 
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-      - name: Cache pnpm dependencies
-        uses: actions/cache@v4
+      # [FIX P1-4a] Node 20 LTS konsisten dengan job validate
+      - name: Setup Node.js 20 LTS
+        uses: actions/setup-node@v4
         with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          node-version: '20'
+          cache: 'pnpm'
 
       # [FIX P1-4c] --frozen-lockfile untuk build deterministik
       - name: Install dependencies
