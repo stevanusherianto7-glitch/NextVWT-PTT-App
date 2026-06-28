@@ -42,19 +42,27 @@ export const useChannel100EchoTest = () => {
         setIsCapturing(false);
         const chunks = chunksRef.current;
         if (chunks.length > 0 && isPlayingBackRef.current) {
-          // Process chunks for playback
-          for (const chunk of chunks) {
-            const arrayBuffer = await chunk.arrayBuffer();
+          try {
+            // Combine all chunks into a single Blob (a complete WebM file)
+            const combinedBlob = new Blob(chunks, { type: mediaRecorder.mimeType });
+            const arrayBuffer = await combinedBlob.arrayBuffer();
+            
+            // Convert to base64
             const base64String = btoa(
               new Uint8Array(arrayBuffer).reduce(
                 (data, byte) => data + String.fromCharCode(byte),
                 ''
               )
             );
+            
+            // Play the complete audio file
             await playAudioChunk(base64String);
+          } catch (error) {
+            console.error('[EchoTest] Error processing audio playback:', error);
+          } finally {
+            isPlayingBackRef.current = false;
+            setIsPlayingBack(false);
           }
-          isPlayingBackRef.current = false;
-          setIsPlayingBack(false);
         }
       };
 
