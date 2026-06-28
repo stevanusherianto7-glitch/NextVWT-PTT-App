@@ -68,7 +68,7 @@ export function useChannelRole(roomId: string, userId: string) {
           .eq('user_id', userId)
           .maybeSingle();
 
-        let data = initialData;
+        const data = initialData;
 
         if (error) {
           console.error('Error fetching channel role:', error);

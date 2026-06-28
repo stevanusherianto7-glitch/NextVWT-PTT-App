@@ -1,6 +1,7 @@
 import { StateCreator } from 'zustand';
 import { PTTState } from '../types';
 import { pttRateLimiter } from '../../utils/rateLimiter';
+import { roleRank, type ChannelRole } from '../../../features/moderation/permissions';
 import { activeChannelSubscription, setActiveChannelSubscription } from '../subscription';
 import { safeSetStorage } from '../storeUtils';
 import { startBackgroundService, stopBackgroundService } from '../../utils/backgroundSurvival';
@@ -89,11 +90,7 @@ export const createUISlice: StateCreator<
     const state = get();
     if (!state.isPowerOn) return;
 
-    const roomId = `ptt-room-${state.channelNumber}`;
-    const myRole =
-      (state as { _channelRole?: string })._channelRole ??
-      localStorage.getItem(`channel-role:${roomId}:${state.userId}`) ??
-      'guest';
+    const myRole = (state as { _channelRole?: string })._channelRole ?? state.myChannelRole ?? 'guest';
 
     if (transmitting) {
       if (!pttRateLimiter.canProceed()) {
@@ -109,18 +106,10 @@ export const createUISlice: StateCreator<
       }
 
       const activeTx = state.activeTransmitter;
-      const ROLE_PRIORITY: Record<string, number> = {
-        noc: 5,
-        sys_admin: 4,
-        pjc: 3,
-        operator: 2,
-        member: 1.5,
-        guest: 1,
-      };
 
       if (activeTx && activeTx.userId !== state.userId) {
-        const myPriority = ROLE_PRIORITY[myRole] || 1;
-        const activePriority = ROLE_PRIORITY[activeTx.role || 'guest'] || 1;
+        const myPriority = roleRank[myRole as ChannelRole] ?? 1;
+        const activePriority = roleRank[(activeTx.role as ChannelRole) ?? 'guest'] ?? 1;
 
         // Emergency Override: NOC/SysAdmin/PJC can hijack the floor
         const isEmergencyRank = myRole === 'noc' || myRole === 'sys_admin' || myRole === 'pjc';

@@ -3,6 +3,7 @@ import { PTTState, ChannelItem } from '../types';
 import { BRAND, CHANNELS, fetchChannels as fetchChannelsFromConfig } from '../../utils/config';
 import { getChannelUUID, safeSetStorage, clearChannelOverrides } from '../storeUtils';
 import { channelSwitchRateLimiter } from '../../utils/rateLimiter';
+import type { ChannelRole } from '../../../features/moderation/permissions';
 
 let channelSwitchTimeout: NodeJS.Timeout | null = null;
 
@@ -20,6 +21,10 @@ export const createChannelSlice: StateCreator<
     | 'channelDown'
     | 'toggleScan'
     | 'fetchChannels'
+    | 'myChannelRole'
+    | 'myChannelStatus'
+    | 'setMyChannelRole'
+    | 'setMyChannelStatus'
   >
 > = (set, get) => ({
   channelNumber: BRAND.defaultChannel,
@@ -93,4 +98,9 @@ export const createChannelSlice: StateCreator<
     state.setChannelNumber(state.channelNumber <= 0 ? 999 : state.channelNumber - 1);
   },
   toggleScan: () => get().setScanning(!get().isScanning),
+
+  myChannelRole: 'guest' as ChannelRole,
+  myChannelStatus: 'normal',
+  setMyChannelRole: (role) => set({ myChannelRole: role }),
+  setMyChannelStatus: (status) => set({ myChannelStatus: status }),
 });

@@ -12,9 +12,7 @@ import { performSecurityAudit } from './utils/appSecurity';
 export default function App() {
   const { initializeSession, user, setUser, updateSettings, signInWithGoogle } = usePTTStore();
 
-  if (typeof window !== 'undefined') {
-    (window as any).usePTTStore = usePTTStore;
-  }
+
 
   useEffect(() => {
     performSecurityAudit()

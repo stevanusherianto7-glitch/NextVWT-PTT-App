@@ -1,19 +1,21 @@
 import { useEffect, useState, useRef, lazy, Suspense } from 'react';
-import vintageMic from '../../assets/vintage_mic.png';
-import { ToggleSwitch } from './ToggleSwitch';
-import { LCDPanel } from './LCDPanel';
-import { ControlButtons } from './ControlButtons';
-import { PTTButton } from './PTTButton';
-import { ProgressBar } from './ProgressBar';
 import { usePTTStore } from '../store/usePTTStore';
-import { UserListModal } from './UserListModal';
-import { ChannelListModal } from './ChannelListModal';
 import { STATIC_CHANNELS } from '../utils/constants';
 import { useAudioStreamer } from '../hooks/useAudioStreamer';
 import { toast } from 'sonner';
-import { SettingsPanelSkeleton, KaraokePlayerSkeleton } from './SkeletonLoaders';
-import { FeedbackModal } from './FeedbackModal';
+import { KaraokePlayerSkeleton } from './SkeletonLoaders';
+import { ChannelListModal } from './ChannelListModal';
 import { initGlobalAudioContext } from '../utils/audioContext';
+import { useChannelRole } from '../../features/moderation/useChannelRole';
+import { useChannelSettings } from '../../features/moderation/useChannelSettings';
+import { canUsePTT } from '../../features/moderation/permissions';
+import { getSupabase } from '../utils/supabase';
+
+// Sub-components
+import { RadioHeader, RadioLCD } from './radio/RadioHeader';
+import { RadioBody } from './radio/RadioBody';
+import { RadioFooter, RadioQuickDock } from './radio/RadioFooter';
+import { RadioPanels } from './radio/RadioPanels';
 
 const playChirpSound = (isJoin: boolean) => {
   try {
@@ -54,105 +56,7 @@ const playChirpSound = (isJoin: boolean) => {
     console.warn('Failed to play chirp sound:', err);
   }
 };
-import { useChannelRole } from '../../features/moderation/useChannelRole';
-import { useChannelSettings } from '../../features/moderation/useChannelSettings';
-import { ChannelManagePanel } from '../../features/moderation/ChannelManagePanel';
-import { canUsePTT } from '../../features/moderation/permissions';
-import { getSupabase } from '../utils/supabase';
-import { WalletPanel } from '../../features/payment/WalletPanel';
-import { ROIPBridgePanel } from '../../features/roip/ROIPBridgePanel';
-import { ChatRoomPanel } from '../../features/chat/ChatRoomPanel';
-import { QuickActionDock } from './QuickActionDock';
-import { KaraokeQueuePanel } from '../../features/karaoke-queue/KaraokeQueuePanel';
-import { PrivateChannelPanel } from '../../features/moderation/PrivateChannelPanel';
-import { Player } from '@lottiefiles/react-lottie-player';
-import applauseAnimation from '../../assets/reactions/applause.json';
-import loveAnimation from '../../assets/reactions/love.json';
-import wowAnimation from '../../assets/reactions/wow.json';
-import fireAnimation from '../../assets/reactions/fire.json';
-import crownAnimation from '../../assets/reactions/crown.json';
-import confettiAnimation from '../../assets/reactions/confetti.json';
-import kissAnimation from '../../assets/reactions/kiss.json';
-import bartSvg from '../../assets/reactions/bart.svg';
-import foxSvg from '../../assets/reactions/fox.svg';
 
-const playReactionSound = (kind: string) => {
-  if (kind === 'ketawa_nular') {
-    try {
-      const audio = document.getElementById('audio-player-ketawa-nular') as HTMLAudioElement | null;
-      if (audio) {
-        audio.currentTime = 0;
-        audio.play().catch((err) => console.warn('Failed to play audio-player-ketawa-nular:', err));
-      }
-    } catch (err) {
-      console.warn('Failed to play ketawa_nular:', err);
-    }
-    return;
-  }
-  if (kind === 'ketawa_anjay') {
-    try {
-      const audio = document.getElementById('audio-player-ketawa-anjay') as HTMLAudioElement | null;
-      if (audio) {
-        audio.currentTime = 0;
-        audio.play().catch((err) => console.warn('Failed to play audio-player-ketawa-anjay:', err));
-      }
-    } catch (err) {
-      console.warn('Failed to play ketawa_anjay:', err);
-    }
-    return;
-  }
-  try {
-    const AudioContextClass =
-      window.AudioContext ||
-      (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-    if (!AudioContextClass) return;
-    const audioCtx = new AudioContextClass();
-    const osc = audioCtx.createOscillator();
-    const gainNode = audioCtx.createGain();
-
-    osc.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
-
-    if (kind === 'laugh') {
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(400, audioCtx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.1);
-      osc.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.2);
-      gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.3);
-    } else if (kind === 'buzzer') {
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(100, audioCtx.currentTime);
-      gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.5);
-    } else if (kind === 'horn') {
-      osc.type = 'square';
-      osc.frequency.setValueAtTime(300, audioCtx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(500, audioCtx.currentTime + 0.2);
-      gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.6);
-    } else {
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.1);
-      gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.2);
-    }
-  } catch (e) {
-    console.warn('Audio play failed:', e);
-  }
-};
-
-// Helper to catch dynamic import chunk loading failures (typically after a new deploy)
-// and automatically reload the page to fetch the latest assets
 const lazyRetry = <Props extends object>(
   importFn: () => Promise<{ default: React.ComponentType<Props> }>
 ) => {
@@ -169,15 +73,6 @@ const lazyRetry = <Props extends object>(
   }) as React.LazyExoticComponent<React.ComponentType<Props>>;
 };
 
-// [P2-2] Lazy-load komponen besar — hanya diunduh saat pertama kali dibuka
-// SettingsPanel: ~76KB → split ke chunk terpisah, tidak menambah initial bundle
-const SettingsPanel = lazyRetry<import('./SettingsPanel').SettingsPanelProps>(async () => {
-  const m = await import('./SettingsPanel');
-  return {
-    default: m.SettingsPanel as React.ComponentType<import('./SettingsPanel').SettingsPanelProps>,
-  };
-});
-// FloatingKaraokePlayer: ~21KB → split ke chunk terpisah
 const FloatingKaraokePlayer = lazyRetry<
   import('./FloatingKaraokePlayer').FloatingKaraokePlayerProps
 >(async () => {
@@ -192,20 +87,10 @@ const FloatingKaraokePlayer = lazyRetry<
 export function RadioLayout() {
   const {
     isPowerOn,
-    isConnected,
     isTransmitting,
     isScanning,
-    progress,
-    channelNumber: channel,
-    infoText,
-    locationText,
-    showPTT,
-    showModulator,
-    setPower: setIsPowerOn,
-    setTransmitting: setIsTransmitting,
     setProgress,
     channelUp,
-    channelDown,
     setChannelNumber,
     activeUsers,
     activeTransmitter,
@@ -215,6 +100,11 @@ export function RadioLayout() {
     isKaraokePlayerOpen,
     setKaraokePlayerOpen: setIsKaraokePlayerOpen,
     userId,
+    channelNumber: channel,
+    infoText,
+    locationText,
+    setTransmitting: setIsTransmitting,
+    setPower: setIsPowerOn,
   } = usePTTStore();
 
   const activeChannelObj = STATIC_CHANNELS.find((ch) => ch.number === channel);
@@ -635,7 +525,6 @@ export function RadioLayout() {
           ...prev,
           { id, category: payload.category, reaction: payload.reaction, x, senderName },
         ]);
-        if (payload.category === 'sound') playReactionSound(payload.reaction);
         const isVideo = payload.reaction === 'lion' || payload.reaction === 'aquarium';
         const isKetawa = payload.reaction === 'ketawa_nular' || payload.reaction === 'ketawa_anjay';
         setTimeout(
@@ -666,7 +555,6 @@ export function RadioLayout() {
       ...prev,
       { id: localId, category, reaction: reactionType, x, senderName: localDisplayName },
     ]);
-    if (category === 'sound') playReactionSound(reactionType);
     const isVideo = reactionType === 'lion' || reactionType === 'aquarium';
     const isKetawa = reactionType === 'ketawa_nular' || reactionType === 'ketawa_anjay';
     setTimeout(
@@ -714,11 +602,6 @@ export function RadioLayout() {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, []);
-
-  // Coin deduction watchdog during active PTT transmission (Disabled: Free Transmission)
-  useEffect(() => {
-    // Disabled coin checks and deduction to make transmission completely free of charge.
   }, []);
 
   // AI Operator automated responder (Channel 99)
@@ -804,6 +687,15 @@ export function RadioLayout() {
     ? `PROGRAM SAAT INI: ${programName.toUpperCase()} • CHANNEL ${channel} • ${channelNameStr} • ${displayUser} (${displayLoc}) • STANDBY • READY`
     : `CHANNEL ${channel} • ${channelNameStr} • ${displayUser} (${displayLoc}) • STANDBY • READY`;
 
+  const isPanelOpen =
+    isManageOpen ||
+    isWalletOpen ||
+    isRoipOpen ||
+    isChatOpen ||
+    isQueueOpen ||
+    isPrivateOpen ||
+    isSettingsOpen;
+
   return (
     <div
       onClick={() => {
@@ -816,39 +708,28 @@ export function RadioLayout() {
         boxShadow: 'inset 0 0 0 2px rgba(255,255,255,0.1)',
       }}
     >
-      {isManageOpen ? (
-        <ChannelManagePanel
+      {isPanelOpen ? (
+        <RadioPanels
           roomId={roomId}
           userId={userId}
-          initialChannelName={activeChannelObj?.name}
-          onClose={() => setIsManageOpen(false)}
-          onOpenPrivate={() => {
-            setIsManageOpen(false);
-            setIsPrivateOpen(true);
-          }}
+          channelName={activeChannelObj?.name}
+          isManageOpen={isManageOpen}
+          setIsManageOpen={setIsManageOpen}
+          isWalletOpen={isWalletOpen}
+          setIsWalletOpen={setIsWalletOpen}
+          isRoipOpen={isRoipOpen}
+          setIsRoipOpen={setIsRoipOpen}
+          isChatOpen={isChatOpen}
+          setIsChatOpen={setIsChatOpen}
+          isQueueOpen={isQueueOpen}
+          setIsQueueOpen={setIsQueueOpen}
+          isPrivateOpen={isPrivateOpen}
+          setIsPrivateOpen={setIsPrivateOpen}
+          isSettingsOpen={isSettingsOpen}
+          setIsSettingsOpen={setIsSettingsOpen}
+          isChannelListOpen={isChannelListOpen}
+          setIsChannelListOpen={setIsChannelListOpen}
         />
-      ) : isWalletOpen ? (
-        <WalletPanel onClose={() => setIsWalletOpen(false)} />
-      ) : isRoipOpen ? (
-        <ROIPBridgePanel onClose={() => setIsRoipOpen(false)} />
-      ) : isChatOpen ? (
-        <ChatRoomPanel onClose={() => setIsChatOpen(false)} />
-      ) : isQueueOpen ? (
-        <KaraokeQueuePanel onClose={() => setIsQueueOpen(false)} />
-      ) : isPrivateOpen ? (
-        <PrivateChannelPanel
-          onClose={() => setIsPrivateOpen(false)}
-        />
-      ) : isSettingsOpen ? (
-        // Suspense boundary: tampilkan skeleton saat SettingsPanel sedang dimuat
-        // (hanya terjadi pada kali pertama Settings dibuka dalam sesi ini)
-        <Suspense fallback={<SettingsPanelSkeleton />}>
-          <SettingsPanel
-            onClose={() => setIsSettingsOpen(false)}
-            onOpenModeration={() => setIsManageOpen(true)}
-            onOpenRoip={() => setIsRoipOpen(true)}
-          />
-        </Suspense>
       ) : (
         <div
           className="size-full flex flex-col items-center overflow-hidden relative transition-all duration-300"
@@ -858,571 +739,82 @@ export function RadioLayout() {
             border: 'var(--device-border)',
           }}
         >
-          {/* Top Bar */}
-          <div
-            className="w-full h-[70px] flex items-center justify-between pr-5 z-20 relative overflow-hidden"
-            style={{
-              paddingLeft: 'max(4px, calc(50% - 176.16px))',
-              background: 'var(--header-bg)',
-              boxShadow:
-                'var(--header-shadow), inset 0 -12px 20px -6px rgba(0, 0, 0, 0.45), inset 0 3px 6px rgba(255, 255, 255, 0.4)',
-              borderBottom: 'var(--header-border)',
-            }}
-          >
-            {/* Top Glossy Reflection */}
-            <div className="absolute top-0 left-0 right-0 h-[40%] bg-gradient-to-b from-white/35 to-transparent pointer-events-none z-10" />
-            <div
-              onClick={() => {
-                if (isPowerOn) {
-                  setIsUserListOpen(!isUserListOpen);
-                }
-              }}
-              className={`flex items-center gap-3 relative z-20 ${isPowerOn ? 'cursor-pointer hover:opacity-85 active:scale-98 transition-all' : ''}`}
-            >
-              {/* Logo Section */}
-              <div className="relative flex items-center justify-center h-full">
-                <div className="relative flex items-center justify-center">
-                  {isTransmitting && (
-                    <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-                      <div
-                        className="logo-transmitting-bg"
-                        style={{ width: '100px', height: '100px' }}
-                      >
-                        <div className="extra-ripple"></div>
-                      </div>
-                    </div>
-                  )}
-                  <svg
-                    viewBox="0 0 100 100"
-                    className="w-[68px] h-[68px] relative z-20 transition-all duration-300"
-                    style={{ filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.25))' }}
-                  >
-                    <image
-                      href={vintageMic}
-                      x="0"
-                      y="0"
-                      width="100"
-                      height="100"
-                      preserveAspectRatio="xMidYMid meet"
-                    />
-                  </svg>
-                </div>
-                <div
-                  className="flex flex-col justify-center relative z-20 transition-all duration-300 ml-0"
-                >
-                  <span
-                    className="text-[16px] leading-none tracking-wide select-none"
-                    style={{
-                      fontFamily: "'Outfit', sans-serif",
-                    }}
-                  >
-                    <span className="font-medium" style={{ color: 'var(--header-text-color)' }}>
-                      Next
-                    </span>
-                    <span className="font-black text-[#00C853]">VWT</span>
-                  </span>
-                  <div className="w-[120px] overflow-hidden whitespace-nowrap relative h-[20px] mt-0.5">
-                    <div
-                      className="absolute top-0 left-0 inline-block animate-marquee text-[10px] font-semibold tracking-wide leading-none py-0.5"
-                      style={{ color: 'var(--header-text-color)', opacity: 0.65 }}
-                    >
-                      {marqueeText}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+          {/* Header Section */}
+          <RadioHeader
+            isUserListOpen={isUserListOpen}
+            setIsUserListOpen={setIsUserListOpen}
+            marqueeText={marqueeText}
+          />
 
-            <div className="flex items-center gap-3">
-              <ToggleSwitch isOn={isPowerOn} onToggle={() => setIsPowerOn(!isPowerOn)} />
-            </div>
-          </div>
-
-          {/* Main Content */}
-          <div
-            onClick={() => {
-              if (isPowerOn && isUserListOpen) {
-                setIsUserListOpen(false);
+          {/* Body Section */}
+          <RadioBody
+            isUserListOpen={isUserListOpen}
+            setIsUserListOpen={setIsUserListOpen}
+            floatingReactions={floatingReactions}
+            waitTimer={waitTimer}
+            isBusy={isBusy}
+            status={status}
+            dynamicUserList={dynamicUserList}
+            channelNameStr={channelNameStr}
+            onPressStart={() => {
+              if (!pttAllowed) {
+                toast.error(
+                  status === 'muted'
+                    ? 'Anda sedang dibungkam (muted) di channel ini.'
+                    : status === 'ptt_blocked'
+                      ? 'Hak PTT Anda diblokir di channel ini.'
+                      : 'Tamu biasa dilarang menggunakan PTT di channel ini.'
+                );
+                return;
               }
+              setIsTransmitting(true);
             }}
-            className="flex-1 min-h-0 w-full max-w-[400px] flex flex-col items-center pt-[14px] px-[10px] pb-24 relative cursor-default"
+            onPressEnd={() => setIsTransmitting(false)}
           >
-            {isUserListOpen ? (
-              <div className="w-full max-w-[340px] h-[426px] relative -mt-[14px] overflow-hidden">
-                {/* Background Video Reaction (Lion or Aquarium) */}
-                {isPowerOn &&
-                  floatingReactions.some(
-                    (r) => r.reaction === 'lion' || r.reaction === 'aquarium'
-                  ) &&
-                  (() => {
-                    const activeReaction = floatingReactions.find(
-                      (r) => r.reaction === 'lion' || r.reaction === 'aquarium'
-                    );
-                    const isLion = activeReaction?.reaction === 'lion';
-                    const videoId = isLion ? 'SvBAptWsNZo' : 'jBbqxCpUsjM';
-                    return (
-                      <div className="absolute inset-0 w-full h-full z-0 overflow-hidden bg-black animate-in fade-in duration-300">
-                        <iframe
-                          src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${videoId}&modestbranding=1&rel=0&iv_load_policy=3&vq=highres`}
-                          title={isLion ? '3D Lion Background' : 'Aquarium / Relaxing Background'}
-                          className="absolute pointer-events-none"
-                          style={{
-                            border: 'none',
-                            width: '1084px',
-                            height: '610px',
-                            top: '-92px',
-                            left: '-372px',
-                            filter: 'brightness(1.45) contrast(1.15) saturate(1.25)',
-                          }}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/10 via-transparent to-black/10 pointer-events-none" />
-                      </div>
-                    );
-                  })()}
-                <UserListModal
-                  channel={channel}
-                  channelName={channelNameStr}
-                  users={dynamicUserList}
-                  onClose={() => setIsUserListOpen(false)}
-                  hasVideoBackground={
-                    isPowerOn &&
-                    floatingReactions.some(
-                      (r) => r.reaction === 'lion' || r.reaction === 'aquarium'
-                    )
-                  }
-                />
-              </div>
-            ) : (
-              <div className="w-full h-[424px] flex flex-col justify-start items-center relative">
-                {/* Themed Faceplate Container */}
-                <div
-                  className="w-full flex flex-col items-center pt-6 pb-3 relative z-10 transition-all duration-300"
-                  style={{
-                    borderRadius: '40px 40px 200px 200px / 40px 40px 90px 90px',
-                    background: 'var(--panel-bg)',
-                    boxShadow: 'var(--panel-shadow)',
-                    border: 'var(--panel-border)',
-                    backdropFilter: 'var(--panel-blur)',
-                  }}
-                >
-                  {/* 3D Faceplate Outer Highlight and Shadow Overlay */}
-                  <div
-                    className="absolute inset-0 pointer-events-none z-20"
-                    style={{
-                      borderRadius: '40px 40px 200px 200px / 40px 40px 90px 90px',
-                      boxShadow:
-                        'inset 0 3px 4px rgba(100, 116, 139, 0.5), inset 3px 0 4px rgba(100, 116, 139, 0.5), inset 4px 4px 6px rgba(100, 116, 139, 0.45), inset -4px -4px 8px rgba(0, 0, 0, 0.35), inset 0 -3px 5px rgba(0, 0, 0, 0.3)',
-                    }}
-                  />
-                  {/* LCD Panel */}
-                  <div className="transition-opacity duration-300 flex justify-center w-full relative">
-                    <LCDPanel
-                      channel={channel}
-                      userCount={dynamicUserCount}
-                      isOffline={!isConnected}
-                      isPowerOn={isPowerOn}
-                      onUserCountClick={() => setIsUserListOpen(true)}
-                    />
-                  </div>
+            {/* LCD Panel inside Faceplate */}
+            <RadioLCD
+              userCount={dynamicUserCount}
+              onUserCountClick={() => setIsUserListOpen(true)}
+            />
 
-                  {/* Progress Bar */}
-                  {showModulator && (
-                    <div
-                      className={`mt-2 flex justify-center transition-opacity duration-300 w-full ${isPowerOn ? 'opacity-100' : 'opacity-30'}`}
-                    >
-                      <ProgressBar progress={progress} />
-                    </div>
-                  )}
+            {/* D-pad Footer Buttons inside Faceplate */}
+            <RadioFooter
+              onScan={() => setIsChannelListOpen(true)}
+              onSet={handleSet}
+            />
+          </RadioBody>
 
-                  {/* Control Buttons */}
-                  <div
-                    className={`mt-1 mb-0.5 flex justify-center transition-opacity duration-300 w-full ${isPowerOn ? '' : 'pointer-events-none'}`}
-                  >
-                    <ControlButtons
-                      onScan={() => setIsChannelListOpen(true)}
-                      onSet={handleSet}
-                      onUp={channelUp}
-                      onDown={channelDown}
-                      isScanning={isScanning}
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
+          {/* Quick Action Dock */}
+          <RadioQuickDock
+            isUserListOpen={isUserListOpen}
+            onOpenChat={() => setIsChatOpen(true)}
+            onOpenQueue={() => setIsQueueOpen(true)}
+            onSendReaction={handleSendReaction}
+            getThemeClass={getThemeClass}
+          />
 
-            {/* Floating Reactions Overlay — rendered only when UserListModal is open */}
-            {isPowerOn && isUserListOpen && floatingReactions.length > 0 && (
-              <div
-                className={`absolute inset-x-0 top-[14px] w-full max-w-[340px] mx-auto h-[426px] pointer-events-none z-30 overflow-hidden ${isUserListOpen ? 'flex items-center justify-center' : ''}`}
-              >
-                {floatingReactions.map((r) => {
-                  const floatAnim = isUserListOpen ? 'animate-float-center-up' : 'animate-float-up';
-                  const posStyle = isUserListOpen
-                    ? {
-                        position: 'absolute' as const,
-                        left: '50%',
-                        top: '50%',
-                        transform: 'translate(-50%, -50%)',
-                      }
-                    : {
-                        position: 'absolute' as const,
-                        bottom: 0,
-                        left: `${r.x}%`,
-                        transform: 'translateX(-50%)',
-                      };
-
-                  if (r.category === 'sound') {
-                    const soundEmojis: Record<string, string> = {
-                      laugh: '🤣',
-                      buzzer: '❌',
-                      drum: '🥁',
-                      horn: '🎺',
-                      ketawa_nular: '😆',
-                      ketawa_anjay: '😂',
-                    };
-                    return (
-                      <div
-                        key={r.id}
-                        className="flex flex-col items-center gap-0.5 pointer-events-none"
-                        style={posStyle}
-                      >
-                        <div
-                          className={`${floatAnim} flex flex-col items-center gap-0.5 opacity-80`}
-                        >
-                          <span
-                            className={
-                              isUserListOpen
-                                ? 'text-[110px] filter drop-shadow-[0_0_20px_rgba(255,255,255,0.8)] select-none'
-                                : 'text-[32px] select-none'
-                            }
-                          >
-                            {soundEmojis[r.reaction] || '🎵'}
-                          </span>
-                          {r.senderName && (
-                            <span className="text-[9px] font-bold text-white px-1.5 py-0.5 rounded-full bg-black/60 backdrop-blur-sm leading-none whitespace-nowrap max-w-[80px] truncate">
-                              {r.senderName}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  }
-
-                  if (r.category === 'gift') {
-                    const giftEmojis: Record<string, string> = {
-                      giftbox: '🎁',
-                      rose: '🌹',
-                      diamond: '💎',
-                      coffee: '☕',
-                    };
-                    return (
-                      <div
-                        key={r.id}
-                        className="fixed inset-0 m-auto w-[150px] h-[150px] flex items-center justify-center animate-bounce z-[100] pointer-events-none drop-shadow-2xl"
-                      >
-                        <span className="text-[120px] filter drop-shadow-[0_0_20px_rgba(255,255,255,0.8)]">
-                          {giftEmojis[r.reaction] || '🎁'}
-                        </span>
-                      </div>
-                    );
-                  }
-
-                  if (r.reaction === 'bart') {
-                    return (
-                      <div
-                        key={r.id}
-                        className="flex flex-col items-center gap-0.5 pointer-events-none"
-                        style={posStyle}
-                      >
-                        <div className={`${floatAnim} flex flex-col items-center gap-0.5`}>
-                          <img
-                            src={bartSvg}
-                            className="w-[110px] h-[110px] object-contain"
-                            alt="Bart Simpson"
-                          />
-                          {r.senderName && (
-                            <span className="text-[9px] font-bold text-white px-1.5 py-0.5 rounded-full bg-black/60 backdrop-blur-sm leading-none whitespace-nowrap max-w-[110px] truncate">
-                              {r.senderName}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  }
-
-                  if (r.reaction === 'fox') {
-                    return (
-                      <div
-                        key={r.id}
-                        className="flex flex-col items-center gap-0.5 pointer-events-none"
-                        style={posStyle}
-                      >
-                        <div className={`${floatAnim} flex flex-col items-center gap-0.5`}>
-                          <img
-                            src={foxSvg}
-                            className="w-[180px] h-[180px] object-contain"
-                            alt="Cute Fox"
-                          />
-                          {r.senderName && (
-                            <span className="text-[9px] font-bold text-white px-1.5 py-0.5 rounded-full bg-black/60 backdrop-blur-sm leading-none whitespace-nowrap max-w-[120px] truncate">
-                              {r.senderName}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  }
-
-                  if (r.reaction === 'rocket') {
-                    return (
-                      <div
-                        key={r.id}
-                        className="flex flex-col items-center gap-0.5 pointer-events-none"
-                        style={posStyle}
-                      >
-                        <div
-                          className={`${isUserListOpen ? 'animate-float-center-up' : 'animate-rocket-launch'} flex flex-col items-center gap-0.5`}
-                        >
-                          <span
-                            className="text-[52px] select-none"
-                            style={{
-                              display: 'inline-block',
-                              animation: isUserListOpen
-                                ? undefined
-                                : 'rocket3d 4s ease-out forwards',
-                              filter:
-                                'drop-shadow(0 0 10px rgba(255,140,0,0.9)) drop-shadow(0 6px 12px rgba(0,0,0,0.5))',
-                            }}
-                          >
-                            🚀
-                          </span>
-                          {r.senderName && (
-                            <span className="text-[9px] font-bold text-white px-1.5 py-0.5 rounded-full bg-black/60 backdrop-blur-sm leading-none whitespace-nowrap max-w-[90px] truncate">
-                              {r.senderName}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  }
-                  if (r.reaction === 'lightning') {
-                    return (
-                      <div
-                        key={r.id}
-                        className="flex flex-col items-center gap-0.5 pointer-events-none"
-                        style={posStyle}
-                      >
-                        <div
-                          className={`${isUserListOpen ? 'animate-float-center-up' : ''} flex flex-col items-center gap-0.5`}
-                        >
-                          <span
-                            className="text-[58px] select-none"
-                            style={{
-                              display: 'inline-block',
-                              animation: isUserListOpen
-                                ? undefined
-                                : 'lightning3d 4s ease-out forwards',
-                              filter:
-                                'drop-shadow(0 0 16px rgba(255,255,60,1)) drop-shadow(0 0 32px rgba(255,200,0,0.7))',
-                            }}
-                          >
-                            ⚡
-                          </span>
-                          {r.senderName && (
-                            <span className="text-[9px] font-bold text-white px-1.5 py-0.5 rounded-full bg-black/60 backdrop-blur-sm leading-none whitespace-nowrap max-w-[90px] truncate">
-                              {r.senderName}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  }
-
-                  if (r.reaction === 'star3d') {
-                    return (
-                      <div
-                        key={r.id}
-                        className="flex flex-col items-center gap-0.5 pointer-events-none"
-                        style={posStyle}
-                      >
-                        <div
-                          className={`${isUserListOpen ? 'animate-float-center-up' : ''} flex flex-col items-center gap-0.5`}
-                        >
-                          <span
-                            className="text-[56px] select-none"
-                            style={{
-                              display: 'inline-block',
-                              animation: isUserListOpen
-                                ? undefined
-                                : 'star3dSpin 4.5s ease-out forwards',
-                              filter:
-                                'drop-shadow(0 0 14px rgba(255,220,0,0.95)) drop-shadow(0 0 28px rgba(255,180,0,0.6))',
-                            }}
-                          >
-                            🌟
-                          </span>
-                          {r.senderName && (
-                            <span className="text-[9px] font-bold text-white px-1.5 py-0.5 rounded-full bg-black/60 backdrop-blur-sm leading-none whitespace-nowrap max-w-[90px] truncate">
-                              {r.senderName}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  }
-
-                  if (r.reaction === 'lion' || r.reaction === 'aquarium') {
-                    if (isUserListOpen) return null; // Rendered as background behind UserListModal instead
-                    const isLion = r.reaction === 'lion';
-                    const videoId = isLion ? 'SvBAptWsNZo' : 'jBbqxCpUsjM';
-                    return (
-                      <div
-                        key={r.id}
-                        className="absolute inset-0 w-full h-full z-40 pointer-events-auto flex flex-col items-center justify-center bg-black animate-in fade-in duration-300"
-                      >
-                        <div className="w-full h-full relative overflow-hidden bg-black flex items-center justify-center">
-                          <iframe
-                            src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${videoId}&modestbranding=1&rel=0&iv_load_policy=3&vq=highres`}
-                            title={isLion ? '3D Lion Reaction' : 'Aquarium / Relaxing Reaction'}
-                            className="absolute pointer-events-none"
-                            style={{
-                              border: 'none',
-                              width: '1084px',
-                              height: '610px',
-                              top: '-92px',
-                              left: '-372px',
-                              filter: 'brightness(1.45) contrast(1.15) saturate(1.25)',
-                            }}
-                          />
-                          {/* Overlay to prevent clicking/navigating inside the iframe */}
-                          <div className="absolute inset-0 bg-transparent" />
-                        </div>
-                        {r.senderName && (
-                          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50">
-                            <span className="text-[10px] font-bold text-white px-3 py-1.5 rounded-full bg-black/80 border border-white/10 backdrop-blur-sm shadow-md whitespace-nowrap">
-                              REAKSI DARI: {r.senderName.toUpperCase()}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  }
-
-                  const animationMap: Record<string, unknown> = {
-                    applause: applauseAnimation,
-                    love: loveAnimation,
-                    kiss: kissAnimation,
-                    wow: wowAnimation,
-                    fire: fireAnimation,
-                    crown: crownAnimation,
-                    confetti: confettiAnimation,
-                  };
-                  const animData = animationMap[r.reaction];
-                  return (
-                    <div
-                      key={r.id}
-                      className="flex flex-col items-center gap-0.5 pointer-events-none"
-                      style={posStyle}
-                    >
-                      <div className={`${floatAnim} flex flex-col items-center gap-0.5`}>
-                        {animData ? (
-                          <Player
-                            autoplay
-                            loop={false}
-                            src={animData}
-                            style={{ width: '110px', height: '110px' }}
-                          />
-                        ) : (
-                          <span className="text-4xl">🔥</span>
-                        )}
-                        {r.senderName && (
-                          <span className="text-[9px] font-bold text-white px-1.5 py-0.5 rounded-full bg-black/60 backdrop-blur-sm leading-none whitespace-nowrap max-w-[110px] truncate">
-                            {r.senderName}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* Quick Action Dock - tampil hanya saat UserListModal terbuka, posisi sama seperti semula */}
-            {isUserListOpen && (
-              <div
-                onClick={(e) => e.stopPropagation()}
-                className="w-full flex justify-center z-20 mt-3"
-              >
-                <QuickActionDock
-                  onOpenChat={() => setIsChatOpen(true)}
-                  onOpenQueue={() => setIsQueueOpen(true)}
-                  onSendReaction={handleSendReaction}
-                  isPowerOn={isPowerOn}
-                  showSocialFeatures={isPowerOn}
-                  themeKey={getThemeClass(themeText)}
-                />
-              </div>
-            )}
-
-            {/* PTT Button */}
-            {showPTT && (
-              <div
-                className={`absolute left-0 right-0 w-full flex justify-center transition-opacity duration-300 opacity-100 ${isPowerOn ? '' : 'pointer-events-none'}`}
-                style={{ bottom: 'calc(20px + env(safe-area-inset-bottom, 8px))' }}
-              >
-                <div onClick={(e) => e.stopPropagation()}>
-                  <PTTButton
-                    isActive={isTransmitting}
-                    isBusy={isBusy}
-                    isMuted={status === 'muted'}
-                    waitCountdown={waitTimer}
-                    onPressStart={() => {
-                      if (isPowerOn) {
-                        if (!pttAllowed) {
-                          toast.error(
-                            status === 'muted'
-                              ? 'Anda sedang dibungkam (muted) di channel ini.'
-                              : status === 'ptt_blocked'
-                                ? 'Hak PTT Anda diblokir di channel ini.'
-                                : 'Tamu biasa dilarang menggunakan PTT di channel ini.'
-                          );
-                          return;
-                        }
-                        setIsTransmitting(true);
-                      }
-                    }}
-                    onPressEnd={() => setIsTransmitting(false)}
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Floating Karaoke Player — lazy-loaded, hanya mount saat mode music aktif */}
-            {isPowerOn && audioMode === 'music' && isKaraokePlayerOpen && (
-              <div onClick={(e) => e.stopPropagation()}>
-                <Suspense fallback={<KaraokePlayerSkeleton />}>
-                  <FloatingKaraokePlayer onClose={() => setIsKaraokePlayerOpen(false)} />
-                </Suspense>
-              </div>
-            )}
-          </div>
+          {/* Floating Karaoke Player — lazy-loaded, hanya mount saat mode music aktif */}
+          {isPowerOn && audioMode === 'music' && isKaraokePlayerOpen && (
+            <div onClick={(e) => e.stopPropagation()}>
+              <Suspense fallback={<KaraokePlayerSkeleton />}>
+                <FloatingKaraokePlayer onClose={() => setIsKaraokePlayerOpen(false)} />
+              </Suspense>
+            </div>
+          )}
         </div>
       )}
 
-      {/* Channel List Modal Dialog */}
-      {isChannelListOpen && (
+      {/* Channel List Modal Dialog (Overlay when not main panel) */}
+      {!isPanelOpen && isChannelListOpen && (
         <ChannelListModal
           onClose={() => setIsChannelListOpen(false)}
-          onSelectChannel={(num) => setChannelNumber(num)}
+          onSelectChannel={(num: number) => setChannelNumber(num)}
         />
       )}
 
       {/* Preloaded Sound Reaction Players */}
       <audio id="audio-player-ketawa-nular" src="/sounds/ketawa_nular.mp3" preload="auto" />
       <audio id="audio-player-ketawa-anjay" src="/sounds/ketawa_anjay.mp3" preload="auto" />
-
-      {/* In-App Feedback Modal */}
-      <FeedbackModal />
     </div>
   );
 }

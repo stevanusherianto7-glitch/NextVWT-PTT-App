@@ -94,6 +94,12 @@ export interface PTTState {
   codecFallbackActive: boolean;
   coins: number;
   fetchCoins: () => Promise<void>;
+  
+  // Role & status user di channel aktif (dibaca dari DB saat join)
+  myChannelRole: ChannelRole;
+  myChannelStatus: 'normal' | 'muted' | 'controlled' | 'wait' | 'wait_controlled';
+  setMyChannelRole: (role: ChannelRole) => void;
+  setMyChannelStatus: (status: 'normal' | 'muted' | 'controlled' | 'wait' | 'wait_controlled') => void;
 
   // Fase 1: Onboarding & Feedback
   hasCompletedOnboarding: boolean;

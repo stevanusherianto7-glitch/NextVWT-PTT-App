@@ -1,4 +1,4 @@
-export type ChannelRole = 'noc' | 'sys_admin' | 'pjc' | 'operator' | 'guest';
+export type ChannelRole = 'noc' | 'sys_admin' | 'pjc' | 'operator' | 'member' | 'guest';
 
 export type ChannelUserStatus =
   | 'active'
@@ -47,6 +47,7 @@ export type ModerationAction =
 
 export const roleRank: Record<ChannelRole, number> = {
   guest: 1,
+  member: 1.5,
   operator: 2,
   pjc: 3,
   sys_admin: 4,
@@ -121,6 +122,7 @@ export function canPerformAction(role: ChannelRole, action: ModerationAction): b
       'VIEW_LOGS',
     ],
     operator: ['VIEW_ADMIN_PANEL', 'MANAGE_QUEUE'],
+    member: [],
     guest: [],
   };
 
