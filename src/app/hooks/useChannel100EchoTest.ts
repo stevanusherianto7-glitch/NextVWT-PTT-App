@@ -1,7 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
 import { useAudioPlayback } from './useAudioPlayback';
-import { toast } from 'sonner';
-import { usePTTStore } from '../store/usePTTStore';
 
 export const useChannel100EchoTest = () => {
   const [isCapturing, setIsCapturing] = useState(false);
@@ -14,7 +12,7 @@ export const useChannel100EchoTest = () => {
   const isCapturingRef = useRef(false);
   const isPlayingBackRef = useRef(false);
 
-  const { playAudioChunk, getAudioContext } = useAudioPlayback();
+  const { playAudioChunk } = useAudioPlayback();
 
   const startEchoCapture = useCallback(async () => {
     if (isCapturingRef.current) return;
@@ -67,14 +65,15 @@ export const useChannel100EchoTest = () => {
       };
 
       mediaRecorder.start(100);
-    } catch (err: any) {
+    } catch (err: unknown) {
       isCapturingRef.current = false;
       setIsCapturing(false);
       setHasChunks(false);
-      if (err.name === 'NotAllowedError') {
-        throw new Error('MicPermissionDenied');
-      } else if (err.name === 'NotFoundError') {
-        throw new Error('MicNotFound');
+      const errorName = err instanceof Error ? err.name : '';
+      if (errorName === 'NotAllowedError') {
+        throw new Error('MicPermissionDenied', { cause: err });
+      } else if (errorName === 'NotFoundError') {
+        throw new Error('MicNotFound', { cause: err });
       }
       throw err;
     }
