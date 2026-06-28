@@ -111,20 +111,26 @@ export function useRadioOrchestrator() {
   const isFullDuplexActive = fullDuplex || audioMode === 'music';
   const isBusy = !isFullDuplexActive && !!isReceiving;
 
-  const isPebeOrPebri = (u: UserListModalProps['users'][number]) => {
-    if (typeof u === 'string') {
-      return u.toLowerCase() === 'pebe herianto' || u.toLowerCase() === 'pebri haryanto';
-    }
-    const name = u?.displayName || u?.userId || '';
-    return name.toLowerCase() === 'pebe herianto' || name.toLowerCase() === 'pebri haryanto';
-  };
-
   const safeActiveUsers = activeUsers || [];
-  const dynamicUserList = [
+  const rawList = [
     ...safeActiveUsers,
     ...(activeChannelObj?.users || []),
     ...simulatedUsers,
-  ].filter((u) => !isPebeOrPebri(u));
+  ];
+
+  // Deduplicate by normalizing key (lowercase) and preferring objects over strings
+  const uniqueUsersMap = new Map<string, typeof rawList[number]>();
+  rawList.forEach((u) => {
+    const key = typeof u === 'string' ? u : u.userId;
+    if (key) {
+      const normalizedKey = key.toLowerCase();
+      if (!uniqueUsersMap.has(normalizedKey) || typeof u !== 'string') {
+        uniqueUsersMap.set(normalizedKey, u);
+      }
+    }
+  });
+
+  const dynamicUserList = Array.from(uniqueUsersMap.values());
   const dynamicUserCount = dynamicUserList.length;
 
   const getThemeClass = (theme: string) => {
