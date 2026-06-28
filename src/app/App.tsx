@@ -95,7 +95,7 @@ export default function App() {
                   await signInWithGoogle();
                 } else if (provider === 'guest') {
                   const guestUser = {
-                    id: 'guest-' + Math.random().toString(36).substring(2, 11),
+                    id: 'guest-' + crypto.randomUUID(),
                     isGuest: true as const,
                     email: 'guest@example.com',
                     user_metadata: { full_name: 'Tamu Peb' },

@@ -464,27 +464,24 @@ export function getDeterministicProfile(username: string): UserProfile {
 function AvatarImage({
   src,
   displayName,
-  avatarColor,
   fallbackIconUrl,
   badge,
 }: {
   src?: string;
   displayName: string;
-  avatarColor: string;
   fallbackIconUrl: string;
   badge?: React.ReactNode;
 }) {
   const [hasError, setHasError] = useState(false);
 
-  if (hasError || !src) {
-    const isVoiceIcon = fallbackIconUrl === iconVoice;
-    const bgColor = isVoiceIcon ? '#ffffff' : avatarColor || '#3F51B5';
+  if (hasError || !src || isGoogleDefaultAvatar(src)) {
+    const bgColor = '#ffffff';
     return (
       <div
         className="w-full h-full rounded-none flex items-center justify-center shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)] border border-white/20"
         style={{ backgroundColor: bgColor }}
       >
-        <img src={fallbackIconUrl} alt={displayName} className="w-[35px] h-[35px] object-contain" />
+        <img src={fallbackIconUrl} alt={displayName} className="w-full h-full object-contain p-1.5" />
       </div>
     );
   }
@@ -500,6 +497,14 @@ function AvatarImage({
       {badge}
     </>
   );
+}
+
+/**
+ * Helper function to determine if a URL points to Google's default initials avatar
+ */
+export function isGoogleDefaultAvatar(url?: string): boolean {
+  if (!url) return false;
+  return url.includes('googleusercontent.com/a/default-user') || url.includes('/default-user');
 }
 
 /**
@@ -735,6 +740,11 @@ export function UserListModal({
     }
   }, [users, mapUsers]);
   const [activeZoomedAvatar, setActiveZoomedAvatar] = useState<(typeof modalUsers)[0] | null>(null);
+  const [zoomedHasError, setZoomedHasError] = useState(false);
+
+  useEffect(() => {
+    setZoomedHasError(false);
+  }, [activeZoomedAvatar]);
 
   // Check if current logged-in user holds Moderator/Operator/NOC/SysAdmin position
   const roomId = `ptt-room-${channel}`;
@@ -1006,7 +1016,6 @@ export function UserListModal({
                       <AvatarImage
                         src={avatarUrlToUse}
                         displayName={profile.displayName}
-                        avatarColor={profile.avatarColor}
                         fallbackIconUrl={fallbackIconUrl}
                         badge={badgeNode}
                       />
@@ -1085,19 +1094,31 @@ export function UserListModal({
           >
             {/* Expanded Avatar */}
             <div className="w-40 h-40 rounded-none overflow-hidden shadow-lg border-2 border-[#00C853] relative flex items-center justify-center bg-gray-100">
-              {activeZoomedAvatar.avatarUrl ? (
+              {activeZoomedAvatar.avatarUrl && !zoomedHasError && !isGoogleDefaultAvatar(activeZoomedAvatar.avatarUrl) ? (
                 <img
                   src={activeZoomedAvatar.avatarUrl}
                   alt={activeZoomedAvatar.displayName}
+                  onError={() => setZoomedHasError(true)}
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div
-                  className="w-full h-full flex items-center justify-center text-white font-bold text-5xl"
-                  style={{ backgroundColor: activeZoomedAvatar.avatarColor }}
-                >
-                  {activeZoomedAvatar.displayName.charAt(0).toUpperCase()}
-                </div>
+                (() => {
+                  const mode = getUserMode(activeZoomedAvatar);
+                  const fallbackIconUrl = activeZoomedAvatar.role === 'noc' ? iconNoc : MODE_ICONS[mode];
+                  const bgColor = '#ffffff';
+                  return (
+                    <div
+                      className="w-full h-full flex items-center justify-center"
+                      style={{ backgroundColor: bgColor }}
+                    >
+                      <img
+                        src={fallbackIconUrl}
+                        alt={activeZoomedAvatar.displayName}
+                        className="w-full h-full object-contain p-4"
+                      />
+                    </div>
+                  );
+                })()
               )}
             </div>
 

@@ -106,7 +106,7 @@ export function RadioLCD({ userCount, onUserCountClick }: RadioLCDProps) {
       <LCDPanel
         channel={channelNumber}
         userCount={userCount}
-        isOffline={!isConnected}
+        isOffline={isPowerOn ? false : !isConnected}
         isPowerOn={isPowerOn}
         onUserCountClick={onUserCountClick}
       />

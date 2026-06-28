@@ -66,11 +66,8 @@ export function subscribeToChannel(channelNum: number, retryCount = 0) {
         setActiveChannelSubscription(null);
       }
 
-      // Clear active users list immediately on channel change to prevent showing stale users
-      usePTTStore.setState({ activeUsers: [] });
-
-      // Optimistic connection state for smooth fallback and instant UX
-      usePTTStore.setState({ isConnected: true });
+      // Clear active users list immediately on channel change and set connection to false
+      usePTTStore.setState({ activeUsers: [], isConnected: false });
 
       // Update Foreground Service notification
       const channelStr = String(channelNum).padStart(3, '0');
@@ -537,6 +534,8 @@ export function subscribeToChannel(channelNum: number, retryCount = 0) {
               }, 5000);
             }
           }, 10000); // Check every 10 seconds
+        } else {
+          usePTTStore.setState({ isConnected: false });
         }
 
         if ((status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') && retryCount < 5) {

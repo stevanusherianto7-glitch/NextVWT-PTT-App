@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { usePTTStore } from '../store/usePTTStore';
 import { STATIC_CHANNELS } from '../utils/constants';
 import { useAudioStreamer } from './useAudioStreamer';
+import { base64ToArrayBuffer, arrayBufferToBase64 } from './useAudioPlayback';
 import { toast } from 'sonner';
 import { initGlobalAudioContext } from '../utils/audioContext';
 import { useChannelRole } from '../../features/moderation/useChannelRole';
@@ -265,24 +266,28 @@ export function useRadioOrchestrator() {
       });
       txStartTimeRef.current = Date.now();
     } else {
-      stopRecording();
-
       const currentChannel = usePTTStore.getState().channelNumber;
       if (currentChannel === 100) {
-        setTimeout(async () => {
+        stopRecording(async () => {
           if (echoChunksRef.current.length > 0) {
             try {
               const chunksToPlay = [...echoChunksRef.current];
               echoChunksRef.current = [];
 
-              for (const chunk of chunksToPlay) {
-                await playAudioChunk(chunk);
-              }
+              // Convert base64 chunks back to array buffers, combine into a single Blob, and convert to base64
+              const buffers = chunksToPlay.map(base64ToArrayBuffer);
+              const combinedBlob = new Blob(buffers, { type: 'audio/webm' });
+              const arrayBuffer = await combinedBlob.arrayBuffer();
+              const base64String = arrayBufferToBase64(arrayBuffer);
+
+              await playAudioChunk(base64String);
             } catch (err) {
               console.error('Failed to play back parrot echo chunks:', err);
             }
           }
-        }, 500);
+        });
+      } else {
+        stopRecording();
       }
 
       if (txStartTimeRef.current > 0) {
