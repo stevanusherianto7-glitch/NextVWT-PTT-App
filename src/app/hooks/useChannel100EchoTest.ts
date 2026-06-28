@@ -51,13 +51,7 @@ export const useChannel100EchoTest = () => {
                 ''
               )
             );
-            await playAudioChunk({
-              audio_b64: base64String,
-              sequenceNumber: 0,
-              userId: 'echo-test',
-              isLast: false,
-              timestamp: Date.now(),
-            });
+            await playAudioChunk(base64String);
           }
           isPlayingBackRef.current = false;
           setIsPlayingBack(false);

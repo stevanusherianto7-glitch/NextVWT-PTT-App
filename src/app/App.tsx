@@ -9,10 +9,6 @@ import { RadioLayout } from './components/RadioLayout';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { performSecurityAudit } from './utils/appSecurity';
 
-if (import.meta.env.DEV || import.meta.env.MODE === 'test') {
-  (window as unknown as Record<string, unknown>).__store__ = usePTTStore;
-}
-
 export default function App() {
   const { initializeSession, user, setUser, updateSettings, signInWithGoogle } = usePTTStore();
 
