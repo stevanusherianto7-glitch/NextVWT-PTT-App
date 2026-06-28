@@ -146,12 +146,20 @@ export function RadioLayout() {
   const isFullDuplexActive = fullDuplex || audioMode === 'music';
   const isBusy = !isFullDuplexActive && !!isReceiving;
 
+  const isPebeOrPebri = (u: any) => {
+    if (typeof u === 'string') {
+      return u.toLowerCase() === 'pebe herianto' || u.toLowerCase() === 'pebri haryanto';
+    }
+    const name = u?.displayName || u?.userId || '';
+    return name.toLowerCase() === 'pebe herianto' || name.toLowerCase() === 'pebri haryanto';
+  };
+
   const safeActiveUsers = activeUsers || [];
   const dynamicUserList = [
     ...safeActiveUsers,
     ...(activeChannelObj?.users || []),
     ...simulatedUsers,
-  ];
+  ].filter((u) => !isPebeOrPebri(u));
   const dynamicUserCount = dynamicUserList.length;
 
   const getThemeClass = (theme: string) => {
