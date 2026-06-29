@@ -278,10 +278,10 @@ export function UserListModal({ channel, users, hasVideoBackground }: UserListMo
       return list.map((user) => {
         const uId = typeof user === 'string' ? user : user.userId;
         const roomId = `ptt-room-${channel}`;
-        const localRole = sessionStorage.getItem(
+        const localRole = localStorage.getItem(
           `channel-role:${roomId}:${uId}`
         ) as ChannelRole | null;
-        const localStatus = sessionStorage.getItem(`channel-status:${roomId}:${uId}`);
+        const localStatus = localStorage.getItem(`channel-status:${roomId}:${uId}`);
 
         let profileData: UserProfile;
         if (typeof user === 'string') {
@@ -423,12 +423,10 @@ export function UserListModal({ channel, users, hasVideoBackground }: UserListMo
 
   // Check if current logged-in user holds Moderator/Operator/NOC/SysAdmin position
   const roomId = `ptt-room-${channel}`;
-  const localProfile = modalUsers.find(
-    (u) => u.userId === localUserId && u.callSign === localCallSign
-  );
+  const localProfile = modalUsers.find((u) => u.userId === localUserId);
   const localRole =
     (localUserId
-      ? (sessionStorage.getItem(`channel-role:${roomId}:${localUserId}`) as ChannelRole | null)
+      ? (localStorage.getItem(`channel-role:${roomId}:${localUserId}`) as ChannelRole | null)
       : null) ||
     localProfile?.role ||
     'guest';
@@ -454,7 +452,6 @@ export function UserListModal({ channel, users, hasVideoBackground }: UserListMo
       console.warn('NOC role is protected and cannot be changed');
       return;
     }
-    sessionStorage.setItem(`channel-role:${roomId}:${uId}`, nextRole);
     localStorage.setItem(`channel-role:${roomId}:${uId}`, nextRole);
     if (uId === localUserId || uId === '2DYUA' || uId === localName) {
       window.dispatchEvent(new Event('channel-role-changed'));
@@ -490,7 +487,6 @@ export function UserListModal({ channel, users, hasVideoBackground }: UserListMo
       return;
     }
     const statusVal = statusType === 'normal' ? 'active' : statusType;
-    sessionStorage.setItem(`channel-status:${roomId}:${uId}`, statusVal);
     localStorage.setItem(`channel-status:${roomId}:${uId}`, statusVal);
 
     if (uId === localUserId || uId === '2DYUA' || uId === localName) {

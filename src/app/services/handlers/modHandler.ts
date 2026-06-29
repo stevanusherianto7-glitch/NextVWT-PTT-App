@@ -49,7 +49,6 @@ export function handleUpdateRole(
   const payload = safeParseRealtimePayload(UpdateRolePayloadSchema, rawPayload, 'update_role');
   if (!payload) return;
   const roomId = `ptt-room-${channelNum}`;
-  sessionStorage.setItem(`channel-role:${roomId}:${payload.targetUserId}`, payload.nextRole);
   localStorage.setItem(`channel-role:${roomId}:${payload.targetUserId}`, payload.nextRole);
   window.dispatchEvent(new Event('channel-role-changed'));
 
@@ -103,7 +102,6 @@ export function handleUpdateStatus(
   if (!payload) return;
   const roomId = `ptt-room-${channelNum}`;
   const statusVal = payload.statusType === 'normal' ? 'active' : payload.statusType;
-  sessionStorage.setItem(`channel-status:${roomId}:${payload.targetUserId}`, statusVal);
   localStorage.setItem(`channel-status:${roomId}:${payload.targetUserId}`, statusVal);
   window.dispatchEvent(new Event('channel-role-changed'));
 
