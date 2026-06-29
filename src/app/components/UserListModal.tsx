@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { usePTTStore } from '../store/usePTTStore';
 import { activeChannelSubscription } from '../store/subscription';
 import { ChannelRole, canModerateRole } from '../../features/moderation/permissions';
+import { getSupabase } from '../utils/supabase';
 
 import { UserProfile } from './UserListModal/utils';
 import { UserListItem } from './UserListModal/UserListItem';
@@ -445,6 +446,31 @@ export function UserListModal({ channel, users, hasVideoBackground }: UserListMo
     activeZoomedAvatar.userId !== 'Pebe Herianto' &&
     canModerateRole(localRole, activeZoomedAvatar.role || 'guest');
 
+  const logModerationAction = async (
+    targetUserId: string,
+    action: string,
+    detail: Record<string, any>
+  ) => {
+    try {
+      const targetUser = modalUsers.find((u) => u.userId === targetUserId);
+      const supabaseInstance = await getSupabase();
+      await supabaseInstance.from('channel_moderation_logs').insert({
+        room_id: `ptt-room-${channel}`,
+        actor_id: localUserId,
+        actor_role: localRole,
+        target_user_id: targetUserId,
+        action,
+        detail: {
+          ...detail,
+          actor_name: localName,
+          target_name: targetUser?.displayName || targetUserId,
+        },
+      });
+    } catch (err) {
+      console.error('Failed to insert moderation log:', err);
+    }
+  };
+
   const handleUpdateRole = (uId: string, nextRole: ChannelRole) => {
     const roomId = `ptt-room-${channel}`;
     const targetUser = modalUsers.find((u) => u.userId === uId);
@@ -452,6 +478,7 @@ export function UserListModal({ channel, users, hasVideoBackground }: UserListMo
       console.warn('NOC role is protected and cannot be changed');
       return;
     }
+    const previousRole = targetUser?.role || 'guest';
     localStorage.setItem(`channel-role:${roomId}:${uId}`, nextRole);
     if (uId === localUserId || uId === '2DYUA' || uId === localName) {
       window.dispatchEvent(new Event('channel-role-changed'));
@@ -467,6 +494,11 @@ export function UserListModal({ channel, users, hasVideoBackground }: UserListMo
         },
       });
     }
+
+    logModerationAction(uId, 'SET_USER_ROLE', {
+      nextRole,
+      previousRole,
+    });
 
     setModalUsers((prev: any[]) =>
       prev.map((u) => (u.userId === uId ? { ...u, role: nextRole } : u))
@@ -503,6 +535,10 @@ export function UserListModal({ channel, users, hasVideoBackground }: UserListMo
         },
       });
     }
+
+    logModerationAction(uId, 'SET_STATUS_' + statusType.toUpperCase(), {
+      statusType,
+    });
 
     setModalUsers((prev: any[]) =>
       prev.map((u) => {
