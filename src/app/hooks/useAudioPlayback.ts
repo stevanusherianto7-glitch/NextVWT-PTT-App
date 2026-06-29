@@ -28,8 +28,6 @@ import { initGlobalAudioContext } from '../utils/audioContext';
 // Global Singleton Audio Context variables
 
 let globalPlaybackAnalyser: AnalyserNode | null = null;
-let playbackAnimationFrameId: number | null = null;
-let playbackTimeoutId: NodeJS.Timeout | null = null;
 
 import { __resetAudioContextForTest as __resetGlobalCtx } from '../utils/audioContext';
 
@@ -99,37 +97,40 @@ export function useAudioPlayback() {
         gainNode.gain.value = store.pttVolume / 100;
 
         source.connect(gainNode);
-        if (globalPlaybackAnalyser) {
-          gainNode.connect(globalPlaybackAnalyser);
-          if (playbackAnimationFrameId === null) {
-            const bufferLength = globalPlaybackAnalyser.frequencyBinCount;
-            const dataArray = new Float32Array(bufferLength);
-            const update = () => {
-              if (!globalPlaybackAnalyser) return;
-              globalPlaybackAnalyser.getFloatTimeDomainData(dataArray);
-              let sum = 0;
-              for (let i = 0; i < bufferLength; i++) {
-                sum += dataArray[i] * dataArray[i];
-              }
-              const rms = Math.sqrt(sum / bufferLength);
-              const scaledProgress = Math.min(100, Math.round(rms * 400));
-              usePTTStore.getState().setProgress(scaledProgress);
-              playbackAnimationFrameId = requestAnimationFrame(update);
-            };
-            update();
-          }
+        // ── RX Level Meter ────────────────────────────────────────────────────────
+        const rxAnalyser = ctx.createAnalyser();
+        rxAnalyser.fftSize = 512;
+        const rxDataArray = new Float32Array(rxAnalyser.fftSize);
 
-          if (playbackTimeoutId) clearTimeout(playbackTimeoutId);
-          playbackTimeoutId = setTimeout(() => {
-            if (playbackAnimationFrameId !== null) {
-              cancelAnimationFrame(playbackAnimationFrameId);
-              playbackAnimationFrameId = null;
-              usePTTStore.getState().setProgress(0);
-            }
-          }, 500);
-        } else {
-          gainNode.connect(ctx.destination);
-        }
+        gainNode.connect(rxAnalyser);
+        rxAnalyser.connect(ctx.destination);
+
+        const rxMeter = setInterval(() => {
+          rxAnalyser.getFloatTimeDomainData(rxDataArray);
+          let sum = 0;
+          for (let i = 0; i < rxDataArray.length; i++) {
+            sum += rxDataArray[i] * rxDataArray[i];
+          }
+          const rms = Math.sqrt(sum / rxDataArray.length);
+          const scaledProgress = Math.min(100, Math.round(rms * 400));
+          usePTTStore.getState().setProgress(scaledProgress);
+        }, 80);
+
+        source.onended = () => {
+          clearInterval(rxMeter);
+          try {
+            source.disconnect();
+            gainNode.disconnect();
+            rxAnalyser.disconnect();
+          } catch {
+            // ignore
+          }
+          const state = usePTTStore.getState();
+          if (!state.activeTransmitter && !state.isTransmitting) {
+            state.setProgress(0);
+          }
+        };
+        // ── End RX Level Meter ────────────────────────────────────────────────────
 
         source.start(nextPlaybackTimeRef.current);
         nextPlaybackTimeRef.current += audioBuffer.duration;

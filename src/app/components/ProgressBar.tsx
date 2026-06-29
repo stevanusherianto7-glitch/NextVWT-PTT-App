@@ -75,6 +75,30 @@ export function ProgressBar({ progress }: ProgressBarProps) {
           />
         </div>
       )}
+
+      {/* Level modulation description label */}
+      {progress > 0 && (
+        <div
+          className="absolute -bottom-4 left-0 right-0 text-center select-none pointer-events-none"
+          style={{
+            fontSize: '8px',
+            letterSpacing: '1.5px',
+            opacity: 0.85,
+            fontFamily: "'Outfit', 'Orbitron', monospace",
+            fontWeight: 'bold',
+          }}
+        >
+          {progress > 83.3 ? (
+            <span style={{ color: '#ff3333' }}>◉ MODULASI PENUH</span>
+          ) : progress > 62.5 ? (
+            <span style={{ color: '#ffaa00' }}>◎ CUKUP TERDENGAR</span>
+          ) : progress > 15 ? (
+            <span style={{ color: '#00C853' }}>○ SUARA LEMAH</span>
+          ) : (
+            <span style={{ color: '#888' }}>· TIDAK TERDETEKSI</span>
+          )}
+        </div>
+      )}
     </div>
   );
 }

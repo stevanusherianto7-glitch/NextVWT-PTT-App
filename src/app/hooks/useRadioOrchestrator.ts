@@ -207,28 +207,11 @@ export function useRadioOrchestrator() {
     }
 
     const isReceiving =
-      activeTransmitter && activeTransmitter.userId !== usePTTStore.getState().userId;
+      !!activeTransmitter &&
+      activeTransmitter.userId !== usePTTStore.getState().userId;
 
-    if (isTransmitting || isReceiving) {
-      const interval = setInterval(() => {
-        const time = Date.now() / 1000;
-        const speechEnvelope = Math.max(
-          0.1,
-          Math.sin(time * 1.6) * 0.45 + Math.sin(time * 0.55) * 0.55 + 0.25
-        );
-        const voiceRipple = Math.sin(time * 24) * 12 + Math.sin(time * 48) * 8;
-        const randomNoise = Math.random() * 14 - 7;
-
-        let simulatedProgress = speechEnvelope * 82 + voiceRipple + randomNoise;
-        simulatedProgress = Math.max(0, Math.min(100, simulatedProgress));
-        setProgress(simulatedProgress);
-      }, 80);
-
-      return () => {
-        clearInterval(interval);
-        setProgress(0);
-      };
-    } else {
+    // Reset saat tidak ada aktivitas sama sekali
+    if (!isTransmitting && !isReceiving) {
       setProgress(0);
     }
   }, [isPowerOn, isTransmitting, activeTransmitter, setProgress]);
@@ -611,16 +594,19 @@ export function useRadioOrchestrator() {
         const speechStart = Date.now();
         const progInterval = setInterval(() => {
           const elapsed = (Date.now() - speechStart) / 1000;
-          const speechEnvelope = Math.max(
-            0.15,
-            Math.sin(elapsed * 2.0) * 0.5 + Math.sin(elapsed * 0.7) * 0.5 + 0.3
-          );
-          const voiceRipple = Math.sin(elapsed * 30) * 10 + Math.sin(elapsed * 60) * 6;
-          const randomNoise = Math.random() * 12 - 6;
 
-          let simulatedProgress = speechEnvelope * 80 + voiceRipple + randomNoise;
-          simulatedProgress = Math.max(0, Math.min(100, simulatedProgress));
-          setProgress(simulatedProgress);
+          // Envelope lebih mirip pola bicara manusia:
+          // - ada "burst" saat konsonan
+          // - ada "sustain" saat vokal
+          // - ada "gap" singkat saat jeda antar kata (setiap ~0.4 detik)
+          const wordRhythm = Math.max(0, Math.sin(elapsed * 7.5)); // ~1 kata/detik
+          const syllable = Math.abs(Math.sin(elapsed * 14));        // ~2 suku kata/detik
+          const breathingGap = elapsed % 3.5 < 0.2 ? 0.05 : 1;    // jeda napas setiap 3.5 detik
+
+          const speechEnvelope = (wordRhythm * 0.5 + syllable * 0.5) * breathingGap;
+          const naturalProgress = Math.max(5, speechEnvelope * 85 + (Math.random() * 8 - 4));
+
+          setProgress(Math.min(100, naturalProgress));
         }, 80);
 
         if ('speechSynthesis' in window) {
