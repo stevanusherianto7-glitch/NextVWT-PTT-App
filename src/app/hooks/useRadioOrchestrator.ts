@@ -128,7 +128,8 @@ export function useRadioOrchestrator() {
   });
 
   const dynamicUserList = Array.from(uniqueUsersMap.values());
-  const dynamicUserCount = dynamicUserList.length;
+  // Simulasikan jumlah user di panel LCD hingga angka 3 digit (+125 offset)
+  const dynamicUserCount = dynamicUserList.length + 125;
 
   const getThemeClass = (theme: string) => {
     const t = theme?.toLowerCase() || '';

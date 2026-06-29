@@ -355,7 +355,7 @@ export function LCDPanel({
                     style={{ filter: 'drop-shadow(1px 1px 0px rgba(0,0,0,0.2))' }}
                   />
                 </div>
-                <div className="w-[24px] flex justify-end">
+                <div className="w-[38px] flex justify-end">
                   <span
                     className="text-2xl font-medium tracking-tight leading-none"
                     style={{
@@ -363,7 +363,7 @@ export function LCDPanel({
                       color: '#ffffff',
                     }}
                   >
-                    {_isPowerOn ? userCount.toString().padStart(2, '0') : '00'}
+                    {_isPowerOn ? userCount.toString().padStart(3, '0') : '000'}
                   </span>
                 </div>
               </div>
