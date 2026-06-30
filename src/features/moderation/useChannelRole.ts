@@ -13,7 +13,7 @@ export function useChannelRole(roomId: string, userId: string) {
               const parsed = JSON.parse(raw);
               return parsed.infoText || '';
             }
-          } catch (e) {
+          } catch {
             // ignore
           }
           return '';

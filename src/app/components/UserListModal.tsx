@@ -449,7 +449,7 @@ export function UserListModal({ channel, users, hasVideoBackground }: UserListMo
   const logModerationAction = async (
     targetUserId: string,
     action: string,
-    detail: Record<string, any>
+    detail: Record<string, unknown>
   ) => {
     try {
       const targetUser = modalUsers.find((u) => u.userId === targetUserId);
@@ -500,10 +500,10 @@ export function UserListModal({ channel, users, hasVideoBackground }: UserListMo
       previousRole,
     });
 
-    setModalUsers((prev: any[]) =>
+    setModalUsers((prev) =>
       prev.map((u) => (u.userId === uId ? { ...u, role: nextRole } : u))
     );
-    setActiveZoomedAvatar((prev: any) =>
+    setActiveZoomedAvatar((prev) =>
       prev && prev.userId === uId ? { ...prev, role: nextRole } : prev
     );
   };
@@ -540,7 +540,7 @@ export function UserListModal({ channel, users, hasVideoBackground }: UserListMo
       statusType,
     });
 
-    setModalUsers((prev: any[]) =>
+    setModalUsers((prev) =>
       prev.map((u) => {
         if (u.userId === uId) {
           return {
@@ -555,7 +555,7 @@ export function UserListModal({ channel, users, hasVideoBackground }: UserListMo
       })
     );
 
-    setActiveZoomedAvatar((prev: any) => {
+    setActiveZoomedAvatar((prev) => {
       if (!prev || prev.userId !== uId) return prev;
       return {
         ...prev,
