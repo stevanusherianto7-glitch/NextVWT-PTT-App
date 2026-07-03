@@ -203,7 +203,7 @@ serve(async (req: Request) => {
     }
 
     // 5. Execute Action using admin client
-    let result: any = null;
+    let result: unknown = null;
 
     if (action === 'SET_USER_ROLE') {
       const nextRole = payload?.nextRole as ChannelRole;
@@ -440,9 +440,10 @@ serve(async (req: Request) => {
       status: 200,
     });
 
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Error executing moderate-channel:', err);
-    return new Response(JSON.stringify({ error: err.message || 'Server Error' }), {
+    const message = err instanceof Error ? err.message : 'Server Error';
+    return new Response(JSON.stringify({ error: message }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

@@ -3,7 +3,11 @@ import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 // @ts-ignore
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
-declare const Deno: any;
+declare const Deno: {
+  env: {
+    get(key: string): string | undefined;
+  };
+};
 
 const ALLOWED_ORIGINS = [
   'http://localhost:5173',
@@ -165,9 +169,10 @@ serve(async (req: Request) => {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
-  } catch (err: any) {
-    console.error(`[ERROR] Webhook error: ${err.message}`);
-    return new Response(JSON.stringify({ error: err.message || 'Internal server error' }), {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    console.error(`[ERROR] Webhook error: ${message}`);
+    return new Response(JSON.stringify({ error: message }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

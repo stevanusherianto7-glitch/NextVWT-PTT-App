@@ -1,0 +1,246 @@
+===== usePttTransmit.ts =====
+import { useState, useEffect } from 'react';
+import { usePTTStore } from '../store/usePTTStore';
+import { initGlobalAudioContext } from '../utils/audioContext';
+
+// ─── Walkie-Talkie Classic Sound Engine ───────────────────────────────────────
+
+/**
+ * Mechanical key-click + burst static: the physical sound of pressing a
+ * spring-loaded PTT button on an analog transceiver.
+ */
+const playPressSound = (ctx: AudioContext, masterGain: GainNode) => {
+  const t = ctx.currentTime;
+  const duration = 0.08; // 80ms duration
+
+  const osc = ctx.createOscillator();
+  const env = ctx.createGain();
+
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(1000, t); // Clean 1000Hz tone like IndoVWT
+
+  env.gain.setValueAtTime(0, t);
+  env.gain.linearRampToValueAtTime(0.38, t + 0.003); // Instant attack
+  env.gain.setValueAtTime(0.38, t + duration - 0.01);
+  env.gain.exponentialRampToValueAtTime(0.001, t + duration); // Fast release decay
+
+  osc.connect(env);
+  env.connect(masterGain);
+
+  osc.start(t);
+  osc.stop(t + duration + 0.01);
+};
+
+/**
+ * Roger Beep + Squelch Tail: Replaced with a clean 1100Hz digital beep tone
+ * mimicking the IndoVWT app start/end audio experience.
+ */
+const playReleaseSound = (ctx: AudioContext, masterGain: GainNode) => {
+  const t = ctx.currentTime;
+  const duration = 0.08; // 80ms duration
+
+  const osc = ctx.createOscillator();
+  const env = ctx.createGain();
+
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(1100, t); // Clean 1100Hz tone for release (distinct pitch)
+
+  env.gain.setValueAtTime(0, t);
+  env.gain.linearRampToValueAtTime(0.38, t + 0.003); // Instant attack
+  env.gain.setValueAtTime(0.38, t + duration - 0.01);
+  env.gain.exponentialRampToValueAtTime(0.001, t + duration); // Fast release decay
+
+  osc.connect(env);
+  env.connect(masterGain);
+
+  osc.start(t);
+  osc.stop(t + duration + 0.01);
+};
+
+const playRadioSound = (
+  type: 'press' | 'release',
+  ctx: AudioContext,
+  toneOnStartEnd: boolean,
+  pttVolume: number
+) => {
+  if (!toneOnStartEnd) return;
+  try {
+    if (ctx.state === 'suspended') ctx.resume();
+
+    const masterGain = ctx.createGain();
+    masterGain.connect(ctx.destination);
+    masterGain.gain.value = Math.min(1.0, pttVolume / 100);
+
+    if (type === 'press') {
+      playPressSound(ctx, masterGain);
+    } else {
+      playReleaseSound(ctx, masterGain);
+    }
+  } catch (err) {
+    console.warn('PTT audio playback failed:', err);
+  }
+};
+
+interface UsePttTransmitProps {
+  onPressStart: () => void;
+  onPressEnd: () => void;
+  isActive: boolean;
+  isBusy: boolean;
+}
+
+export function usePttTransmit({
+  onPressStart,
+  onPressEnd,
+  isActive,
+  isBusy,
+}: UsePttTransmitProps) {
+  const [isDepressed, setIsDepressed] = useState(false);
+
+  const isPowerOn = usePTTStore((state) => state.isPowerOn);
+  const togglePtt = usePTTStore((state) => state.togglePtt);
+  const toneOnStartEnd = usePTTStore((state) => state.toneOnStartEnd);
+  const pttVolume = usePTTStore((state) => state.pttVolume);
+  const vibrateOnStart = usePTTStore((state) => state.vibrateOnStart);
+
+  const initAudio = () => {
+    return initGlobalAudioContext();
+  };
+
+  const triggerHaptic = (duration: number) => {
+    if (!vibrateOnStart) return;
+    if (typeof window !== 'undefined' && window.navigator && window.navigator.vibrate) {
+      try {
+        window.navigator.vibrate(duration);
+      } catch {
+        // Safe fallback
+      }
+    }
+  };
+
+  const handleMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
+    if (isBusy) return;
+    if (e.type === 'touchstart') {
+      e.preventDefault();
+    }
+    setIsDepressed(true);
+    triggerHaptic(15);
+    const ctx = initAudio();
+
+    if (!togglePtt && isPowerOn) {
+      onPressStart();
+      if (ctx) playRadioSound('press', ctx, toneOnStartEnd, pttVolume);
+    }
+  };
+
+  const handleMouseUp = (e: React.MouseEvent | React.TouchEvent) => {
+    if (isBusy) return;
+    if (e.type === 'touchend') {
+      e.preventDefault();
+    }
+
+    const ctx = initAudio();
+    if (isDepressed && isPowerOn) {
+      if (togglePtt) {
+        const nextState = !isActive;
+        if (nextState) {
+          onPressStart();
+          if (ctx) playRadioSound('press', ctx, toneOnStartEnd, pttVolume);
+        } else {
+          onPressEnd();
+          if (ctx) playRadioSound('release', ctx, toneOnStartEnd, pttVolume);
+        }
+      } else {
+        onPressEnd();
+        if (ctx) playRadioSound('release', ctx, toneOnStartEnd, pttVolume);
+      }
+      triggerHaptic(10);
+    }
+    setIsDepressed(false);
+  };
+
+  const handleMouseLeave = () => {
+    if (isBusy) return;
+    const ctx = initAudio();
+    if (isDepressed && isPowerOn) {
+      if (!togglePtt) {
+        onPressEnd();
+        if (ctx) playRadioSound('release', ctx, toneOnStartEnd, pttVolume);
+      }
+      triggerHaptic(5);
+    }
+    setIsDepressed(false);
+  };
+
+  // Keyboard Spacebar event listener
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === 'Space') {
+        if (e.repeat) return;
+        e.preventDefault();
+        if (!isPowerOn || isBusy) return;
+        setIsDepressed(true);
+        triggerHaptic(15);
+        const ctx = initAudio();
+
+        if (!togglePtt) {
+          onPressStart();
+          if (ctx) playRadioSound('press', ctx, toneOnStartEnd, pttVolume);
+        }
+      }
+    };
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.code === 'Space') {
+        e.preventDefault();
+        if (!isPowerOn || isBusy) return;
+
+        const ctx = initAudio();
+        if (isDepressed) {
+          if (togglePtt) {
+            const nextState = !isActive;
+            if (nextState) {
+              onPressStart();
+              if (ctx) playRadioSound('press', ctx, toneOnStartEnd, pttVolume);
+            } else {
+              onPressEnd();
+              if (ctx) playRadioSound('release', ctx, toneOnStartEnd, pttVolume);
+            }
+          } else {
+            onPressEnd();
+            if (ctx) playRadioSound('release', ctx, toneOnStartEnd, pttVolume);
+          }
+          triggerHaptic(10);
+        }
+        setIsDepressed(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    isPowerOn,
+    isBusy,
+    isActive,
+    isDepressed,
+    togglePtt,
+    toneOnStartEnd,
+    pttVolume,
+    vibrateOnStart,
+    onPressEnd,
+  ]);
+
+  return {
+    isDepressed,
+    handleMouseDown,
+    handleMouseUp,
+    handleMouseLeave,
+  };
+}
+
+
+

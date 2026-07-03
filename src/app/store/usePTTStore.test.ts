@@ -1,14 +1,29 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { usePTTStore } from './usePTTStore';
 import { getChannelUUID, safeGetStorage, safeSetStorage } from './storeUtils';
+import { supabase } from '../utils/supabase';
 
 // ─── Mock Supabase ────────────────────────────────────────────────────────────
 // Mock Supabase to keep unit tests offline-capable and fast
 vi.mock('../utils/supabase', () => {
+  const callbacks: Record<string, (payload?: unknown) => void> = {};
+  let currentPresenceState: Record<string, unknown[]> = {};
+
   const mockChannel = {
-    on: vi.fn(() => mockChannel),
+    on: vi.fn((type: string, filterOrCb: unknown, cb?: unknown) => {
+      if (typeof filterOrCb === 'function') {
+        callbacks[type] = filterOrCb as (payload?: unknown) => void;
+      } else if (cb && typeof cb === 'function') {
+        const key = (filterOrCb as { event?: string })?.event
+          ? `${type}_${(filterOrCb as { event?: string }).event}`
+          : type;
+        callbacks[key] = cb as (payload?: unknown) => void;
+      }
+      return mockChannel;
+    }),
     track: vi.fn(() => Promise.resolve()),
     send: vi.fn(() => Promise.resolve()),
+    presenceState: vi.fn(() => currentPresenceState),
     subscribe: vi.fn((callback) => {
       if (callback) callback('SUBSCRIBED');
       return {
@@ -19,6 +34,10 @@ vi.mock('../utils/supabase', () => {
   };
 
   const mockSupabase = {
+    _callbacks: callbacks,
+    _setPresenceState: (state: Record<string, unknown[]>) => {
+      currentPresenceState = state;
+    },
     channel: vi.fn(() => mockChannel),
     auth: {
       getSession: vi.fn(() => Promise.resolve({ data: { session: null } })),
@@ -413,5 +432,335 @@ describe('usePTTStore – localStorage Persistence & Offline Robustness', () => 
 
     const updated = usePTTStore.getState();
     expect(updated.callSign).toBe('ABC12');
+  });
+});
+
+// ─── Phase 1.3: Store State & Realtime Handler Tests ─────────────────────────
+describe('PTT collision detection (tie-breaking logic)', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    sessionStorage.clear();
+    localStorage.setItem('channel-role:ptt-room-100:user-AAA', 'operator');
+    usePTTStore.setState({
+      userId: 'user-AAA',
+      callSign: 'MYCS',
+      myChannelRole: 'operator',
+      isTransmitting: true,
+      lastTransmitTime: 1000,
+    });
+    usePTTStore.getState().subscribeToChannel(100);
+  });
+
+  it('Terima ptt_state dari NOC (role noc) saat kita transmit → isTransmitting false (NOC override)', () => {
+    const cb = (
+      supabase as unknown as {
+        _callbacks: Record<string, (payload?: unknown) => void>;
+        _setPresenceState: (state: unknown) => void;
+      }
+    )._callbacks['broadcast_ptt_state'];
+    expect(cb).toBeDefined();
+    cb({
+      payload: {
+        userId: 'user-NOC',
+        displayName: 'NOC User',
+        callSign: 'NOC01',
+        isTransmitting: true,
+        role: 'noc',
+        timestamp: 1000,
+      },
+    });
+    expect(usePTTStore.getState().isTransmitting).toBe(false);
+  });
+
+  it('Terima ptt_state timestamp lebih baru dari userId yang lebih kecil → kita kalah, isTransmitting false', () => {
+    const cb = (
+      supabase as unknown as {
+        _callbacks: Record<string, (payload?: unknown) => void>;
+        _setPresenceState: (state: unknown) => void;
+      }
+    )._callbacks['broadcast_ptt_state'];
+    cb({
+      payload: {
+        userId: 'user-000',
+        displayName: 'Other User',
+        callSign: 'OTH01',
+        isTransmitting: true,
+        role: 'operator',
+        timestamp: 500,
+      },
+    });
+    expect(usePTTStore.getState().isTransmitting).toBe(false);
+  });
+
+  it('Terima ptt_state timestamp sama, userId pengirim > userId kita → kita menang, isTransmitting tetap true', () => {
+    const cb = (
+      supabase as unknown as {
+        _callbacks: Record<string, (payload?: unknown) => void>;
+        _setPresenceState: (state: unknown) => void;
+      }
+    )._callbacks['broadcast_ptt_state'];
+    cb({
+      payload: {
+        userId: 'user-ZZZ',
+        displayName: 'ZZZ User',
+        callSign: 'ZZZ01',
+        isTransmitting: true,
+        role: 'operator',
+        timestamp: 1000,
+      },
+    });
+    expect(usePTTStore.getState().isTransmitting).toBe(true);
+  });
+
+  it('Terima ptt_state isTransmitting=false dari activeTransmitter → activeTransmitter null, progress 0', () => {
+    usePTTStore.setState({
+      activeTransmitter: {
+        userId: 'user-TX',
+        displayName: 'TX User',
+        callSign: 'TX01',
+        role: 'operator',
+      },
+      progress: 50,
+    });
+    const cb = (
+      supabase as unknown as {
+        _callbacks: Record<string, (payload?: unknown) => void>;
+        _setPresenceState: (state: unknown) => void;
+      }
+    )._callbacks['broadcast_ptt_state'];
+    cb({
+      payload: {
+        userId: 'user-TX',
+        displayName: 'TX User',
+        callSign: 'TX01',
+        isTransmitting: false,
+      },
+    });
+    expect(usePTTStore.getState().activeTransmitter).toBeNull();
+  });
+});
+
+describe('channel number navigation', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    sessionStorage.clear();
+    usePTTStore.setState({ isPowerOn: true, channelNumber: 1 });
+  });
+
+  it('channelUp() dari channel 1 → channel 2', () => {
+    usePTTStore.getState().channelUp();
+    expect(usePTTStore.getState().channelNumber).toBe(2);
+  });
+
+  it('channelUp() dari channel 999 → channel 0 (wrap)', () => {
+    usePTTStore.setState({ channelNumber: 999 });
+    usePTTStore.getState().channelUp();
+    expect(usePTTStore.getState().channelNumber).toBe(0);
+  });
+
+  it('channelDown() dari channel 1 → channel 0', () => {
+    usePTTStore.getState().channelDown();
+    expect(usePTTStore.getState().channelNumber).toBe(0);
+  });
+
+  it('channelDown() dari channel 0 → channel 999 (wrap)', () => {
+    usePTTStore.setState({ channelNumber: 0 });
+    usePTTStore.getState().channelDown();
+    expect(usePTTStore.getState().channelNumber).toBe(999);
+  });
+
+  it('setChannelNumber(42) → channelNumber === 42', () => {
+    usePTTStore.getState().setChannelNumber(42);
+    expect(usePTTStore.getState().channelNumber).toBe(42);
+  });
+
+  it('setChannelNumber(-1) → tolak atau clamp ke 0', () => {
+    usePTTStore.getState().setChannelNumber(-1);
+    expect(usePTTStore.getState().channelNumber).toBe(0);
+  });
+
+  it('setChannelNumber(1000) → tolak atau clamp ke 999', () => {
+    usePTTStore.getState().setChannelNumber(1000);
+    expect(usePTTStore.getState().channelNumber).toBe(999);
+  });
+});
+
+describe('kick handler', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    sessionStorage.clear();
+    usePTTStore.setState({ userId: 'my-user-id', channelNumber: 100 });
+    usePTTStore.getState().subscribeToChannel(100);
+  });
+
+  it('kick payload targetUserId === userId kita → channelNumber berubah ke 302', () => {
+    const cb = (
+      supabase as unknown as {
+        _callbacks: Record<string, (payload?: unknown) => void>;
+        _setPresenceState: (state: unknown) => void;
+      }
+    )._callbacks['broadcast_kick'];
+    cb({
+      payload: {
+        targetUserId: 'my-user-id',
+        reason: 'Violation',
+      },
+    });
+    expect(usePTTStore.getState().channelNumber).toBe(302);
+  });
+
+  it('kick payload targetUserId !== userId kita → channelNumber tidak berubah', () => {
+    const cb = (
+      supabase as unknown as {
+        _callbacks: Record<string, (payload?: unknown) => void>;
+        _setPresenceState: (state: unknown) => void;
+      }
+    )._callbacks['broadcast_kick'];
+    cb({
+      payload: {
+        targetUserId: 'other-user-id',
+        reason: 'Violation',
+      },
+    });
+    expect(usePTTStore.getState().channelNumber).toBe(100);
+  });
+
+  it('kick payload invalid (Zod gagal) → state tidak berubah', () => {
+    const cb = (
+      supabase as unknown as {
+        _callbacks: Record<string, (payload?: unknown) => void>;
+        _setPresenceState: (state: unknown) => void;
+      }
+    )._callbacks['broadcast_kick'];
+    cb({
+      payload: {
+        targetUserId: '', // empty string fails min(1) Zod validation
+      },
+    });
+    expect(usePTTStore.getState().channelNumber).toBe(100);
+  });
+});
+
+describe('update_role handler', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    sessionStorage.clear();
+    localStorage.setItem('channel-role:ptt-room-100:my-user-id', 'operator');
+    usePTTStore.setState({ userId: 'my-user-id', channelNumber: 100 });
+    usePTTStore.getState().subscribeToChannel(100);
+    usePTTStore.setState({ myChannelRole: 'operator' });
+  });
+
+  it('targetUserId === userId kita, nextRole=pjc → myChannelRole === pjc & localStorage updated', () => {
+    const cb = (
+      supabase as unknown as {
+        _callbacks: Record<string, (payload?: unknown) => void>;
+        _setPresenceState: (state: unknown) => void;
+      }
+    )._callbacks['broadcast_update_role'];
+    cb({
+      payload: {
+        targetUserId: 'my-user-id',
+        nextRole: 'pjc',
+      },
+    });
+    expect(usePTTStore.getState().myChannelRole).toBe('pjc');
+    expect(localStorage.getItem('channel-role:ptt-room-100:my-user-id')).toBe('pjc');
+  });
+
+  it('targetUserId !== userId kita → myChannelRole tidak berubah', () => {
+    const cb = (
+      supabase as unknown as {
+        _callbacks: Record<string, (payload?: unknown) => void>;
+        _setPresenceState: (state: unknown) => void;
+      }
+    )._callbacks['broadcast_update_role'];
+    cb({
+      payload: {
+        targetUserId: 'other-user-id',
+        nextRole: 'pjc',
+      },
+    });
+    expect(usePTTStore.getState().myChannelRole).toBe('operator');
+  });
+});
+
+describe('presence member tracking', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    sessionStorage.clear();
+    usePTTStore.setState({ activeUsers: [] });
+    usePTTStore.getState().subscribeToChannel(100);
+  });
+
+  it('presence join event → activeUsers bertambah 1', () => {
+    const cb = (
+      supabase as unknown as {
+        _callbacks: Record<string, (payload?: unknown) => void>;
+        _setPresenceState: (state: unknown) => void;
+      }
+    )._callbacks['presence_sync'];
+    (
+      supabase as unknown as {
+        _callbacks: Record<string, (payload?: unknown) => void>;
+        _setPresenceState: (state: unknown) => void;
+      }
+    )._setPresenceState({
+      key1: [{ userId: 'user-1', displayName: 'User One', callSign: 'US1' }],
+    });
+    cb();
+    expect(usePTTStore.getState().activeUsers.length).toBe(1);
+    expect(usePTTStore.getState().activeUsers[0].userId).toBe('user-1');
+  });
+
+  it('presence leave event → activeUsers berkurang 1', () => {
+    const cb = (
+      supabase as unknown as {
+        _callbacks: Record<string, (payload?: unknown) => void>;
+        _setPresenceState: (state: unknown) => void;
+      }
+    )._callbacks['presence_sync'];
+    (
+      supabase as unknown as {
+        _callbacks: Record<string, (payload?: unknown) => void>;
+        _setPresenceState: (state: unknown) => void;
+      }
+    )._setPresenceState({
+      key1: [{ userId: 'user-1', displayName: 'User One' }],
+      key2: [{ userId: 'user-2', displayName: 'User Two' }],
+    });
+    cb();
+    expect(usePTTStore.getState().activeUsers.length).toBe(2);
+
+    (
+      supabase as unknown as {
+        _callbacks: Record<string, (payload?: unknown) => void>;
+        _setPresenceState: (state: unknown) => void;
+      }
+    )._setPresenceState({
+      key1: [{ userId: 'user-1', displayName: 'User One' }],
+    });
+    cb();
+    expect(usePTTStore.getState().activeUsers.length).toBe(1);
+  });
+
+  it('presence join user yang sama dua kali → tidak duplikat di activeUsers', () => {
+    const cb = (
+      supabase as unknown as {
+        _callbacks: Record<string, (payload?: unknown) => void>;
+        _setPresenceState: (state: unknown) => void;
+      }
+    )._callbacks['presence_sync'];
+    (
+      supabase as unknown as {
+        _callbacks: Record<string, (payload?: unknown) => void>;
+        _setPresenceState: (state: unknown) => void;
+      }
+    )._setPresenceState({
+      key1: [{ userId: 'user-1', displayName: 'User One' }],
+      key2: [{ userId: 'user-1', displayName: 'User One Duplicate' }],
+    });
+    cb();
+    expect(usePTTStore.getState().activeUsers.length).toBe(1);
   });
 });

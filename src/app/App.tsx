@@ -9,10 +9,6 @@ import { RadioLayout } from './components/RadioLayout';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { performSecurityAudit } from './utils/appSecurity';
 
-if (import.meta.env.DEV || import.meta.env.MODE === 'test') {
-  (window as unknown as Record<string, unknown>).__store__ = usePTTStore;
-}
-
 export default function App() {
   const { initializeSession, user, setUser, updateSettings, signInWithGoogle } = usePTTStore();
 
@@ -99,7 +95,7 @@ export default function App() {
                   await signInWithGoogle();
                 } else if (provider === 'guest') {
                   const guestUser = {
-                    id: 'guest-' + Math.random().toString(36).substring(2, 11),
+                    id: 'guest-' + crypto.randomUUID(),
                     isGuest: true as const,
                     email: 'guest@example.com',
                     user_metadata: { full_name: 'Tamu Peb' },

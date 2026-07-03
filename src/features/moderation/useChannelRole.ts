@@ -5,7 +5,20 @@ import type { RealtimeChannel } from '@supabase/supabase-js';
 
 export function useChannelRole(roomId: string, userId: string) {
   const localName =
-    typeof window !== 'undefined' ? localStorage.getItem('nextvwt:info-text') || '' : '';
+    typeof window !== 'undefined'
+      ? (() => {
+          try {
+            const raw = localStorage.getItem('nextvwt_settings');
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              return parsed.infoText || '';
+            }
+          } catch {
+            // ignore
+          }
+          return '';
+        })()
+      : '';
   const isPebe =
     userId === 'Pebe Herianto' ||
     localName.toLowerCase() === 'pebe herianto' ||

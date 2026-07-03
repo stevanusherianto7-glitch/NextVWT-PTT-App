@@ -89,6 +89,25 @@ export function PrivateChannelPanel({ onClose }: PrivateChannelPanelProps) {
 
       if (badgeErr) throw badgeErr;
 
+      // Log the badge activation action
+      try {
+        await supabase.from('channel_moderation_logs').insert({
+          room_id: roomId,
+          actor_id: userId,
+          actor_role: role || 'guest',
+          target_user_id: userId,
+          action: 'ACTIVATE_BADGE_MERAH',
+          detail: {
+            actor_name: localName,
+            target_name: localName,
+            badge_key: 'badge_merah',
+            badge_label: 'Badge Merah',
+          },
+        });
+      } catch (logErr) {
+        console.warn('Failed to insert badge moderation log:', logErr);
+      }
+
       toast.success('Selamat! Anda berhasil mengaktifkan Badge Merah 🛡️');
       setHasBadge(true);
     } catch (err) {

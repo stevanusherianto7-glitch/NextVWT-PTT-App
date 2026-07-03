@@ -73,6 +73,13 @@ export const BRAND: BrandConfig = {
   // accentColor: '#FF3D00',       // Override accent red
 };
 
+/**
+ * Channel yang TIDAK menampilkan dock reaksi (Animasi / Suara / Gift).
+ * - CH 000: DUKUNGAN & BANTUAN — channel resmi, tidak ada fitur sosial
+ * - CH 100: LANDING/ECHO TEST — channel solo untuk test modulasi
+ */
+export const NO_REACTION_CHANNELS: ReadonlySet<number> = new Set([0, 100]);
+
 const BASE_CHANNELS: ChannelConfigItem[] = [
   { number: 0, name: 'DUKUNGAN & BANTUAN', type: 'green', users: [] },
   {

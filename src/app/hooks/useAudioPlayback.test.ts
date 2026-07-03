@@ -325,7 +325,7 @@ describe('useAudioPlayback', () => {
   });
 
   it('should handle decodeAudioData failure gracefully without crashing', async () => {
-    mockCtx.decodeAudioData = vi.fn().mockRejectedValue(new Error('EncodingError: corrupt audio'));
+    mockCtx.decodeAudioData.mockRejectedValueOnce(new Error('EncodingError: corrupt audio'));
     usePTTStore.setState({ isTransmitting: false });
     const { result } = renderHook(() => useAudioPlayback());
     const noActivePeer = vi.fn(() => false);
@@ -336,5 +336,38 @@ describe('useAudioPlayback', () => {
         await result.current.playAudioChunk(makeDummyBase64(), noActivePeer);
       })
     ).resolves.not.toThrow();
+  });
+});
+
+describe('Phase 1.4: WebRTC Disconnection Fallback Test', () => {
+  beforeEach(() => {
+    localStorageMock.clear();
+    setupAudioContextMock('running');
+    __resetAudioContextForTest();
+  });
+
+  it('should fallback to Supabase Realtime playback automatically when WebRTC drops (iceConnectionState disconnected)', async () => {
+    const mockTransmitter = { userId: 'peer-001', displayName: 'Peer' };
+    usePTTStore.setState({
+      isTransmitting: false,
+      isConnected: true,
+      activeTransmitter: mockTransmitter as import('../store/types').PTTState['activeTransmitter'],
+    });
+
+    const { result } = renderHook(() => useAudioPlayback());
+
+    // Simulasikan koneksi WebRTC terputus (disconnected / cleaned up) sehingga hasActivePeer mengembalikan false
+    const hasActivePeer = vi.fn((_userId: string) => {
+      // simulate iceConnectionState === 'disconnected' → peer removed
+      return false;
+    });
+
+    await act(async () => {
+      await result.current.playAudioChunk(makeDummyBase64(), hasActivePeer);
+    });
+
+    // Karena WebRTC disconnected (hasActivePeer false), fallback Realtime harus aktif dan mendecode audio
+    expect(mockCtx.decodeAudioData).toHaveBeenCalled();
+    expect(hasActivePeer).toHaveBeenCalledWith('peer-001');
   });
 });

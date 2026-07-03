@@ -1,4 +1,5 @@
 // @ts-nocheck
+// deno-lint-ignore-file no-explicit-any
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { MeteredProvider } from "./providers/metered.ts";
@@ -12,8 +13,10 @@ const ALLOWED_ORIGINS = [
   'https://nextvwt.id',
   'https://www.nextvwt.id',
   'https://app.nextvwt.id',
+  'https://YOUR_BIZNET_GIO_DOMAIN_OR_IP',
   'capacitor://localhost',
   'http://localhost',
+  'https://localhost',
 ];
 
 function handleCors(req: Request): Response | { headers: Record<string, string> } {

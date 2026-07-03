@@ -312,57 +312,79 @@ export function useAudioStreamer() {
   }, [pttVolume, audioElementsRef]);
 
   // Stop recording and release microphone
-  const stopRecording = useCallback(() => {
-    isRecordingRef.current = false;
-    stopVAD();
+  const stopRecording = useCallback(
+    (onFlushed?: () => void) => {
+      isRecordingRef.current = false;
+      stopVAD();
 
-    if (currentCleanupRef.current) {
-      currentCleanupRef.current();
-      currentCleanupRef.current = null;
-    }
+      const finishCleanup = () => {
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach((track) => track.stop());
+          streamRef.current = null;
+        }
+        mediaRecorderRef.current = null;
 
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
-    }
-    mediaRecorderRef.current = null;
+        // Disconnect and release Audio Nodes for Garbage Collection
+        const nodes = audioNodesRef.current;
+        if (nodes.source) {
+          nodes.source.disconnect();
+          nodes.source = null;
+        }
+        if (nodes.delay) {
+          nodes.delay.disconnect();
+          nodes.delay = null;
+        }
+        if (nodes.feedback) {
+          nodes.feedback.disconnect();
+          nodes.feedback = null;
+        }
+        if (nodes.dest) {
+          nodes.dest.disconnect();
+          nodes.dest = null;
+        }
 
-    // Disconnect and release Audio Nodes for Garbage Collection
-    const nodes = audioNodesRef.current;
-    if (nodes.source) {
-      nodes.source.disconnect();
-      nodes.source = null;
-    }
-    if (nodes.delay) {
-      nodes.delay.disconnect();
-      nodes.delay = null;
-    }
-    if (nodes.feedback) {
-      nodes.feedback.disconnect();
-      nodes.feedback = null;
-    }
-    if (nodes.dest) {
-      nodes.dest.disconnect();
-      nodes.dest = null;
-    }
-
-    // Fast PTT: Swap back to silent track
-    const store = usePTTStore.getState();
-    if (store.isConnected) {
-      const silent = getSilentTrack();
-      if (silent.track) {
-        for (const pc of peerConnectionsRef.current.values()) {
-          const senders = pc.getSenders();
-          const sender = senders.find((s) => s.track?.kind === 'audio');
-          if (sender) {
-            sender.replaceTrack(silent.track).catch((err) => {
-              console.warn('Failed to swap back to silent track:', err);
-            });
+        // Fast PTT: Swap back to silent track
+        const store = usePTTStore.getState();
+        if (store.isConnected) {
+          const silent = getSilentTrack();
+          if (silent.track) {
+            for (const pc of peerConnectionsRef.current.values()) {
+              const senders = pc.getSenders();
+              const sender = senders.find((s) => s.track?.kind === 'audio');
+              if (sender) {
+                sender.replaceTrack(silent.track).catch((err) => {
+                  console.warn('Failed to swap back to silent track:', err);
+                });
+              }
+            }
           }
         }
+
+        if (onFlushed) {
+          onFlushed();
+        }
+      };
+
+      const recorder = mediaRecorderRef.current;
+      if (recorder && recorder.state !== 'inactive') {
+        recorder.onstop = () => {
+          finishCleanup();
+        };
+        try {
+          recorder.stop();
+        } catch {
+          finishCleanup();
+        }
+      } else {
+        finishCleanup();
       }
-    }
-  }, [getSilentTrack, stopVAD, peerConnectionsRef, streamRef]);
+
+      if (currentCleanupRef.current) {
+        currentCleanupRef.current = null;
+      }
+    },
+    [getSilentTrack, stopVAD, peerConnectionsRef, streamRef]
+  );
 
   // Start recording microphone
   const startRecording = useCallback(

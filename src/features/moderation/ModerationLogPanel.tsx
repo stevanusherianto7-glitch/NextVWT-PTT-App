@@ -110,8 +110,19 @@ export function ModerationLogPanel({ roomId }: ModerationLogPanelProps) {
     }
   };
 
+  const getActorLabel = (log: ModerationLog) => {
+    const actorName = log.detail?.actor_name as string | undefined;
+    if (actorName) {
+      return `${actorName} (${log.actor_id.substring(0, 8)})`;
+    }
+    return log.actor_id.length > 8 ? log.actor_id.substring(0, 8) : log.actor_id;
+  };
+
   const formatActionDescription = (log: ModerationLog) => {
-    const target = log.target_user_id || 'Sistem';
+    const targetName = log.detail?.target_name as string | undefined;
+    const target = targetName
+      ? `${targetName} (${log.target_user_id?.substring(0, 8) || ''})`
+      : log.target_user_id || 'Sistem';
     const detail = log.detail || {};
 
     switch (log.action) {
@@ -135,6 +146,18 @@ export function ModerationLogPanel({ roomId }: ModerationLogPanelProps) {
         return `Memblokir permanen (ban) ${target}${detail.reason ? ` dengan alasan: "${detail.reason}"` : ''}.`;
       case 'UNBAN_USER':
         return `Membatalkan blokir permanen (unban) ${target}.`;
+      case 'ACTIVATE_BADGE_MERAH':
+        return `Mengaktifkan Badge Merah (Akses Saluran Privat) untuk ${target}.`;
+      case 'SET_STATUS_NORMAL':
+        return `Mengubah status jalur ${target} menjadi normal (Voice).`;
+      case 'SET_STATUS_MUTED':
+        return `Mengubah status jalur ${target} menjadi Silent (Mute).`;
+      case 'SET_STATUS_CONTROLLED':
+        return `Mengubah status jalur ${target} menjadi Controlled.`;
+      case 'SET_STATUS_WAIT':
+        return `Mengubah status jalur ${target} menjadi Wait (Antri).`;
+      case 'SET_STATUS_WAIT_CONTROLLED':
+        return `Mengubah status jalur ${target} menjadi Wait Controlled.`;
       default:
         return `${log.action} pada ${target} ${JSON.stringify(detail)}`;
     }
@@ -175,7 +198,7 @@ export function ModerationLogPanel({ roomId }: ModerationLogPanelProps) {
               <div className="log-meta">
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-white text-[10px] bg-slate-800 px-1.5 py-0.5 rounded">
-                    Mod: {log.actor_id}
+                    Mod: {getActorLabel(log)}
                   </span>
                   <span className={`role-badge ${log.actor_role} text-[9px] px-1 py-0`}>
                     {getActorRoleLabel(log.actor_role)}

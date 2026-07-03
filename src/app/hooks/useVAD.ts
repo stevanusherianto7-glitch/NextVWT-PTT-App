@@ -7,6 +7,8 @@ export function useVAD(threshold = 0.01, silenceTimeout = 1500) {
   const vadIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const isVADSpeakingRef = useRef<boolean>(true);
 
+  const prevProgressRef = useRef(0);
+
   const startVAD = useCallback(
     (stream: MediaStream, micTrack: MediaStreamTrack) => {
       try {
@@ -45,9 +47,21 @@ export function useVAD(threshold = 0.01, silenceTimeout = 1500) {
           }
           const rms = Math.sqrt(sum / bufferLength);
 
-          // Update store progress bar with real RMS value scaled to 0-100 range
-          const scaledProgress = Math.min(100, Math.round(rms * 400));
-          usePTTStore.getState().setProgress(scaledProgress);
+          // Update store progress bar with real RMS value scaled to 0-100 range with asymmetric smoothing
+          const PROGRESS_SCALE = 400;
+          const rawProgress = Math.min(100, rms * PROGRESS_SCALE);
+
+          const ATTACK = 0.45; // fast rise
+          const RELEASE = 0.15; // slow decay
+
+          const prev = prevProgressRef.current;
+          const smoothed =
+            rawProgress > prev
+              ? prev + (rawProgress - prev) * ATTACK
+              : prev + (rawProgress - prev) * RELEASE;
+
+          prevProgressRef.current = smoothed;
+          usePTTStore.getState().setProgress(Math.round(smoothed));
 
           if (rms < threshold) {
             if (silenceStart === 0) {
@@ -81,6 +95,7 @@ export function useVAD(threshold = 0.01, silenceTimeout = 1500) {
       vadIntervalRef.current = null;
     }
     vadAnalyserRef.current = null;
+    prevProgressRef.current = 0;
     usePTTStore.getState().setProgress(0);
   }, []);
 

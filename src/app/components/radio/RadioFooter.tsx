@@ -1,6 +1,7 @@
 import { ControlButtons } from '../ControlButtons';
 import { QuickActionDock } from '../QuickActionDock';
 import { usePTTStore } from '../../store/usePTTStore';
+import { NO_REACTION_CHANNELS } from '../../utils/config';
 
 interface RadioFooterProps {
   onScan: () => void;
@@ -31,6 +32,7 @@ interface RadioQuickDockProps {
   onOpenQueue: () => void;
   onSendReaction: (category: 'animation' | 'sound' | 'gift', reactionType: string) => void;
   getThemeClass: (theme: string) => string;
+  channelNumber: number;
 }
 
 export function RadioQuickDock({
@@ -39,10 +41,12 @@ export function RadioQuickDock({
   onOpenQueue,
   onSendReaction,
   getThemeClass,
+  channelNumber,
 }: RadioQuickDockProps) {
   const { isPowerOn, themeText } = usePTTStore();
 
   if (!isUserListOpen) return null;
+  if (NO_REACTION_CHANNELS.has(channelNumber)) return null;
 
   return (
     <div onClick={(e) => e.stopPropagation()} className="w-full flex justify-center z-20 mt-3">

@@ -82,11 +82,14 @@ class MockMediaRecorder {
   state = 'inactive';
   ondataavailable: ((e: { data: Blob }) => void) | null = null;
   onstop: (() => void) | null = null;
+  static lastCreatedInstance: MockMediaRecorder | null = null;
 
   constructor(
     public stream: unknown,
-    public options?: unknown
-  ) {}
+    public options?: MediaRecorderOptions
+  ) {
+    MockMediaRecorder.lastCreatedInstance = this;
+  }
 
   start(_timeslice?: number) {
     this.state = 'recording';
@@ -172,5 +175,44 @@ describe('useAudioStreamer – Hook Unit Tests', () => {
     const { result } = renderHook(() => useAudioStreamer());
     result.current.flushAudioQueue();
     expect(mockFlushAudioQueue).toHaveBeenCalled();
+  });
+});
+
+describe('Phase 1.4: Audio/MediaRecorder Logic & WebRTC Signaling Tests', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should format audio chunks via MediaRecorder in opus/webm format', async () => {
+    const { result } = renderHook(() => useAudioStreamer());
+    const onChunkAvailable = vi.fn();
+
+    await act(async () => {
+      await result.current.startRecording(onChunkAvailable);
+    });
+
+    const instance = (global.MediaRecorder as unknown as typeof MockMediaRecorder)
+      .lastCreatedInstance;
+    expect(instance).toBeDefined();
+    expect(instance?.options?.mimeType).toContain('webm');
+    expect(onChunkAvailable).toHaveBeenCalledWith('mock-base64');
+  });
+
+  it('should gracefully handle microphone permission rejection (NotAllowedError)', async () => {
+    const permError = new DOMException('Permission denied', 'NotAllowedError');
+    const getUserMediaSpy = vi
+      .spyOn(navigator.mediaDevices, 'getUserMedia')
+      .mockRejectedValueOnce(permError);
+
+    const { result } = renderHook(() => useAudioStreamer());
+    const onChunkAvailable = vi.fn();
+
+    await expect(
+      act(async () => {
+        await result.current.startRecording(onChunkAvailable);
+      })
+    ).rejects.toThrow('Permission denied');
+
+    expect(getUserMediaSpy).toHaveBeenCalled();
   });
 });

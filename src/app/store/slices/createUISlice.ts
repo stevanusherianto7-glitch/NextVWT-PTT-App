@@ -298,6 +298,11 @@ export const createUISlice: StateCreator<
   setOnReactionReceived: (callback) => set({ onReactionReceived: callback }),
   broadcastReaction: (category, reaction) => {
     const state = get();
+    // Guard: jangan broadcast reaksi dari channel 100 (echo test) atau channel 0 (support)
+    if (state.channelNumber === 100 || state.channelNumber === 0) {
+      console.warn(`[Reaction] Broadcast reaksi diblokir di channel ${state.channelNumber}`);
+      return;
+    }
     if (!state.isConnected) return;
     if (activeChannelSubscription) {
       activeChannelSubscription.send({

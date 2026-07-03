@@ -24,9 +24,14 @@ export class TwilioProvider implements TurnProvider {
 
     const data = await response.json();
     
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const iceServers = data.ice_servers.map((server: any) => ({
-      urls: server.url || server.urls,
+    interface TwilioIceServer {
+      url?: string;
+      urls?: string | string[];
+      username?: string;
+      credential?: string;
+    }
+    const iceServers = data.ice_servers.map((server: TwilioIceServer) => ({
+      urls: server.urls || server.url || '',
       username: server.username,
       credential: server.credential
     }));
