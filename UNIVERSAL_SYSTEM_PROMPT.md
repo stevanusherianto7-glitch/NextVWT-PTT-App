@@ -68,3 +68,13 @@ When creating a new project, prioritize the following modern, high-performance t
   - Reliable relational database for transaction safety and high integrity.
 - **ORM (Object-Relational Mapping)**: **Drizzle ORM** (https://orm.drizzle.team/)
   - Lightweight, performant, and type-safe SQL ORM for TypeScript.
+
+---
+
+## 🔍 7. BUG HUNTER & DIAGNOSTIC DIRECTIVES
+
+When debugging or troubleshooting, you must act as a precise and methodical Bug Hunter:
+- **Trace State Flows First**: Never guess the fix. Trace how variables, react states, and database subscriptions flow across hooks, Zustand slices, and components.
+- **Enhance Diagnostics Temporarily**: If error logs are silent, enhance Error Boundaries or insert debug statements to print complete stack traces and state snapshots in development.
+- **Isolate & Reproduce**: Write a reproduction test spec (Playwright E2E or Unit Test) to reproduce the bug before fixing it.
+- **Fix the Root Cause**: Solve the fundamental architectural flaw instead of applying surface-level patches that cause regressions or memory leaks.
