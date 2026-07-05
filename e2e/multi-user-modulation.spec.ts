@@ -138,7 +138,7 @@ test.describe('Multi-User Real-time Modulation Delivery', () => {
       },
       { userId: userIdBeta, displayName: 'User Beta', callSign: 'BETA', location: 'BETA' },
     ];
-    await pageAlfa.evaluate(({ users, ownId }) => {
+    await pageAlfa.evaluate(({ users }) => {
       const store = (window as any).__store__;
       if (!store) return;
       users[0].userId = store.getState().userId;
@@ -152,7 +152,7 @@ test.describe('Multi-User Real-time Modulation Delivery', () => {
         }
         return orig(partial);
       };
-    }, { users: alfaUsers, ownId: userIdBeta });
+    }, { users: alfaUsers });
 
     const betaUsers = [
       {
@@ -163,7 +163,7 @@ test.describe('Multi-User Real-time Modulation Delivery', () => {
       },
       { userId: userIdAlfa, displayName: 'User Alfa', callSign: 'ALFA', location: 'ALFA' },
     ];
-    await pageBeta.evaluate(({ users, ownId }) => {
+    await pageBeta.evaluate(({ users }) => {
       const store = (window as any).__store__;
       if (!store) return;
       users[0].userId = store.getState().userId;
@@ -176,7 +176,7 @@ test.describe('Multi-User Real-time Modulation Delivery', () => {
         }
         return orig(partial);
       };
-    }, { users: betaUsers, ownId: userIdAlfa });
+    }, { users: betaUsers });
 
     // Verify Presence Synchronization
     const alfaCount = await pageAlfa.evaluate(
