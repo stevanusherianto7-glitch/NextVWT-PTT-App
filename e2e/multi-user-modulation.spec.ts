@@ -31,11 +31,10 @@ test.describe('Multi-User Real-time Modulation Delivery', () => {
     await pageAlfa.click('button:has-text("Back")');
     await expect(pageAlfa.locator('span:has-text("Pengaturan")').first()).not.toBeVisible();
 
-    // Disable Toggle PTT (Hold-to-Talk mode) for User Alfa
-    await pageAlfa.click('button:has-text("SET")');
-    await pageAlfa.click('button:has-text("Audio")');
-    await pageAlfa.click('label[for="toggle-togglePtt"]');
-    await pageAlfa.click('button:has-text("Back")');
+    // Disable Toggle PTT (Hold-to-Talk mode) for User Alfa via store
+    await pageAlfa.evaluate(() => {
+      (window as any).__store__.getState().updateSettings({ togglePtt: false });
+    });
 
     // 4. User Beta joins
     await pageBeta.goto('/');

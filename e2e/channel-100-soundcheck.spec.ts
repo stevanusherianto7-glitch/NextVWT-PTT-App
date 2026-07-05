@@ -54,10 +54,12 @@ test.describe('Channel 100 Sound Check (Parrot Echo Test)', () => {
     // 4. Wait for D-pad control buttons/SET to appear (ensuring application is booted and login is bypassed)
     await page.waitForSelector('button:has-text("SET")', { timeout: 15000 });
 
-    // 5. Change channel to Channel 100 via store and set coins
+    // 5. Disable toggle PTT (enable hold-to-talk) via store and set coins + channel to 100
     await page.evaluate(() => {
-      (window as any).__store__.setState({ coins: 1000 });
-      (window as any).__store__.getState().setChannelNumber(100);
+      const store = (window as any).__store__;
+      store.setState({ coins: 1000 });
+      store.getState().updateSettings({ togglePtt: false });
+      store.getState().setChannelNumber(100);
     });
 
     // Verify LCD display shows Channel 100

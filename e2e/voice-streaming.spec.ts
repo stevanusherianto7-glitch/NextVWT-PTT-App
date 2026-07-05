@@ -193,11 +193,10 @@ test.describe('Real-time Voice Streaming & Delivery', () => {
       };
     });
 
-    // 6. Disable Toggle PTT (enable Hold-to-Talk) for Speaker Alfa
-    await pageAlfa.click('button:has-text("SET")');
-    await pageAlfa.click('button:has-text("Audio")');
-    await pageAlfa.click('label[for="toggle-togglePtt"]');
-    await pageAlfa.click('button:has-text("Back")');
+    // 6. Disable Toggle PTT (enable Hold-to-Talk) for Speaker Alfa via store
+    await pageAlfa.evaluate(() => {
+      (window as any).__store__.getState().updateSettings({ togglePtt: false });
+    });
 
     // 7. Simulating User Alfa speaking by starting PTT transmission via store
     await pageAlfa.evaluate(() => (window as any).__store__.getState().setTransmitting(true));
