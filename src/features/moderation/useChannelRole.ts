@@ -2,30 +2,10 @@ import { useEffect, useState } from 'react';
 import { getSupabase } from '../../app/utils/supabase';
 import type { ChannelRole } from './permissions';
 import type { RealtimeChannel } from '@supabase/supabase-js';
+import { usePTTStore } from '../../app/store/usePTTStore';
 
 export function useChannelRole(roomId: string, userId: string) {
-  const localName =
-    typeof window !== 'undefined'
-      ? (() => {
-          try {
-            const raw = localStorage.getItem('nextvwt_settings');
-            if (raw) {
-              const parsed = JSON.parse(raw);
-              return parsed.infoText || '';
-            }
-          } catch {
-            // ignore
-          }
-          return '';
-        })()
-      : '';
-  const isPebe =
-    userId === 'Pebe Herianto' ||
-    localName.toLowerCase() === 'pebe herianto' ||
-    localName.toLowerCase() === 'pebri haryanto';
-
   const [role, setRole] = useState<ChannelRole>(() => {
-    if (isPebe) return 'noc';
     if (!roomId || !userId) return 'guest';
     const localRole = localStorage.getItem(
       `channel-role:${roomId}:${userId}`
@@ -41,7 +21,7 @@ export function useChannelRole(roomId: string, userId: string) {
 
   useEffect(() => {
     if (!roomId || !userId) {
-      setRole(isPebe ? 'noc' : 'guest');
+      setRole('guest');
       setStatus('active');
       setLoading(false);
       return;
@@ -57,9 +37,7 @@ export function useChannelRole(roomId: string, userId: string) {
         `channel-role:${roomId}:${userId}`
       ) as ChannelRole | null;
       const localStatus = localStorage.getItem(`channel-status:${roomId}:${userId}`);
-      if (isPebe) {
-        setRole('noc');
-      } else if (localRole) {
+      if (localRole) {
         setRole(localRole);
       }
       if (localStatus) setStatus(localStatus);
@@ -96,10 +74,7 @@ export function useChannelRole(roomId: string, userId: string) {
         ) as ChannelRole | null;
         const localStatus = localStorage.getItem(`channel-status:${roomId}:${userId}`);
 
-        if (isPebe) {
-          setRole('noc');
-          localStorage.setItem(`channel-role:${roomId}:${userId}`, 'noc');
-        } else if (localRole) {
+        if (localRole) {
           setRole(localRole);
         } else if (data?.role) {
           const dbRole = data.role as ChannelRole;
@@ -141,12 +116,17 @@ export function useChannelRole(roomId: string, userId: string) {
 
               if (newRecord && newRecord.user_id === userId) {
                 if (mounted) {
-                  const r = isPebe ? 'noc' : (newRecord.role as ChannelRole) || 'guest';
+                  const r = (newRecord.role as ChannelRole) || 'guest';
                   const s = newRecord.status || 'active';
                   setRole(r);
                   setStatus(s);
                   localStorage.setItem(`channel-role:${roomId}:${userId}`, r);
                   localStorage.setItem(`channel-status:${roomId}:${userId}`, s);
+                  // SINGLE BRIDGE to the PTT store's myChannelRole/myChannelStatus:
+                  // the DB Realtime postgres_changes subscription is the ONLY
+                  // authoritative source. Broadcast handlers (modHandler) must NOT
+                  // set myChannelRole (forged broadcast -> self-elevation).
+                  usePTTStore.setState({ myChannelRole: r, myChannelStatus: s as never });
                   window.dispatchEvent(new Event('channel-role-changed'));
                 }
               } else if (
@@ -155,14 +135,9 @@ export function useChannelRole(roomId: string, userId: string) {
                 oldRecord.user_id === userId
               ) {
                 if (mounted) {
-                  const r = isPebe ? 'noc' : 'guest';
-                  setRole(r);
+                  setRole('guest');
                   setStatus('active');
-                  if (isPebe) {
-                    localStorage.setItem(`channel-role:${roomId}:${userId}`, 'noc');
-                  } else {
-                    localStorage.removeItem(`channel-role:${roomId}:${userId}`);
-                  }
+                  localStorage.removeItem(`channel-role:${roomId}:${userId}`);
                   localStorage.removeItem(`channel-status:${roomId}:${userId}`);
                   window.dispatchEvent(new Event('channel-role-changed'));
                 }
@@ -175,7 +150,7 @@ export function useChannelRole(roomId: string, userId: string) {
                   .eq('user_id', userId)
                   .maybeSingle();
                 if (mounted) {
-                  const r = isPebe ? 'noc' : (refetch?.role as ChannelRole) || 'guest';
+                  const r = (refetch?.role as ChannelRole) || 'guest';
                   const s = refetch?.status || 'active';
                   setRole(r);
                   setStatus(s);
@@ -207,7 +182,7 @@ export function useChannelRole(roomId: string, userId: string) {
         });
       }
     };
-  }, [roomId, userId, isPebe]);
+  }, [roomId, userId]);
 
   return {
     role,

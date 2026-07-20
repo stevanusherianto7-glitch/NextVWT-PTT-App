@@ -654,7 +654,7 @@ describe('update_role handler', () => {
     usePTTStore.setState({ myChannelRole: 'operator' });
   });
 
-  it('targetUserId === userId kita, nextRole=pjc → myChannelRole === pjc & localStorage updated', () => {
+  it('targetUserId === userId kita, nextRole=pjc → localStorage cache updated + event dispatched, BUT myChannelRole TIDAK di-set dari broadcast (authoritative via DB postgres_changes)', () => {
     const cb = (
       supabase as unknown as {
         _callbacks: Record<string, (payload?: unknown) => void>;
@@ -667,8 +667,11 @@ describe('update_role handler', () => {
         nextRole: 'pjc',
       },
     });
-    expect(usePTTStore.getState().myChannelRole).toBe('pjc');
+    // Broadcast is cache-only: localStorage reflects the optimistic value...
     expect(localStorage.getItem('channel-role:ptt-room-100:my-user-id')).toBe('pjc');
+    // ...but myChannelRole must NOT be set from an unverified broadcast
+    // (prevents forged update_role self-elevation; real role arrives via DB).
+    expect(usePTTStore.getState().myChannelRole).toBe('operator');
   });
 
   it('targetUserId !== userId kita → myChannelRole tidak berubah', () => {
@@ -685,6 +688,24 @@ describe('update_role handler', () => {
       },
     });
     expect(usePTTStore.getState().myChannelRole).toBe('operator');
+  });
+
+  it('SECURITY: forged update_role broadcast (nextRole=noc) targeting self does NOT self-elevate myChannelRole', () => {
+    const cb = (
+      supabase as unknown as {
+        _callbacks: Record<string, (payload?: unknown) => void>;
+        _setPresenceState: (state: unknown) => void;
+      }
+    )._callbacks['broadcast_update_role'];
+    cb({
+      payload: {
+        targetUserId: 'my-user-id',
+        nextRole: 'noc', // attacker tries to grant themselves NOC
+      },
+    });
+    // The forged broadcast must NOT change the authoritative role state.
+    expect(usePTTStore.getState().myChannelRole).toBe('operator');
+    expect(localStorage.getItem('channel-role:ptt-room-100:my-user-id')).toBe('noc'); // cache only
   });
 });
 

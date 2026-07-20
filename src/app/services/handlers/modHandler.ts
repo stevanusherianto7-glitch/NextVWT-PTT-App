@@ -54,7 +54,13 @@ export function handleUpdateRole(
 
   const currentStore = usePTTStore.getState();
   if (payload.targetUserId === currentStore.userId) {
-    usePTTStore.setState({ myChannelRole: payload.nextRole as ChannelRole });
+    // NOTE: myChannelRole/myChannelStatus are NOT set from the broadcast.
+    // The broadcast is only an optimistic UI cache signal; the authoritative
+    // role/status come from the DB Realtime `postgres_changes` subscription
+    // (see useChannelRole). This prevents a forged `update_role` broadcast
+    // from self-elevating: a forged push writes localStorage but the DB
+    // subscription will overwrite it with the real server-verified role.
+    window.dispatchEvent(new Event('channel-role-changed'));
   }
   if (payload.targetUserId === currentStore.userId && activeChannelSubscription) {
     const userMeta = currentStore.user;
@@ -107,7 +113,9 @@ export function handleUpdateStatus(
 
   const currentStore = usePTTStore.getState();
   if (payload.targetUserId === currentStore.userId) {
-    usePTTStore.setState({ myChannelStatus: payload.statusType });
+    // myChannelStatus is NOT set from the broadcast (see handleUpdateRole note):
+    // authoritative status arrives via the DB Realtime postgres_changes subscription.
+    window.dispatchEvent(new Event('channel-role-changed'));
   }
   if (payload.targetUserId === currentStore.userId && activeChannelSubscription) {
     const userMeta = currentStore.user;

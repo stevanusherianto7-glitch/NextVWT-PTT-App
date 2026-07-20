@@ -189,8 +189,7 @@ export const createUISlice: StateCreator<
     );
     if (
       targetUser?.role === 'noc' ||
-      targetLocalRole === 'noc' ||
-      targetUserId === 'Pebe Herianto'
+      targetLocalRole === 'noc'
     ) {
       console.warn('Cannot hang up NOC user');
       return;
@@ -234,8 +233,7 @@ export const createUISlice: StateCreator<
     );
     if (
       targetUser?.role === 'noc' ||
-      targetLocalRole === 'noc' ||
-      targetUserId === 'Pebe Herianto'
+      targetLocalRole === 'noc'
     ) {
       console.warn('Cannot kick NOC user');
       return;
