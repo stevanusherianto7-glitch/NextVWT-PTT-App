@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { getChannelUserCount, checkIfNewUser, STATIC_CHANNELS } from './constants';
 
 describe('constants', () => {

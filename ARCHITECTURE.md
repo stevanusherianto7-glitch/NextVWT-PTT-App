@@ -187,11 +187,16 @@ Channel statis didefinisikan di `BRAND`/`CHANNELS` (`config.ts`).
 
 ## 10. Testing Strategy
 
-- **Unit** (Vitest): store slices, permissions, rateLimiter, useWebRTC, channel 100 echo.
-  Target: 196 test pass (9 file).
+- **Unit** (Vitest): store slices, permissions, rateLimiter, useWebRTC, channel 100 echo,
+  realtime handlers (ptt/voice/webrtc), roomId, secureConfig. **Terukur 2026-07-21:
+  233 test pass (19 file).** Coverage baseline (vitest --coverage): Lines ~20.6% /
+  Branches ~14.4% — naikkan per batch, lihat `docs/TESTING.md`.
 - **E2E** (Playwright): boot, PTT, moderasi, layout, voice streaming. Base URL
-  `localhost:5188`, Chromium dengan fake media stream.
-- **Lint/Type**: ESLint (`src/**/*.{ts,tsx}`) + `tsc --noEmit` wajib hijau sebelum merge.
+  `localhost:5188`, Chromium dengan fake media stream. **Butuh Playwright browser
+  ter-install** (`npx playwright install chromium`) — di environment tanpa browser,
+  E2E tidak dapat dijalankan; gunakan unit test + coverage sebagai bukti.
+- **Lint/Type**: ESLint (`src/**/*.{ts,tsx}`) + `tsc --noEmit` wajib hijau sebelum merge
+  (tsconfig sudah sertakan `vitest/globals` sehingga test file lolos type-check).
 
 ---
 

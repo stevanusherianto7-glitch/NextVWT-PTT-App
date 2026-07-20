@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import {
   checkDOMIntegrity,
   checkDomainAuthorization,
@@ -69,7 +69,6 @@ describe('integrity', () => {
       // @ts-expect-error force tamper
       window.fetch = undefined;
       expect(checkFunctionIntegrity()).toBe(false);
-      // @ts-expect-error restore
       window.fetch = orig;
     });
   });

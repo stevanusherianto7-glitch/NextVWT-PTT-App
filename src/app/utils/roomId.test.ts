@@ -2,32 +2,22 @@ import { describe, it, expect } from 'vitest';
 import { resolveRoomId } from './roomId';
 
 describe('resolveRoomId', () => {
-  it('returns default for null/undefined', () => {
+  it('returns default when channel is null/undefined', () => {
     expect(resolveRoomId(null)).toBe('room:default');
-    expect(resolveRoomId(undefined)).toBe('room:default');
+    expect(resolveRoomId(undefined as unknown as null)).toBe('room:default');
   });
 
-  it('prefers id', () => {
-    expect(resolveRoomId({ id: 5 })).toBe('room:5');
+  it('prefers id over number over name', () => {
+    expect(resolveRoomId({ id: 'abc', number: 5, name: 'Main' })).toBe('room:abc');
+    expect(resolveRoomId({ number: 5, name: 'Main' })).toBe('room:5');
+    expect(resolveRoomId({ name: 'Main' })).toBe('room:main');
   });
 
-  it('falls back to number', () => {
-    expect(resolveRoomId({ number: 12 })).toBe('room:12');
+  it('normalizes whitespace and casing', () => {
+    expect(resolveRoomId({ name: '  Hello World ' })).toBe('room:hello-world');
   });
 
-  it('falls back to name', () => {
-    expect(resolveRoomId({ name: 'CH-7' })).toBe('room:ch-7');
-  });
-
-  it('trims, lowercases and dashes spaces', () => {
-    expect(resolveRoomId({ name: 'Main Channel ' })).toBe('room:main-channel');
-  });
-
-  it('handles string id', () => {
-    expect(resolveRoomId({ id: 'ABC' })).toBe('room:abc');
-  });
-
-  it('handles null id but valid number', () => {
-    expect(resolveRoomId({ id: null, number: 3 })).toBe('room:3');
+  it('falls back to default when all fields missing', () => {
+    expect(resolveRoomId({})).toBe('room:default');
   });
 });

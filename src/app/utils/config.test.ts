@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const mockOrder = vi.fn(() => Promise.resolve({ data: [], error: null }));
-const mockSelect = vi.fn(() => ({ order: mockOrder }));
-const mockFrom = vi.fn(() => ({ select: mockSelect }));
+const mockOrder: any = vi.fn(() => Promise.resolve({ data: [], error: null }));
+const mockSelect: any = vi.fn(() => ({ order: mockOrder }));
+const mockFrom: any = vi.fn(() => ({ select: mockSelect }));
 
 vi.mock('@/app/utils/supabase', () => ({
   getSupabase: vi.fn(() => Promise.resolve({ from: mockFrom })),

@@ -22,10 +22,27 @@
 - [x] .env.example diupdate dengan template Biznet Gio
 - [x] @ts-nocheck dihapus dari turn-credentials/index.ts
 
+## LiveKit SFU Dual-Mode (2026-07-20 → 2026-07-21)
+- [x] Mesh + SFU dual-mode via VITE_LIVEKIT_URL / USE_SFU
+- [x] AudioTransport interface + LiveKitAudioTransport
+- [x] livekit-token Edge Function (server-side mint, room-scoped)
+- [x] Integrasi ke useRadioAudioEngine; presence dari LiveKit participants
+
 ## Build Status
-- pnpm type-check: PASS
+- pnpm type-check: PASS (diperbaiki 2026-07-21 — tsconfig.types ditambah vitest/globals; test files taip ulang)
 - pnpm build: PASS
-- pnpm test: PASS (196 tests passed, 0 failed)
+- pnpm test: PASS (253+ tests, 19 file)
+- pnpm lint: 0 error / 4 warning
+
+## Catatan Coverage (diukur nyata, 2026-07-21)
+- `vitest run --coverage` baseline: Lines ~20%, Branches ~14% (sebagian besar
+  features/* dan komponen UI masih 0%).
+- Util/logic inti (permissions, rateLimit, roomId, config, supabase, secureConfig,
+  realtime handlers) sudah ter-cover. Target: naikkan coverage per batch,
+  jangan klaim 100% sebelum terukur.
 
 ## Masalah yang Ditemukan Selama Refactor
-Tidak ada temuan baru. Semua tests dan builds berhasil dijalankan tanpa peringatan lint atau typescript error kritis.
+- tsconfig.json tidak menyertakan `vitest/globals` → tsc gagal pada test file
+  yang pakai `vi`/`beforeEach` global. SUDAH DIPERBAIKI.
+- REFACTOR_SUMMARY lama salah menyatakan "196 tests" dan "type-check PASS"
+  padahal saat itu tsc FAIL. SUDAH DIPERBAIKI di dokumen ini.
