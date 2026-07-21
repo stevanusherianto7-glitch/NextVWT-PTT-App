@@ -118,7 +118,6 @@ jobs:
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
-          VITE_LIVEKIT_URL: ''
           VITE_E2E_DISABLE_SFU: '1'
 
       - name: Upload Playwright Report (on E2E failure)

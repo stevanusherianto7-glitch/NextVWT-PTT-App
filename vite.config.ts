@@ -223,6 +223,8 @@ export default defineConfig(({ command: _command, mode }) => {
       // Pass environment variables to the client
       'import.meta.env.VITE_VERCEL_ENV': JSON.stringify(env.VITE_VERCEL_ENV),
       'import.meta.env.VITE_API_BASE_URL': JSON.stringify(env.VITE_API_BASE_URL),
+      // E2E: compile-time flag to disable SFU (set via webServer.env in Playwright config)
+      __E2E_DISABLE_SFU__: JSON.stringify(process.env.VITE_E2E_DISABLE_SFU === '1'),
     },
   }
 })
