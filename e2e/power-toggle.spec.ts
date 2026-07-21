@@ -7,15 +7,15 @@
  * Solution: click the visible <label class="toggle-switch"> wrapper instead,
  * and use evaluate() + isChecked() to read checkbox state.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from './fixtures';
 
 // Click the visible toggle label (parent of the hidden input)
-async function clickPowerToggle(page: import('@playwright/test').Page) {
+async function clickPowerToggle(page: Page) {
   await page.locator('label.toggle-switch').first().click();
 }
 
 // Read the underlying checkbox state via evaluate (bypasses visibility)
-async function isPowerOn(page: import('@playwright/test').Page): Promise<boolean> {
+async function isPowerOn(page: Page): Promise<boolean> {
   return page.evaluate(() => {
     const el = document.querySelector('.toggle-switch-input') as HTMLInputElement | null;
     return el ? el.checked : true;

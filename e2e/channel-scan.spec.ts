@@ -2,7 +2,7 @@
  * e2e/channel-scan.spec.ts
  * NextVWT – Channel List Modal (SCAN Button) Flow Tests
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 test.describe('Channel Scan Flow', () => {
   test.beforeEach(async ({ page }) => {

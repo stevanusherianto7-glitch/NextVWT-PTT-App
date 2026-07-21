@@ -9,7 +9,7 @@
  * 4. User count is displayed in the LCD
  * 5. User list shows user items with name and callsign
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 test.describe('User List Modal', () => {
   test.beforeEach(async ({ page }) => {

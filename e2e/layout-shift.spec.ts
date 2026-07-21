@@ -2,7 +2,7 @@
  * e2e/layout-shift.spec.ts
  * NextVWT – Cumulative Layout Shift (CLS) E2E Verification
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 interface LayoutShiftEntry extends PerformanceEntry {
   hadRecentInput: boolean;

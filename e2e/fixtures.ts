@@ -5,8 +5,13 @@
  * Provides `audioContext` fixture that injects getUserMedia / MediaRecorder /
  * AudioContext mocks BEFORE page load via addInitScript, so hooks capture
  * the mocked APIs during initialization.
+ *
+ * Also provides `mockPage` fixture (pre-configured page with audio mocks
+ * and default local storage) and `spawnMockUser` helper for multi-user tests.
  */
-import { test as base, type BrowserContext } from '@playwright/test';
+import { test as base, type BrowserContext, type Page } from '@playwright/test';
+
+export type { Page } from '@playwright/test';
 
 /** The mock script injected via addInitScript before page load. */
 const AUDIO_MOCK_SCRIPT = `
@@ -63,16 +68,30 @@ const AUDIO_MOCK_SCRIPT = `
       start(timeslice) {
         this.state = 'recording';
         if (this.onstart) this.onstart(new Event('start'));
+
+        // Fire an immediate initial chunk to prevent race conditions on fast stops
+        setTimeout(() => {
+          if (this.ondataavailable && this.state === 'recording') {
+            this.ondataavailable({ data: new Blob(['mock-audio'], { type: 'audio/webm' }) });
+          }
+        }, 0);
+
         this._intervalId = setInterval(() => {
           if (this.ondataavailable && this.state === 'recording') {
             this.ondataavailable({ data: new Blob(['mock-audio'], { type: 'audio/webm' }) });
           }
-        }, timeslice || 250);
+        }, timeslice || 100);
       }
 
       stop() {
+        if (this.state === 'inactive') return;
         this.state = 'inactive';
         if (this._intervalId) clearInterval(this._intervalId);
+
+        // Deliver a final chunk before stopping
+        if (this.ondataavailable) {
+          this.ondataavailable({ data: new Blob(['mock-audio-final'], { type: 'audio/webm' }) });
+        }
         if (this.onstop) this.onstop(new Event('stop'));
       }
 
@@ -104,15 +123,51 @@ export async function injectAudioMocks(context: BrowserContext) {
 }
 
 /**
+ * Inject default local storage values to bypass onboarding, splash screens,
+ * and feedback dialogs.
+ */
+export async function injectLocalStorageDefaults(page: Page) {
+  await page.addInitScript(() => {
+    window.localStorage.setItem(
+      'nextvwt_settings',
+      JSON.stringify({
+        hasCompletedOnboarding: true,
+        lastFeedbackTime: Date.now(),
+      })
+    );
+  });
+}
+
+/**
+ * Spawn a pre-configured mock user for multi-user tests.
+ * Returns a context and page with audio mocks and default local storage injected.
+ */
+export async function spawnMockUser(
+  browser: { newContext: (opts: Record<string, unknown>) => Promise<BrowserContext> },
+  displayName: string
+) {
+  const context = await browser.newContext({ permissions: ['microphone'] });
+  await injectAudioMocks(context);
+  const page = await context.newPage();
+  await injectLocalStorageDefaults(page);
+  return { context, page };
+}
+
+/**
  * Extended test fixture that automatically injects audio mocks into every
  * new browser context. Use `test` from this file instead of @playwright/test.
  */
-export const test = base.extend<{ audioContext: BrowserContext }>({
+export const test = base.extend<{ audioContext: BrowserContext; mockPage: Page }>({
   audioContext: async ({ browser }, use) => {
     const context = await browser.newContext({ permissions: ['microphone'] });
     await injectAudioMocks(context);
     await use(context);
     await context.close();
+  },
+  mockPage: async ({ audioContext }, use) => {
+    const page = await audioContext.newPage();
+    await injectLocalStorageDefaults(page);
+    await use(page);
   },
 });
 

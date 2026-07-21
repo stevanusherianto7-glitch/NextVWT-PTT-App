@@ -9,7 +9,7 @@
  * 4. Photo source buttons are present
  * 5. Sign out button is present
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 test.describe('Settings Profile Section', () => {
   test.beforeEach(async ({ page }) => {

@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 test.describe('Robustness Simulator: Supabase Offline Fallback', () => {
   test('Graceful Boot-Up without Supabase API (Offline Start)', async ({ page }) => {

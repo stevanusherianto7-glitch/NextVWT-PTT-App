@@ -9,7 +9,7 @@
  * 4. Reaction popover has Animasi, Suara, Gifts tabs
  * 5. Clicking a reaction sends it (floating reaction appears)
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 test.describe('Reaction Dock', () => {
   test.beforeEach(async ({ page }) => {

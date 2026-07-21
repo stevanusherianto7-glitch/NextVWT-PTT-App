@@ -8,9 +8,9 @@
  * 3. Theme persists
  * 4. Toggle states persist
  */
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from './fixtures';
 
-async function bypassLoginGate(page: import('@playwright/test').Page) {
+async function bypassLoginGate(page: Page) {
   const guestBtn = page.locator('button:has-text("Masuk sebagai Tamu")');
   const pttBtn = page.locator('button:has-text("PTT")');
   await Promise.race([

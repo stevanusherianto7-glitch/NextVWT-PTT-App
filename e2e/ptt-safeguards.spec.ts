@@ -2,7 +2,7 @@
  * e2e/ptt-safeguards.spec.ts
  * NextVWT – PTT Robustness Safeguards E2E Tests
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 import { injectAudioMocks } from './fixtures';
 
 test.describe('PTT Robustness & Safeguards', () => {

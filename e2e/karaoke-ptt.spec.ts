@@ -2,7 +2,7 @@
  * e2e/karaoke-ptt.spec.ts
  * NextVWT – Karaoke Mode PTT Resilience E2E Tests
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 test.describe('PTT Resilience in Karaoke / Music Mode', () => {
   test('should open Karaoke Player and modulate PTT voice streaming with built-in Echo without crashing', async ({

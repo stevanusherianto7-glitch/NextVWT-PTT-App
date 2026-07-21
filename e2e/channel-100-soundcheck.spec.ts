@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 test.describe('Channel 100 Sound Check (Parrot Echo Test)', () => {
   test('should record audio and play it back locally when on Channel 100', async ({

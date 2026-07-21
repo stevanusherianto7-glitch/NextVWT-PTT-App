@@ -9,7 +9,7 @@
  * 4. PTT button toggles isTransmitting in store
  * 5. PTT button depressed state on mouse hold
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 test.describe('PTT Button Visual States', () => {
   test.beforeEach(async ({ page }) => {

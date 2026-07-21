@@ -2,7 +2,7 @@
  * e2e/voice-streaming.spec.ts
  * NextVWT – Real-time Voice Streaming E2E Tests
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 import { injectAudioMocks } from './fixtures';
 
 test.describe('Real-time Voice Streaming & Delivery', () => {

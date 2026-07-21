@@ -39,6 +39,10 @@ export default defineConfig({
   use: {
     baseURL: process.env.PLAYWRIGHT_TEST_BASE_URL || 'http://localhost:5188',
 
+    // Granular timeouts to fail fast and clear bottlenecks
+    actionTimeout: 10_000,
+    navigationTimeout: 15_000,
+
     // Screenshots & Traces untuk debugging CI failures (sesuai user rules)
     screenshot: 'only-on-failure',
     trace: 'on-first-retry',
@@ -62,6 +66,7 @@ export default defineConfig({
           args: [
             '--use-fake-ui-for-media-stream',
             '--use-fake-device-for-media-stream',
+            '--disable-audio-output',
           ],
         },
       },
@@ -79,6 +84,7 @@ export default defineConfig({
                 args: [
                   '--use-fake-ui-for-media-stream',
                   '--use-fake-device-for-media-stream',
+                  '--disable-audio-output',
                 ],
               },
             },
@@ -92,9 +98,8 @@ export default defineConfig({
     {
       command: 'pnpm dev',
       url: 'http://localhost:5188',
-      reuseExistingServer: true,
+      reuseExistingServer: !process.env.CI,
       timeout: 30_000,
-      // Untuk project chromium-sfu, inject VITE_LIVEKIT_URL via env
       env:
         process.env.NEXTVWT_RUN_SFU_E2E === '1'
           ? { VITE_LIVEKIT_URL: process.env.VITE_LIVEKIT_URL || 'ws://localhost:7880' }

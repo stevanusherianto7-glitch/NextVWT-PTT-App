@@ -2,7 +2,7 @@
  * e2e/settings-flow.spec.ts
  * NextVWT – Settings Panel (SET Button) Flow Tests
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 test.describe('Settings Panel Flow', () => {
   test.beforeEach(async ({ page }) => {

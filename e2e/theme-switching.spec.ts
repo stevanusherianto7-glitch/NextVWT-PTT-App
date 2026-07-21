@@ -8,7 +8,7 @@
  * 3. Selecting a theme applies it and closes modal
  * 4. Theme persists via store
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 test.describe('Theme Switching', () => {
   test.beforeEach(async ({ page }) => {

@@ -9,7 +9,7 @@
  * Test menjamin: app load tanpa pageerror, power-on bekerja, activeUsers terisi.
  * SFU test best-effort: skip graceful bila token/SFU belum tersedia.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixtures';
 
 const RUN_SFU = process.env.NEXTVWT_RUN_SFU_E2E === '1';
 

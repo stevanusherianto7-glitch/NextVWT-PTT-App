@@ -5,7 +5,7 @@
  * The actual <input> checkboxes are visually hidden via CSS class "settings-checkbox-input".
  * The visible toggle is the <label> element. We use `force: true` to interact with hidden inputs.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 test.describe('Settings Panel Toggles', () => {
   test.beforeEach(async ({ page }) => {

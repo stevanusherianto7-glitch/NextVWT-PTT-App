@@ -10,7 +10,7 @@
  * 5. Signal bars are visible
  * 6. Signal click shows latency tooltip
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 test.describe('LCD Panel Information', () => {
   test.beforeEach(async ({ page }) => {

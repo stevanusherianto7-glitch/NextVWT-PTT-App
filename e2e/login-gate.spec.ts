@@ -9,7 +9,7 @@
  * 4. Loading state shows spinner
  * 5. Footer text is visible
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 test.describe('Login Gate & Guest Login', () => {
   test.beforeEach(async ({ page }) => {

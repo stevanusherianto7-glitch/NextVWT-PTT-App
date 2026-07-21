@@ -8,7 +8,7 @@
  * 3. Displays channel 100 (landing channel) on boot
  * 4. Shows the NextVWT brand logo and marquee
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 test.describe('App Boot & Initial State', () => {
   test.beforeEach(async ({ page }) => {

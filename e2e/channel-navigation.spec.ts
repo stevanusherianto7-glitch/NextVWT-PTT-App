@@ -8,7 +8,7 @@
  * 3. LCD updates reflect navigation changes
  * 4. Multiple rapid presses work correctly
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 test.describe('Channel Up/Down Navigation', () => {
   test.beforeEach(async ({ page }) => {

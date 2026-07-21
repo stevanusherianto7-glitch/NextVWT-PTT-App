@@ -2,7 +2,7 @@
  * e2e/multi-user-modulation.spec.ts
  * NextVWT – Multi-User Modulation Delivery Flow Tests
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 import { injectAudioMocks } from './fixtures';
 
 test.describe('Multi-User Real-time Modulation Delivery', () => {

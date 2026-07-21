@@ -2,7 +2,7 @@
  * e2e/modulation-simulation.spec.ts
  * NextVWT – User Modulation Activity & Network Failure Simulation Tests
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 test.describe('User Modulation Activity Simulation', () => {
   test.beforeEach(async ({ page }) => {
