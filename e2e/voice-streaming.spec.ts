@@ -3,17 +3,20 @@
  * NextVWT – Real-time Voice Streaming E2E Tests
  */
 import { test, expect } from '@playwright/test';
+import { injectAudioMocks } from './fixtures';
 
 test.describe('Real-time Voice Streaming & Delivery', () => {
   test('should record audio chunks from microphone and broadcast them to channel peers', async ({
     browser,
   }) => {
-    // 1. Instantiate browser contexts with microphone permissions granted
+    // 1. Instantiate browser contexts with microphone permissions + audio mocks
     const contextAlfa = await browser.newContext({ permissions: ['microphone'] });
+    await injectAudioMocks(contextAlfa);
     const pageAlfa = await contextAlfa.newPage();
     pageAlfa.on('console', (msg) => console.log('PAGE ALFA LOG:', msg.text()));
 
     const contextBeta = await browser.newContext({ permissions: ['microphone'] });
+    await injectAudioMocks(contextBeta);
     const pageBeta = await contextBeta.newPage();
     pageBeta.on('console', (msg) => console.log('PAGE BETA LOG:', msg.text()));
 
@@ -109,52 +112,7 @@ test.describe('Real-time Voice Streaming & Delivery', () => {
       }
     }, userIdAlfa);
 
-    // 5. Mock getUserMedia to return a real synthetic Web Audio destination stream
-    const mockUserMediaScript = () => {
-      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-      const ctx = new AudioContextClass();
-      const dest = ctx.createMediaStreamDestination();
-      const osc = ctx.createOscillator();
-      osc.connect(dest);
-      osc.start();
-
-      ctx.resume().catch(() => {});
-
-      navigator.mediaDevices.getUserMedia = async () => {
-        return dest.stream;
-      };
-
-      // Mock MediaRecorder to bypass NotSupportedError in headless Chromium with synthetic streams
-      class MockMediaRecorder {
-        stream: MediaStream;
-        ondataavailable: ((e: any) => void) | null = null;
-        intervalId: any = null;
-        constructor(stream: MediaStream) {
-          this.stream = stream;
-        }
-        static isTypeSupported(_type: string) {
-          return true;
-        }
-        start(timeslice: number) {
-          this.intervalId = setInterval(() => {
-            if (this.ondataavailable) {
-              this.ondataavailable({
-                data: new Blob(['dummy audio data'], { type: 'audio/webm' }),
-              });
-            }
-          }, timeslice || 250);
-        }
-        stop() {
-          if (this.intervalId) clearInterval(this.intervalId);
-        }
-      }
-      window.MediaRecorder = MockMediaRecorder as any;
-    };
-
-    await pageAlfa.evaluate(mockUserMediaScript);
-    await pageBeta.evaluate(mockUserMediaScript);
-
-    // Expose a bridge function to pipe voice chunks from Alfa to Beta
+    // 5. Expose a bridge function to pipe voice chunks from Alfa to Beta
     await pageAlfa.exposeFunction('onVoiceChunkBroadcasted', async (base64: string) => {
       await pageBeta.evaluate((chunk) => {
         const store = (window as any).__store__;

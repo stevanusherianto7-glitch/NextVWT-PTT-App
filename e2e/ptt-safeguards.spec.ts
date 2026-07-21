@@ -3,11 +3,13 @@
  * NextVWT – PTT Robustness Safeguards E2E Tests
  */
 import { test, expect } from '@playwright/test';
+import { injectAudioMocks } from './fixtures';
 
 test.describe('PTT Robustness & Safeguards', () => {
   test('Collision Avoidance – should disable PTT button and display BUSY when channel is occupied', async ({
     page,
   }) => {
+    await injectAudioMocks(page.context());
     await page.goto('/');
 
     // Bypass login modal
@@ -84,6 +86,7 @@ test.describe('PTT Robustness & Safeguards', () => {
   test('Watchdog Timeout – should auto-revert receiver to standby if active transmitter is silent/dead', async ({
     page,
   }) => {
+    await injectAudioMocks(page.context());
     await page.goto('/');
 
     // Bypass login modal
@@ -157,6 +160,7 @@ test.describe('PTT Robustness & Safeguards', () => {
   test('Mic Permission Denial – should show toast error and reset PTT state gracefully', async ({
     page,
   }) => {
+    await injectAudioMocks(page.context());
     await page.goto('/');
 
     // Bypass login modal

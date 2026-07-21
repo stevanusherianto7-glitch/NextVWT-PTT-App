@@ -71,7 +71,7 @@ export default defineConfig(({ command: _command, mode }) => {
             'vendor-supabase': ['@supabase/supabase-js'],
 
             // Framer Motion / animation — besar & jarang berubah
-            'vendor-motion': ['motion'],
+                        // [REMOVED] 'vendor-motion': ['motion'],
 
             // Lucide icons — ratusan icons, dipisah agar tree-shakeable per chunk
             'vendor-icons': ['lucide-react'],
@@ -102,10 +102,10 @@ export default defineConfig(({ command: _command, mode }) => {
             ],
 
             // Zustand state management
-            'vendor-zustand': ['zustand'],
+                        'vendor-zustand': ['zustand'],
 
-            // Router
-            'vendor-router': ['react-router'],
+                        // Router - [REMOVED] react-router tidak dipakai di codebase
+                        // 'vendor-router': ['react-router'],
           },
         },
       },

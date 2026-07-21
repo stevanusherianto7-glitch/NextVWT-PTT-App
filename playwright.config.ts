@@ -94,7 +94,7 @@ export default defineConfig({
       env:
         process.env.NEXTVWT_RUN_SFU_E2E === '1'
           ? { VITE_LIVEKIT_URL: process.env.VITE_LIVEKIT_URL || 'ws://localhost:7880' }
-          : {},
+          : { VITE_LIVEKIT_URL: '' },
     },
   ],
 

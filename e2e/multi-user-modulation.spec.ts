@@ -3,17 +3,20 @@
  * NextVWT – Multi-User Modulation Delivery Flow Tests
  */
 import { test, expect } from '@playwright/test';
+import { injectAudioMocks } from './fixtures';
 
 test.describe('Multi-User Real-time Modulation Delivery', () => {
   test('should deliver transmission and modulation states between users in the same channel', async ({
     browser,
   }) => {
     // 1. Instantiating Browser Context for User Alfa
-    const contextAlfa = await browser.newContext();
+    const contextAlfa = await browser.newContext({ permissions: ['microphone'] });
+    await injectAudioMocks(contextAlfa);
     const pageAlfa = await contextAlfa.newPage();
 
     // 2. Instantiating Browser Context for User Beta
-    const contextBeta = await browser.newContext();
+    const contextBeta = await browser.newContext({ permissions: ['microphone'] });
+    await injectAudioMocks(contextBeta);
     const pageBeta = await contextBeta.newPage();
 
     // 3. User Alfa joins
@@ -51,60 +54,7 @@ test.describe('Multi-User Real-time Modulation Delivery', () => {
     await pageBeta.click('button:has-text("Back")');
     await expect(pageBeta.locator('span:has-text("Pengaturan")').first()).not.toBeVisible();
 
-    // 5. Mock getUserMedia to return a real synthetic Web Audio destination stream
-    const mockUserMediaScript = () => {
-      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-      const ctx = new AudioContextClass();
-      const dest = ctx.createMediaStreamDestination();
-      const osc = ctx.createOscillator();
-      osc.connect(dest);
-      osc.start();
-
-      ctx.resume().catch(() => {});
-
-      navigator.mediaDevices.getUserMedia = async () => {
-        return dest.stream;
-      };
-
-      if (window.AnalyserNode) {
-        window.AnalyserNode.prototype.getFloatTimeDomainData = function (array: Float32Array) {
-          for (let i = 0; i < array.length; i++) {
-            array[i] = Math.sin(i * 0.1) * 0.1;
-          }
-        };
-      }
-
-      // Mock MediaRecorder to bypass NotSupportedError in headless Chromium
-      class MockMediaRecorder {
-        stream: MediaStream;
-        ondataavailable: ((e: any) => void) | null = null;
-        intervalId: any = null;
-        constructor(stream: MediaStream) {
-          this.stream = stream;
-        }
-        static isTypeSupported(_type: string) {
-          return true;
-        }
-        start(timeslice: number) {
-          this.intervalId = setInterval(() => {
-            if (this.ondataavailable) {
-              this.ondataavailable({
-                data: new Blob(['dummy audio data'], { type: 'audio/webm' }),
-              });
-            }
-          }, timeslice || 250);
-        }
-        stop() {
-          if (this.intervalId) clearInterval(this.intervalId);
-        }
-      }
-      window.MediaRecorder = MockMediaRecorder as any;
-    };
-
-    await pageAlfa.evaluate(mockUserMediaScript);
-    await pageBeta.evaluate(mockUserMediaScript);
-
-    // Set channel to a normal non-isolated channel (Channel 16) for both users to allow network broadcasting to be tested
+    // 5. Set channel to a normal non-isolated channel (Channel 16) for both users to allow network broadcasting to be tested
     await pageAlfa.evaluate(() => {
       (window as any).__store__.setState({ coins: 1000 });
       (window as any).__store__.getState().setChannelNumber(16);
