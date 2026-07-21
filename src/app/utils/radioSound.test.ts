@@ -1,10 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import {
-  playRadioTone,
-  playPressSound,
-  playReleaseSound,
-  playChirpSound,
-} from './radioSound';
+import { playRadioTone, playPressSound, playReleaseSound, playChirpSound } from './radioSound';
 import { __resetAudioContextForTest } from './audioContext';
 
 describe('radioSound', () => {

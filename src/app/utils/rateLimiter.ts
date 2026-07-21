@@ -50,10 +50,7 @@ export class RateLimiter {
     // Cek apakah sudah melebihi limit
     if (this.timestamps.length >= this.config.maxRequests) {
       this.blockedUntil = now + this.config.blockDurationMs;
-      devWarn(
-        '[RateLimiter] Rate limit exceeded. Blocked until:',
-        new Date(this.blockedUntil)
-      );
+      devWarn('[RateLimiter] Rate limit exceeded. Blocked until:', new Date(this.blockedUntil));
       return false;
     }
 

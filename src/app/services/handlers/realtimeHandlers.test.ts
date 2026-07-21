@@ -99,7 +99,9 @@ describe('pttHandler.handlePttState', () => {
   });
 
   it('clears activeTransmitter when the transmitter stops (matching id)', () => {
-    seedStore({ activeTransmitter: { userId: 'other-1', displayName: 'Budi', callSign: 'ZZ99ZZ' } as never });
+    seedStore({
+      activeTransmitter: { userId: 'other-1', displayName: 'Budi', callSign: 'ZZ99ZZ' } as never,
+    });
     handlePttState({
       userId: 'other-1',
       displayName: 'Budi',
@@ -115,7 +117,9 @@ describe('pttHandler watchdog', () => {
 
   it('force-clears stale transmitter after timeout', () => {
     vi.useFakeTimers();
-    seedStore({ activeTransmitter: { userId: 'x', displayName: 'X', callSign: 'XX00XX' } as never });
+    seedStore({
+      activeTransmitter: { userId: 'x', displayName: 'X', callSign: 'XX00XX' } as never,
+    });
     startActiveTransmitterWatchdog('x', 'X');
     vi.advanceTimersByTime(60000);
     expect(usePTTStore.getState().activeTransmitter).toBeNull();

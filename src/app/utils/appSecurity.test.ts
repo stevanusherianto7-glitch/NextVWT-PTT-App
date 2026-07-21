@@ -1,5 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { detectEmulator, performSecurityAudit, verifyInstallationSource } from '../utils/appSecurity';
+import {
+  detectEmulator,
+  performSecurityAudit,
+  verifyInstallationSource,
+} from '../utils/appSecurity';
 
 // Capacitor is a hard import in appSecurity.ts; mock it with a mutable flag
 // so we can exercise both the web (native=false) and native (native=true) paths.

@@ -59,7 +59,14 @@ describe('canPerformAction', () => {
     expect(canPerformAction('operator', 'MUTE_USER')).toBe(false);
   });
   it('noc/sys_admin can do everything listed', () => {
-    const actions = ['MANAGE_ROLES', 'MUTE_USER', 'KICK_USER', 'BAN_USER', 'BLOCK_PTT', 'VIEW_LOGS'];
+    const actions = [
+      'MANAGE_ROLES',
+      'MUTE_USER',
+      'KICK_USER',
+      'BAN_USER',
+      'BLOCK_PTT',
+      'VIEW_LOGS',
+    ];
     for (const a of actions) {
       expect(canPerformAction('noc', a as never)).toBe(true);
       expect(canPerformAction('sys_admin', a as never)).toBe(true);
@@ -80,6 +87,8 @@ describe('canUsePTT / canUseChat / canUseReaction', () => {
   });
   it('chat and reaction gated similarly', () => {
     expect(canUseChat({ role: 'guest', status: 'active', allowGuestChat: false })).toBe(false);
-    expect(canUseReaction({ role: 'guest', status: 'banned', allowGuestReaction: true })).toBe(false);
+    expect(canUseReaction({ role: 'guest', status: 'banned', allowGuestReaction: true })).toBe(
+      false
+    );
   });
 });

@@ -269,9 +269,7 @@ export function subscribeToChannel(channelNum: number, retryCount = 0) {
                 if (heartbeatState.expectedPingId) {
                   heartbeatState.missedPings++;
                   heartbeatState.expectedPingId = null;
-                  devWarn(
-                    `[Heartbeat] Pong timeout. Missed count: ${heartbeatState.missedPings}`
-                  );
+                  devWarn(`[Heartbeat] Pong timeout. Missed count: ${heartbeatState.missedPings}`);
                   if (heartbeatState.missedPings >= 2) {
                     console.error(
                       `[Heartbeat] ${heartbeatState.missedPings} consecutive timeouts. ` +

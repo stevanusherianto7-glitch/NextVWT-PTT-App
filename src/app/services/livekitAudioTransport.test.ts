@@ -35,12 +35,20 @@ vi.mock('livekit-client', () => {
     muted = false;
     source = 'microphone';
     constructor(public mediaStreamTrack: MediaStreamTrack) {}
-    mute() { this.muted = true; mockMute(); }
-    unmute() { this.muted = false; mockUnmute(); }
+    mute() {
+      this.muted = true;
+      mockMute();
+    }
+    unmute() {
+      this.muted = false;
+      mockUnmute();
+    }
   }
   return {
     Room: class {
-      constructor() { return mockRoom; }
+      constructor() {
+        return mockRoom;
+      }
     },
     Track: { Kind: { Audio: 'audio', Video: 'video' }, Source: { Microphone: 'microphone' } },
     LocalAudioTrack: FakeLocalAudioTrack,
@@ -54,8 +62,7 @@ import { LiveKitAudioTransport } from './livekitAudioTransport';
 class FakeMediaStream {
   constructor(public tracks: MediaStreamTrack[]) {}
 }
-(globalThis as unknown as { MediaStream: typeof FakeMediaStream }).MediaStream =
-  FakeMediaStream;
+(globalThis as unknown as { MediaStream: typeof FakeMediaStream }).MediaStream = FakeMediaStream;
 
 describe('LiveKitAudioTransport', () => {
   beforeEach(() => {
@@ -70,7 +77,9 @@ describe('LiveKitAudioTransport', () => {
   it('connect memanggil room.connect dengan url + token', async () => {
     const t = new LiveKitAudioTransport('wss://sfu.example.com');
     await t.connect('ptt-room-1', 'jwt-token');
-    expect(mockConnect).toHaveBeenCalledWith('wss://sfu.example.com', 'jwt-token', { autoSubscribe: true });
+    expect(mockConnect).toHaveBeenCalledWith('wss://sfu.example.com', 'jwt-token', {
+      autoSubscribe: true,
+    });
   });
 
   it('publishMic publish track & default mute (PTT off)', async () => {

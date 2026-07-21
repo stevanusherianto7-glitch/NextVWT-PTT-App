@@ -18,7 +18,7 @@ describe('constants', () => {
 
   it('getChannelUserCount returns deterministic count for unknown channel (>299)', () => {
     const n = getChannelUserCount(301);
-    expect(n).toBe((301 * 13 + 7) % 37 + 2);
+    expect(n).toBe(((301 * 13 + 7) % 37) + 2);
   });
 
   it('checkIfNewUser returns false when no date', () => {

@@ -40,7 +40,9 @@ describe('useModerationActions — client-side guard', () => {
     await a.setUserRole('target-1', 'guest', 'operator');
     expect(mockInvoke).toHaveBeenCalledWith(
       'moderate-channel',
-      expect.objectContaining({ body: expect.objectContaining({ action: 'SET_USER_ROLE', target_user_id: 'target-1' }) })
+      expect.objectContaining({
+        body: expect.objectContaining({ action: 'SET_USER_ROLE', target_user_id: 'target-1' }),
+      })
     );
   });
 
@@ -70,20 +72,29 @@ describe('useModerationActions — client-side guard', () => {
     await expect(guest.muteUser('t')).rejects.toThrow(/izin/);
     const noc = useModerationActions({ ...ctx, actorRole: 'noc' });
     await noc.muteUser('t', 'guest', 15);
-    expect(mockInvoke).toHaveBeenCalledWith('moderate-channel', expect.objectContaining({ body: expect.objectContaining({ action: 'MUTE_USER' }) }));
+    expect(mockInvoke).toHaveBeenCalledWith(
+      'moderate-channel',
+      expect.objectContaining({ body: expect.objectContaining({ action: 'MUTE_USER' }) })
+    );
   });
 
   it('kickUser → subscribes a moderation channel, broadcasts kick, then calls edge fn', async () => {
     const noc = useModerationActions({ ...ctx, actorRole: 'noc' });
     await noc.kickUser('target-9', 'guest');
     expect(mockSend).toHaveBeenCalledWith(expect.objectContaining({ event: 'kick' }));
-    expect(mockInvoke).toHaveBeenCalledWith('moderate-channel', expect.objectContaining({ body: expect.objectContaining({ action: 'KICK_USER' }) }));
+    expect(mockInvoke).toHaveBeenCalledWith(
+      'moderate-channel',
+      expect.objectContaining({ body: expect.objectContaining({ action: 'KICK_USER' }) })
+    );
   });
 
   it('banUser → calls BAN_USER then kicks', async () => {
     const noc = useModerationActions({ ...ctx, actorRole: 'noc' });
     await noc.banUser('target-9', 'guest', 'spam', 0);
-    expect(mockInvoke).toHaveBeenCalledWith('moderate-channel', expect.objectContaining({ body: expect.objectContaining({ action: 'BAN_USER' }) }));
+    expect(mockInvoke).toHaveBeenCalledWith(
+      'moderate-channel',
+      expect.objectContaining({ body: expect.objectContaining({ action: 'BAN_USER' }) })
+    );
   });
 
   it('edge fn error → propagates (no silent swallow)', async () => {

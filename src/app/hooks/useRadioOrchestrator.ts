@@ -116,11 +116,7 @@ export function useRadioOrchestrator() {
 
   const { waitTimer } = useRadioModeration(roomId, userId, isPowerOn, channelStatus);
 
-  const { floatingReactions, handleSendReaction } = useRadioReactions(
-    isPowerOn,
-    infoText,
-    channel
-  );
+  const { floatingReactions, handleSendReaction } = useRadioReactions(isPowerOn, infoText, channel);
 
   // Drive the join/leave chirp from the deduplicated user list.
   useEffect(() => {

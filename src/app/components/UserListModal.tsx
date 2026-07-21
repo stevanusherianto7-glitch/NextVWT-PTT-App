@@ -37,7 +37,6 @@ export interface UserListModalProps {
   hasVideoBackground?: boolean;
 }
 
-
 export function UserListModal({ channel, users, hasVideoBackground }: UserListModalProps) {
   const isTransmitting = usePTTStore((state) => state.isTransmitting);
   const activeTransmitter = usePTTStore((state) => state.activeTransmitter);

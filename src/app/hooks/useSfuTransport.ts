@@ -1,7 +1,10 @@
 import { useEffect, useRef } from 'react';
 import { usePTTStore } from '../store/usePTTStore';
 import { USE_SFU, BRAND } from '../utils/config';
-import { createLiveKitTransport, type LiveKitAudioTransport } from '../services/livekitAudioTransport';
+import {
+  createLiveKitTransport,
+  type LiveKitAudioTransport,
+} from '../services/livekitAudioTransport';
 import { fetchLiveKitToken } from '../services/livekitToken';
 import { toast } from 'sonner';
 

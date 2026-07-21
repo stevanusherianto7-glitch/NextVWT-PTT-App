@@ -187,10 +187,7 @@ export const createUISlice: StateCreator<
     const targetLocalRole = localStorage.getItem(
       `channel-role:ptt-room-${state.channelNumber}:${targetUserId}`
     );
-    if (
-      targetUser?.role === 'noc' ||
-      targetLocalRole === 'noc'
-    ) {
+    if (targetUser?.role === 'noc' || targetLocalRole === 'noc') {
       console.warn('Cannot hang up NOC user');
       return;
     }
@@ -231,10 +228,7 @@ export const createUISlice: StateCreator<
     const targetLocalRole = localStorage.getItem(
       `channel-role:ptt-room-${state.channelNumber}:${targetUserId}`
     );
-    if (
-      targetUser?.role === 'noc' ||
-      targetLocalRole === 'noc'
-    ) {
+    if (targetUser?.role === 'noc' || targetLocalRole === 'noc') {
       console.warn('Cannot kick NOC user');
       return;
     }
