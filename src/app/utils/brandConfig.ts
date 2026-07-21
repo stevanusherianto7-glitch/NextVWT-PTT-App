@@ -34,10 +34,16 @@ export const BRAND: BrandConfig = {
   simulatedUserOffset: import.meta.env.PROD ? 0 : 125,
   livekitUrl: import.meta.env.VITE_LIVEKIT_URL || '',
 };
-declare const __E2E_DISABLE_SFU__: boolean;
-
-/** Dual-mode switch: true bila LiveKit SFU terkonfigurasi. */
-export const USE_SFU = !__E2E_DISABLE_SFU__ && Boolean(BRAND.livekitUrl);
+/**
+ * Dual-mode switch: true bila LiveKit SFU terkonfigurasi.
+ * `typeof` guard agar unit test (vitest transform terkadang tidak menyuntikkan
+ * global __E2E_DISABLE_SFU__) tidak throw ReferenceError. Di build/dev,
+ * Vite menyuntikkan global ini via `define`.
+ */
+declare const __E2E_DISABLE_SFU__: boolean | undefined;
+const E2E_DISABLE_SFU =
+  typeof __E2E_DISABLE_SFU__ !== 'undefined' ? __E2E_DISABLE_SFU__ : false;
+export const USE_SFU = !E2E_DISABLE_SFU && Boolean(BRAND.livekitUrl);
 
 /** Channels that do not show the reaction dock. */
 export const NO_REACTION_CHANNELS: ReadonlySet<number> = new Set([0, 100]);

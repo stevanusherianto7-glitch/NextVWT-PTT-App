@@ -144,7 +144,7 @@ export async function injectLocalStorageDefaults(page: Page) {
  */
 export async function spawnMockUser(
   browser: { newContext: (opts: Record<string, unknown>) => Promise<BrowserContext> },
-  displayName: string
+  _displayName: string
 ) {
   const context = await browser.newContext({ permissions: ['microphone'] });
   await injectAudioMocks(context);
