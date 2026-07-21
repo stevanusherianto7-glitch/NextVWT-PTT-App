@@ -35,8 +35,10 @@ export const BRAND: BrandConfig = {
   livekitUrl: import.meta.env.VITE_LIVEKIT_URL || '',
 };
 
-/** Dual-mode switch: true bila LiveKit SFU terkonfigurasi. */
-export const USE_SFU = Boolean(BRAND.livekitUrl);
+/** Dual-mode switch: true bila LiveKit SFU terkonfigurasi.
+ *  VITE_E2E_DISABLE_SFU allows E2E tests to force mesh mode even when
+ *  VITE_LIVEKIT_URL is set in .env. */
+export const USE_SFU = !import.meta.env.VITE_E2E_DISABLE_SFU && Boolean(BRAND.livekitUrl);
 
 /** Channels that do not show the reaction dock. */
 export const NO_REACTION_CHANNELS: ReadonlySet<number> = new Set([0, 100]);
