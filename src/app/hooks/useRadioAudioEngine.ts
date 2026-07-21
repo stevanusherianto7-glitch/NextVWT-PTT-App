@@ -4,9 +4,10 @@ import { useAudioStreamer } from './useAudioStreamer';
 import { base64ToArrayBuffer, arrayBufferToBase64 } from './useAudioPlayback';
 import { toast } from 'sonner';
 import { playChirpSound } from '../utils/radioSound';
-import { USE_SFU, BRAND } from '../utils/config';
-import { createLiveKitTransport, type LiveKitAudioTransport } from '../services/livekitAudioTransport';
-import { fetchLiveKitToken } from '../services/livekitToken';
+import { USE_SFU } from '../utils/config';
+import { useSfuTransport } from './useSfuTransport';
+import { useNetworkConnection } from './useNetworkConnection';
+import { useStaleTransmitterWatchdog } from './useStaleTransmitterWatchdog';
 
 interface UseRadioAudioEngineArgs {
   isPowerOn: boolean;
@@ -23,8 +24,8 @@ interface UseRadioAudioEngineArgs {
  * the channel scan loop, the power/connection resets, and the simulated AI
  * operator reply on channel 99.
  *
- * Extracted from the former 741-line useRadioOrchestrator to keep each hook
- * focused on a single responsibility.
+ * Composed from focused sub-hooks: useSfuTransport, useNetworkConnection,
+ * useStaleTransmitterWatchdog.
  */
 export function useRadioAudioEngine({
   isPowerOn,
@@ -43,10 +44,10 @@ export function useRadioAudioEngine({
   const txStartTimeRef = useRef<number>(0);
   const echoChunksRef = useRef<string[]>([]);
 
-  // ── SFU (LiveKit) transport refs (hanya dipakai bila USE_SFU) ────────────────
-  const transportRef = useRef<LiveKitAudioTransport | null>(null);
-  const localMicStreamRef = useRef<MediaStream | null>(null);
-  const remoteAudioElsRef = useRef<HTMLAudioElement[]>([]);
+  // ── Sub-hooks ─────────────────────────────────────────────────────────────
+  useSfuTransport({ isPowerOn, isTransmitting, channel });
+  useNetworkConnection();
+  const { resetWatchdogRef } = useStaleTransmitterWatchdog(activeTransmitter);
 
   // Auto-chirp when the local user list changes (join/leave).
   const prevUserIdsRef = useRef<string[]>([]);
@@ -54,85 +55,6 @@ export function useRadioAudioEngine({
   useEffect(() => {
     isFirstRender.current = true;
   }, [channel]);
-
-  // ── SFU (LiveKit) lifecycle: connect saat power on + USE_SFU ────────────────
-  // Reconnect tiap ganti channel. Mesh (Supabase) tetap fallback bila !USE_SFU.
-  useEffect(() => {
-    if (!USE_SFU || !isPowerOn) return;
-
-    let cancelled = false;
-    const roomName = `ptt-room-${channel}`;
-
-    async function setup() {
-      try {
-        const transport = createLiveKitTransport(BRAND.livekitUrl);
-        if (!transport) return;
-
-        const { token } = await fetchLiveKitToken(channel);
-        if (cancelled) return;
-
-        // Ambil mic track lokal → di-publish ke SFU (LiveKit kelola transmisi)
-        const localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        localMicStreamRef.current = localStream;
-        const track = localStream.getAudioTracks()[0];
-        if (!track) throw new Error('Tidak ada audio track dari mikrofon');
-
-        transport.onRemoteAudio((_userId, stream) => {
-          const el = new Audio();
-          el.srcObject = stream;
-          el.autoplay = true;
-          void el.play().catch(() => undefined);
-          remoteAudioElsRef.current.push(el);
-        });
-
-        // Task 12: presence dari LiveKit participants (real count, tanpa +125)
-        transport.onPresence((users) => {
-          usePTTStore.setState({
-            activeUsers: users.map((u) => ({
-              userId: u.userId,
-              displayName: u.displayName,
-              callSign: u.callSign,
-              location: u.location,
-              isNewUser: false,
-            })),
-          });
-        });
-
-        await transport.connect(roomName, token);
-        await transport.publishMic(track);
-        transport.emitInitialPresence();
-        transport.setMicEnabled(false); // PTT: mic mati sampai TX
-        transportRef.current = transport;
-      } catch (err) {
-        console.error('[SFU] gagal connect ke LiveKit:', err);
-        toast.error('Gagal menghubungkan ke server audio (SFU). Menggunakan mode fallback.');
-        // Mesh tetap jalan via useAudioStreamer sebagai fallback
-      }
-    }
-
-    void setup();
-
-    return () => {
-      cancelled = true;
-      transportRef.current?.disconnect();
-      transportRef.current = null;
-      localMicStreamRef.current?.getTracks().forEach((t) => t.stop());
-      localMicStreamRef.current = null;
-      remoteAudioElsRef.current.forEach((el) => {
-        el.pause();
-        el.srcObject = null;
-      });
-      remoteAudioElsRef.current = [];
-    };
-  }, [isPowerOn, channel]);
-
-  // ── SFU transmit (PTT on/off) ─────────────────────────────────────────────────
-  useEffect(() => {
-    if (!USE_SFU) return;
-    // Channel 100 = echo lokal (AD-4), tidak publish ke SFU
-    const enabled = isTransmitting && isPowerOn && channel !== 100;
-    transportRef.current?.setMicEnabled(enabled);
-  }, [isTransmitting, isPowerOn, channel]);
 
   // Reset progress when there is no transmit/receive activity.
   useEffect(() => {
@@ -150,8 +72,6 @@ export function useRadioAudioEngine({
 
   // Transmit lifecycle — start/stop recording and route the audio chunks.
   useEffect(() => {
-    // SFU mode (non-echo channel): LiveKit mengelola mic via transportRef.
-    // Transmit on/off ditangani di effect "SFU transmit" di atas.
     if (USE_SFU && channel !== 100) return;
 
     if (isTransmitting && isPowerOn) {
@@ -231,37 +151,7 @@ export function useRadioAudioEngine({
     setIsTransmitting,
   ]);
 
-  // Stale-transmitter watchdog (auto-clear after 1.5s silence).
-  const resetWatchdogRef = useRef<(() => void) | null>(null);
-  useEffect(() => {
-    let watchdogTimer: ReturnType<typeof setTimeout> | null = null;
-
-    const resetWatchdog = () => {
-      if (watchdogTimer) clearTimeout(watchdogTimer);
-      watchdogTimer = setTimeout(() => {
-        const state = usePTTStore.getState();
-        if (state.activeTransmitter && state.activeTransmitter.userId !== state.userId) {
-          usePTTStore.setState({ activeTransmitter: null, progress: 0 });
-        }
-      }, 1500);
-    };
-
-    resetWatchdogRef.current = resetWatchdog;
-
-    if (activeTransmitter && activeTransmitter.userId !== usePTTStore.getState().userId) {
-      resetWatchdog();
-    }
-
-    return () => {
-      if (watchdogTimer) {
-        clearTimeout(watchdogTimer);
-      }
-      resetWatchdogRef.current = null;
-    };
-  }, [activeTransmitter]);
-
-  // Play inbound voice chunks (mesh path). Saat USE_SFU, remote audio
-  // diputar via LiveKit onRemoteAudio (audio elements) — jangan double-play.
+  // Play inbound voice chunks (mesh path).
   useEffect(() => {
     if (USE_SFU) return;
 
@@ -276,7 +166,7 @@ export function useRadioAudioEngine({
     return () => {
       setOnVoiceChunkReceived(null);
     };
-  }, [isPowerOn, channel, status, setOnVoiceChunkReceived, playAudioChunk]);
+  }, [isPowerOn, channel, status, setOnVoiceChunkReceived, playAudioChunk, resetWatchdogRef]);
 
   // Stop audio when power is cut.
   useEffect(() => {
@@ -315,42 +205,6 @@ export function useRadioAudioEngine({
       );
     }
   }, [status, isTransmitting, setIsTransmitting]);
-
-  // Online/offline connection handling.
-  useEffect(() => {
-    const handleOnline = () => {
-      toast.success('Koneksi internet terhubung kembali. Menghubungkan radio...');
-      const store = usePTTStore.getState();
-      store.setConnected(true);
-      if (store.isPowerOn) {
-        store.subscribeToChannel(store.channelNumber);
-      }
-    };
-
-    const handleOffline = () => {
-      toast.error('Koneksi internet terputus. Radio offline.');
-      const store = usePTTStore.getState();
-      store.setConnected(false);
-      usePTTStore.setState({
-        activeUsers: [],
-        activeTransmitter: null,
-        progress: 0,
-        isTransmitting: false,
-      });
-    };
-
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    if (!navigator.onLine) {
-      handleOffline();
-    }
-
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, []);
 
   // Simulated AI operator reply on channel 99 after a transmission ends.
   const wasTransmittingRef = useRef(false);

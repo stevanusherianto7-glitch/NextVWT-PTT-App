@@ -1,3 +1,5 @@
+import { devWarn } from './logger';
+
 interface RateLimitConfig {
   maxRequests: number; // Max requests dalam window
   windowMs: number; // Window duration dalam milliseconds
@@ -48,7 +50,7 @@ export class RateLimiter {
     // Cek apakah sudah melebihi limit
     if (this.timestamps.length >= this.config.maxRequests) {
       this.blockedUntil = now + this.config.blockDurationMs;
-      console.warn(
+      devWarn(
         '[RateLimiter] Rate limit exceeded. Blocked until:',
         new Date(this.blockedUntil)
       );

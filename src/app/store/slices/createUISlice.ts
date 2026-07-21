@@ -307,7 +307,7 @@ export const createUISlice: StateCreator<
         type: 'broadcast',
         event: 'reaction',
         payload: {
-          id: Math.random().toString(),
+          id: crypto.randomUUID(),
           roomId: state.channelId,
           senderId: state.userId,
           senderCallSign: state.callSign,

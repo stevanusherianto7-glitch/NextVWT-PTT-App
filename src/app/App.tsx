@@ -1,8 +1,7 @@
 import { useEffect } from 'react';
 import { usePTTStore } from './store/usePTTStore';
 import { Toaster } from './components/ui/sonner';
-import { getSupabase } from './utils/supabase';
-import type { Subscription } from '@supabase/supabase-js';
+import { useAuthSession } from './hooks/useAuthSession';
 
 import { LoginGate } from './components/LoginGate';
 import { RadioLayout } from './components/RadioLayout';
@@ -10,7 +9,9 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { performSecurityAudit } from './utils/appSecurity';
 
 export default function App() {
-  const { initializeSession, user, setUser, updateSettings, signInWithGoogle } = usePTTStore();
+  const { initializeSession, user, setUser, signInWithGoogle } = usePTTStore();
+
+  useAuthSession();
 
   useEffect(() => {
     performSecurityAudit()
@@ -27,57 +28,6 @@ export default function App() {
   useEffect(() => {
     initializeSession();
   }, [initializeSession]);
-
-  useEffect(() => {
-    let authSubscription: Subscription | null = null;
-
-    getSupabase().then((supabase) => {
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        const currentUser = usePTTStore.getState().user;
-        if (currentUser && 'isGuest' in currentUser && currentUser.isGuest) return;
-
-        const u = session?.user || null;
-        setUser(u);
-        if (u) {
-          const name = u.user_metadata?.full_name || u.email?.split('@')[0] || 'User';
-
-          const currentSettings = usePTTStore.getState();
-          if (currentSettings.profilePhotoOption === 'custom' && !currentSettings.customPhotoUrl) {
-            updateSettings({ infoText: name, profilePhotoOption: 'google' });
-          } else {
-            updateSettings({ infoText: name });
-          }
-        }
-      });
-
-      const {
-        data: { subscription },
-      } = supabase.auth.onAuthStateChange((_event, session) => {
-        const currentUser = usePTTStore.getState().user;
-        if (currentUser && 'isGuest' in currentUser && currentUser.isGuest) return;
-
-        const u = session?.user || null;
-        setUser(u);
-        if (u) {
-          const name = u.user_metadata?.full_name || u.email?.split('@')[0] || 'User';
-
-          const currentSettings = usePTTStore.getState();
-          if (currentSettings.profilePhotoOption === 'custom' && !currentSettings.customPhotoUrl) {
-            updateSettings({ infoText: name, profilePhotoOption: 'google' });
-          } else {
-            updateSettings({ infoText: name });
-          }
-        }
-      });
-      authSubscription = subscription;
-    });
-
-    return () => {
-      if (authSubscription) {
-        authSubscription.unsubscribe();
-      }
-    };
-  }, [setUser, updateSettings]);
 
   return (
     <ErrorBoundary>

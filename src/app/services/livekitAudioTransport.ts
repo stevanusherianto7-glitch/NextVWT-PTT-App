@@ -13,12 +13,13 @@ export interface SfuPresenceUser {
 /**
  * LiveKitAudioTransport — implementasi SFU dari `AudioTransport`.
  *
- * Skeleton (Task 2 dari plan migrasi). Topologi: client publish 1 audio track,
- * subscribe track semua participant lain. Offload bandwidth ke server LiveKit.
+ * Topologi: client publish 1 audio track, subscribe track semua participant lain.
+ * Offload bandwidth ke server LiveKit.
  *
- * TODO (Task 5+): integrasi ke `useRadioAudioEngine` via `USE_SFU`.
- * TODO (Task 9): `setMicEnabled` dipanggil dari `setTransmitting` store slice.
- * TODO (Task 12): presence diisi dari `Room.participants`.
+ * Integrasi:
+ * - Task 5+: `useSfuTransport` hook mengelola lifecycle connect/disconnect
+ * - Task 9: `setMicEnabled` dipanggil via useEffect di `useSfuTransport`
+ * - Task 12: presence diisi dari `Room.participants` via `onPresence` callback
  *
  * Catatan keamanan: token HARUS di-generate di server (Supabase Edge Function),
  * tidak pernah di-bundle ke client (lihat PRD §7.2 AD-1, SECURITY.md).

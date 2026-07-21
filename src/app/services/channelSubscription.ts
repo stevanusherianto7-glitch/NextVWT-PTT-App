@@ -13,6 +13,7 @@ import { PresenceMetaSchema, ReactionPayloadSchema } from '../store/schemas/real
 import { toast } from 'sonner';
 import { generateUUID } from '../store/storeUtils';
 import { checkIfNewUser } from '../utils/constants';
+import { devLog, devWarn } from '../utils/logger';
 
 import { handlePttState, clearActiveTransmitterWatchdog } from './handlers/pttHandler';
 import { handleVoiceChunk, handleWebRTCSignaling } from './handlers/voiceHandler';
@@ -52,7 +53,7 @@ export function subscribeToChannel(channelNum: number, retryCount = 0) {
 
       // Check if we were preempted by a newer subscription call during the await
       if (subscribingChannelNum !== channelNum) {
-        console.warn(
+        devWarn(
           `[Supabase] Aborting subscription to CH ${channelNum} because target changed to CH ${subscribingChannelNum}`
         );
         return;
@@ -268,7 +269,7 @@ export function subscribeToChannel(channelNum: number, retryCount = 0) {
                 if (heartbeatState.expectedPingId) {
                   heartbeatState.missedPings++;
                   heartbeatState.expectedPingId = null;
-                  console.warn(
+                  devWarn(
                     `[Heartbeat] Pong timeout. Missed count: ${heartbeatState.missedPings}`
                   );
                   if (heartbeatState.missedPings >= 2) {
@@ -306,7 +307,7 @@ export function subscribeToChannel(channelNum: number, retryCount = 0) {
         }
 
         if (status === 'SUBSCRIBED' && retryCount > 0) {
-          console.warn(`[Supabase] Successfully reconnected after ${retryCount} attempt(s).`);
+          devLog(`[Supabase] Successfully reconnected after ${retryCount} attempt(s).`);
           toast.success('Koneksi radio pulih kembali.');
         }
 
