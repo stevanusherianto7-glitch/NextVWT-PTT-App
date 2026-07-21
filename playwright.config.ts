@@ -13,6 +13,15 @@ const __dirname = path.dirname(__filename);
 // Load .env dari root project (sesuai user rules: wajib terhubung dotenv)
 dotenv.config({ path: path.resolve(__dirname, '.env') });
 
+// Force-disable SFU for default E2E tests.
+// .env sets VITE_LIVEKIT_URL=ws://localhost:7880 which makes USE_SFU=true,
+// but the SFU server is not available in CI/E2E. This causes
+// useRadioAudioEngine to skip mesh recording (guard: if USE_SFU && channel !== 100 return).
+// Only enable when explicitly requested via NEXTVWT_RUN_SFU_E2E=1.
+if (process.env.NEXTVWT_RUN_SFU_E2E !== '1') {
+  process.env.VITE_LIVEKIT_URL = '';
+}
+
 export default defineConfig({
   // ─── Test discovery ────────────────────────────────────────────────────────
   testDir: './e2e',
