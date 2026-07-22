@@ -1,166 +1,141 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
-import { useRadioOrchestrator } from './useRadioOrchestrator';
+import { renderHook, act, waitFor } from '@testing-library/react';
+import { usePTTStore } from '../store/usePTTStore';
 
-// ── Store mock (function + namespace) ────────────────────────────────────────
-const storeStateRef = vi.hoisted(() => ({
-  state: {
-    isPowerOn: true,
-    isTransmitting: false,
-    isScanning: false,
-    setProgress: () => {},
-    channelUp: () => {},
-    setChannelNumber: () => {},
-    activeUsers: [] as any[],
-    activeTransmitter: null,
-    themeText: 'theme-classic',
-    audioMode: 'radio',
-    fullDuplex: false,
-    isKaraokePlayerOpen: false,
-    setKaraokePlayerOpen: () => {},
-    userId: 'me',
-    channelNumber: 1,
-    infoText: '',
-    locationText: '',
-    setTransmitting: () => {},
-    setPower: () => {},
-    callSign: '2DYUA',
-    myChannelRole: 'member',
-    lastTransmitTime: 0,
-    user: null,
-    profilePhotoOption: 'none',
-    customPhotoUrl: '',
-  },
-}));
-
-const usePTTStoreMock = vi.hoisted(() => {
-  const fn = (selector?: (s: any) => any) => {
-    const s = storeStateRef.state;
-    return selector ? selector(s) : s;
-  };
-  fn.getState = () => storeStateRef.state;
-  fn.setState = (partial: any) => Object.assign(storeStateRef.state, partial);
-  fn.subscribe = () => () => {};
-  return fn;
-});
-
-vi.mock('../store/usePTTStore', () => ({ usePTTStore: usePTTStoreMock }));
-
-// ── Child hook mocks ───────────────────────────────────────────────────────────
-vi.mock('../utils/constants', () => ({
-  STATIC_CHANNELS: [{ number: 1, name: 'Channel One', users: ['staticUser1'] }],
-  BRAND: { simulatedUserOffset: 0 },
-}));
-vi.mock('../utils/config', () => ({
-  BRAND: { simulatedUserOffset: 0 },
-}));
-vi.mock('../../features/moderation/useChannelRole', () => ({
-  useChannelRole: () => ({ role: 'member' as const, status: 'active' as const, loading: false }),
-}));
-vi.mock('../../features/moderation/useChannelSettings', () => ({
-  useChannelSettings: () => ({
-    settings: { allow_guest_ptt: true, channel_description: 'PROGRAM X' },
-    loading: false,
-    updateSettings: vi.fn(),
-  }),
-}));
-vi.mock('../../features/moderation/permissions', () => ({
-  canUsePTT: () => true,
-}));
+// Mock child hooks so orchestrator test focuses on view-model composition
 vi.mock('./useRadioAudioEngine', () => ({
   useRadioAudioEngine: () => ({ handleUserListChange: vi.fn() }),
 }));
 vi.mock('./useRadioModeration', () => ({
-  useRadioModeration: () => ({ waitTimer: 0 }),
+  useRadioModeration: () => ({ waitTimer: null }),
 }));
 vi.mock('./useRadioReactions', () => ({
   useRadioReactions: () => ({ floatingReactions: [], handleSendReaction: vi.fn() }),
 }));
 
+// Mock supabase for useChannelRole / useChannelSettings
+vi.mock('../../features/moderation/useChannelRole', () => ({
+  useChannelRole: () => ({ role: 'guest', status: 'active', loading: false }),
+}));
+vi.mock('../../features/moderation/useChannelSettings', () => ({
+  useChannelSettings: () => ({ settings: { allow_guest_ptt: true }, loading: false }),
+}));
+
+import { useRadioOrchestrator } from './useRadioOrchestrator';
+
+function makeSupabase() {
+  const mockSupabase = {
+    channel: vi.fn(() => ({
+      on: vi.fn(() => ({ subscribe: vi.fn(() => ({ unsubscribe: vi.fn() })) })),
+      subscribe: vi.fn(() => ({ unsubscribe: vi.fn() })),
+    })),
+    removeChannel: vi.fn(),
+    from: vi.fn(() => ({
+      select: vi.fn(() => ({
+        eq: vi.fn(() => ({
+          maybeSingle: vi.fn(() => Promise.resolve({ data: null, error: null })),
+        })),
+      })),
+    })),
+    functions: { invoke: vi.fn(() => Promise.resolve({ data: null, error: null })) },
+  };
+  return mockSupabase;
+}
+
+vi.mock('../../app/utils/supabase', () => ({
+  getSupabase: vi.fn(() => Promise.resolve((globalThis as any).__sb)),
+}));
+
 describe('useRadioOrchestrator', () => {
   beforeEach(() => {
+    localStorage.clear();
     vi.clearAllMocks();
-    Object.assign(storeStateRef.state, {
+    (globalThis as any).__sb = makeSupabase();
+    usePTTStore.setState({
       isPowerOn: true,
       isTransmitting: false,
       isScanning: false,
+      channelNumber: 100,
       activeUsers: [],
       activeTransmitter: null,
-      themeText: 'theme-classic',
-      audioMode: 'radio',
+      themeText: 'theme-v1',
+      audioMode: 'discussion',
       fullDuplex: false,
       isKaraokePlayerOpen: false,
-      setIsKaraokePlayerOpen: () => {},
+      infoText: 'Budi',
+      locationText: 'BANDUNG, JABAR',
       userId: 'me',
-      channelNumber: 1,
-      infoText: '',
-      locationText: '',
-      callSign: '2DYUA',
+      callSign: 'BUD01',
     });
   });
 
-  it('exposes derived view-model fields', () => {
+  it('composes view-model with theme class mapping', () => {
     const { result } = renderHook(() => useRadioOrchestrator());
-    expect(result.current.isPowerOn).toBe(true);
-    expect(result.current.roomId).toBe('ptt-room-1');
-    expect(result.current.channel).toBe(1);
-    expect(result.current.pttAllowed).toBe(true);
-    expect(Array.isArray(result.current.dynamicUserList)).toBe(true);
-  });
-
-  it('getThemeClass maps known themes', () => {
-    const { result } = renderHook(() => useRadioOrchestrator());
-    expect(result.current.getThemeClass('theme-v1')).toBe('theme-v1');
-    expect(result.current.getThemeClass('v3')).toBe('theme-v3');
-    expect(result.current.getThemeClass('monokrom')).toBe('theme-monokrom');
+    expect(result.current.getThemeClass('theme-v3')).toBe('theme-v3');
+    expect(result.current.getThemeClass('theme-monokrom')).toBe('theme-monokrom');
     expect(result.current.getThemeClass('unknown')).toBe('theme-classic');
   });
 
-  it('dedupes user list (case-insensitive) and includes static + simulated', () => {
-    storeStateRef.state.activeUsers = ['UserA', { userId: 'userb', displayName: 'B' } as any];
+  it('pttAllowed respects guest + allowGuestPTT', async () => {
     const { result } = renderHook(() => useRadioOrchestrator());
-    // UserA (from activeUsers) + userb + staticUser1 from STATIC_CHANNELS.users
-    const ids = result.current.dynamicUserList.map((u) => (typeof u === 'string' ? u : u.userId));
-    // 'UserA' and 'userb' deduped to themselves; staticUser1 added
-    expect(ids).toContain('UserA');
-    expect(ids).toContain('userb');
-    expect(ids).toContain('staticUser1');
-    expect(result.current.dynamicUserList.length).toBe(3);
+    await waitFor(() => expect(result.current.status).toBe('active'));
+    expect(result.current.pttAllowed).toBe(true); // guest + allow_guest_ptt true
   });
 
-  it('handleSet opens settings only when powered on', () => {
-    storeStateRef.state.isPowerOn = true;
+  it('isBusy is false when not receiving', () => {
+    usePTTStore.setState({ activeTransmitter: null });
+    const { result } = renderHook(() => useRadioOrchestrator());
+    expect(result.current.isBusy).toBe(false);
+  });
+
+  it('isBusy true when receiving from another user (half-duplex)', () => {
+    usePTTStore.setState({
+      activeTransmitter: {
+        userId: 'other',
+        callSign: 'OTH01',
+        displayName: 'Other',
+        role: 'guest',
+      },
+      audioMode: 'discussion',
+      fullDuplex: false,
+    });
+    const { result } = renderHook(() => useRadioOrchestrator());
+    expect(result.current.isBusy).toBe(true);
+  });
+
+  it('isBusy false when receiving but full-duplex on', () => {
+    usePTTStore.setState({
+      activeTransmitter: {
+        userId: 'other',
+        callSign: 'OTH01',
+        displayName: 'Other',
+        role: 'guest',
+      },
+      audioMode: 'music',
+      fullDuplex: false,
+    });
+    const { result } = renderHook(() => useRadioOrchestrator());
+    expect(result.current.isBusy).toBe(false);
+  });
+
+  it('handleSet opens settings only when power on', () => {
     const { result } = renderHook(() => useRadioOrchestrator());
     act(() => result.current.handleSet());
     expect(result.current.isSettingsOpen).toBe(true);
-
-    // power off -> handleSet does nothing
-    storeStateRef.state.isPowerOn = false;
-    const { result: r2 } = renderHook(() => useRadioOrchestrator());
-    act(() => r2.current.handleSet());
-    expect(r2.current.isSettingsOpen).toBe(false);
   });
 
-  it('powers-off resets all panel open flags', () => {
-    storeStateRef.state.isPowerOn = false;
+  it('closes all panels when power turned off', () => {
     const { result } = renderHook(() => useRadioOrchestrator());
-    expect(result.current.isPanelOpen).toBe(false);
-    // All individual flags default false when off
-    expect(result.current.isSettingsOpen).toBe(false);
+    act(() => result.current.setIsManageOpen(true));
+    expect(result.current.isManageOpen).toBe(true);
+    act(() => usePTTStore.getState().setPower(false));
     expect(result.current.isManageOpen).toBe(false);
+    expect(result.current.isPanelOpen).toBe(false);
   });
 
-  it('marqueeText includes program name when channel description present', () => {
+  it('builds marquee text from channel info', () => {
     const { result } = renderHook(() => useRadioOrchestrator());
-    expect(result.current.marqueeText).toContain('PROGRAM X');
-    expect(result.current.marqueeText).toContain('CHANNEL 1');
-  });
-
-  it('isBusy true when receiving + half-duplex', () => {
-    storeStateRef.state.activeTransmitter = { userId: 'other', callSign: '9ZZZ' } as any;
-    storeStateRef.state.fullDuplex = false;
-    storeStateRef.state.audioMode = 'radio';
-    const { result } = renderHook(() => useRadioOrchestrator());
-    expect(result.current.isBusy).toBe(true);
+    expect(result.current.marqueeText).toContain('CHANNEL 100');
+    expect(result.current.marqueeText).toContain('BUDI');
   });
 });

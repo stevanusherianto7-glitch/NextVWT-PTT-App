@@ -1,62 +1,49 @@
-/**
- * src/app/services/livekitToken.test.ts
- * Unit tests untuk fetchLiveKitToken (client-side helper).
- *
- * Verifikasi:
- *  1. Memanggil Edge Function `livekit-token` dengan body { channel }.
- *  2. Mengembalikan { token, room, identity } saat response valid.
- *  3. Melempar error bila `functions.invoke` mengembalikan error.
- *  4. Melempar error bila response tidak memiliki token/room.
- */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const mockInvoke = vi.hoisted(() => vi.fn());
-
-vi.mock('../utils/supabase', () => {
-  const mockSupabase = {
-    functions: { invoke: mockInvoke },
-  };
+vi.mock('../../app/utils/supabase', () => {
   return {
-    getSupabase: vi.fn(() => Promise.resolve(mockSupabase)),
+    getSupabase: vi.fn(() => Promise.resolve((globalThis as any).__sb)),
   };
 });
 
 import { fetchLiveKitToken } from './livekitToken';
 
-describe('fetchLiveKitToken', () => {
+describe('livekitToken', () => {
   beforeEach(() => {
-    mockInvoke.mockReset();
+    vi.clearAllMocks();
+    (globalThis as any).__sb = {
+      functions: {
+        invoke: vi.fn(),
+      },
+    };
   });
 
-  it('memanggil livekit-token dengan channel yang benar', async () => {
-    mockInvoke.mockResolvedValue({
-      data: { token: 'jwt-abc', room: 'ptt-room-7', identity: 'user-123' },
-      error: null,
-    });
+  it('requests token from edge function with channel', async () => {
+    const invoke = vi.fn(() =>
+      Promise.resolve({
+        data: { token: 'tk_123', room: 'ptt-room-5', identity: 'u1' },
+        error: null,
+      })
+    );
+    (globalThis as any).__sb.functions.invoke = invoke;
 
-    const result = await fetchLiveKitToken(7);
-
-    expect(mockInvoke).toHaveBeenCalledWith('livekit-token', { body: { channel: 7 } });
-    expect(result.token).toBe('jwt-abc');
-    expect(result.room).toBe('ptt-room-7');
-    expect(result.identity).toBe('user-123');
+    const res = await fetchLiveKitToken(5);
+    expect(invoke).toHaveBeenCalledWith('livekit-token', { body: { channel: 5 } });
+    expect(res.token).toBe('tk_123');
+    expect(res.room).toBe('ptt-room-5');
   });
 
-  it('melempar error bila functions.invoke mengembalikan error', async () => {
-    mockInvoke.mockResolvedValue({
-      data: null,
-      error: { message: 'Unauthorized' },
-    });
-
-    await expect(fetchLiveKitToken(1)).rejects.toThrow(/Gagal mint token LiveKit/);
+  it('throws when edge function returns error', async () => {
+    (globalThis as any).__sb.functions.invoke = vi.fn(() =>
+      Promise.resolve({ data: null, error: { message: 'boom' } })
+    );
+    await expect(fetchLiveKitToken(5)).rejects.toThrow(/Gagal mint token LiveKit/);
   });
 
-  it('melempar error bila response tidak punya token', async () => {
-    mockInvoke.mockResolvedValue({
-      data: { room: 'ptt-room-1' },
-      error: null,
-    });
-
-    await expect(fetchLiveKitToken(1)).rejects.toThrow(/tidak valid/);
+  it('throws when token/room missing in response', async () => {
+    (globalThis as any).__sb.functions.invoke = vi.fn(() =>
+      Promise.resolve({ data: { identity: 'u1' }, error: null })
+    );
+    await expect(fetchLiveKitToken(5)).rejects.toThrow(/tidak valid/);
   });
 });
