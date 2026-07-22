@@ -1,10 +1,11 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import type { FC } from 'react';
 import { ErrorBoundary } from './ErrorBoundary';
 
-function Boom() {
+const Boom: FC = () => {
   throw new Error('kaboom');
-}
+};
 
 describe('ErrorBoundary', () => {
   it('renders children when no error', () => {

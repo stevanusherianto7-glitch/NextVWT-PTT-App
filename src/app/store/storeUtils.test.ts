@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import {
   safeGetStorage,
   safeSetStorage,
@@ -76,8 +76,8 @@ describe('storeUtils', () => {
       const state = {
         channelNumber: 7,
         callSign: 'AB1CD',
-        isPowerOn: true, // not persisted
-        activeTransmitter: { userId: 'x' }, // not persisted
+        isPowerOn: true,
+        activeTransmitter: { userId: 'x' },
       } as never;
       const picked = pickPersistedState(state);
       expect(picked).toHaveProperty('channelNumber', 7);
@@ -92,7 +92,7 @@ describe('storeUtils', () => {
   });
 
   describe('clearChannelOverrides', () => {
-    it('removes matching channel-status / channel-role keys from localStorage', () => {
+    it('removes matching keys from localStorage', () => {
       localStorage.setItem('channel-status:ptt-room-3:abc', '1');
       localStorage.setItem('channel-role:ptt-room-3:abc', 'mod');
       localStorage.setItem('unrelated-key', 'keep');
