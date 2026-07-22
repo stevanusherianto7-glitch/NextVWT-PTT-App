@@ -1,84 +1,44 @@
-// @ts-nocheck
-// deno-lint-ignore-file no-explicit-any
-import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
-import { AccessToken } from "https://esm.sh/livekit-server-sdk@2.10.0";
+// Supabase Edge Function: livekit-token
+// Meng-generate LiveKit access token di SERVER (API secret TIDAK pernah ke client).
+//
+// Deploy:  npx supabase functions deploy livekit-token
+// Local:   npx supabase functions serve livekit-token --no-verify-jwt
+//
+// App memanggil via supabase.functions.invoke('livekit-token', { body: { channel } })
+// yang ditangani SDK (bukan raw fetch) → CORS ditangani Supabase.
 
-const ALLOWED_ORIGINS = [
-  'http://localhost:5188',
-  'http://localhost:4173',
-  'https://nextvwt.vercel.app',
-  'https://nextvwt.id',
-  'https://www.nextvwt.id',
-  'https://app.nextvwt.id',
-  'capacitor://localhost',
-  'http://localhost',
-  'https://localhost',
-];
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { AccessToken } from 'https://esm.sh/livekit-server-sdk@2';
 
-function handleCors(req: Request): Response | { headers: Record<string, string> } {
-  const origin = req.headers.get('Origin');
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers':
+    'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+};
 
-  if (!origin) {
-    return {
-      headers: {
-        'Access-Control-Allow-Origin': ALLOWED_ORIGINS[0],
-        'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Vary': 'Origin',
-      },
-    };
-  }
-
-  if (!ALLOWED_ORIGINS.includes(origin)) {
-    return new Response(JSON.stringify({ error: 'Origin not allowed' }), {
-      status: 403,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
-
-  return {
-    headers: {
-      'Access-Control-Allow-Origin': origin,
-      'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Vary': 'Origin',
-    },
-  };
+interface TokenRequest {
+  channel?: number;
 }
 
-serve(async (req: Request) => {
-  const corsResult = handleCors(req);
-
-  if (corsResult instanceof Response) {
-    return corsResult;
-  }
-  const corsHeaders = corsResult.headers;
-
-  // Handle CORS preflight
+Deno.serve(async (req: Request) => {
+  // Preflight CORS
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
 
   try {
-    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
-    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
-    const livekitApiKey = Deno.env.get('LIVEKIT_API_KEY') ?? '';
-    const livekitApiSecret = Deno.env.get('LIVEKIT_API_SECRET') ?? '';
-
-    if (!livekitApiKey || !livekitApiSecret) {
-      return new Response(
-        JSON.stringify({ error: 'LiveKit tidak dikonfigurasi di server (LIVEKIT_API_KEY/SECRET kosong)' }),
-        { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // 1. Verify user session (auth required — token tidak boleh diberikan ke anon)
-    const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
-      global: { headers: { Authorization: req.headers.get('Authorization') ?? '' } },
-    });
-
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    // ── Auth: hanya user terautentikasi yang boleh minta token ──
+    const authHeader = req.headers.get('authorization') ?? '';
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { authorization: authHeader } } }
+    );
+    const {
+      data: { user },
+      error: authError,
+    } = await supabaseClient.auth.getUser(authHeader.replace('Bearer ', ''));
 
     if (authError || !user) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
@@ -87,56 +47,46 @@ serve(async (req: Request) => {
       });
     }
 
-    // 2. Parse body: room (channel number) + identity opsional
-    const body = await req.json().catch(() => ({}));
-    const { room, channel, identity } = body as {
-      room?: string;
-      channel?: number;
-      identity?: string;
-    };
-
-    // room diisi dari `room` eksplisit, atau `ptt-room-{channel}`
-    const roomName =
-      room ||
-      (typeof channel === 'number' ? `ptt-room-${channel}` : null);
-
-    if (!roomName) {
+    const apiKey = Deno.env.get('LIVEKIT_API_KEY');
+    const apiSecret = Deno.env.get('LIVEKIT_API_SECRET');
+    if (!apiKey || !apiSecret) {
       return new Response(
-        JSON.stringify({ error: 'Field "room" atau "channel" wajib diisi' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: 'LiveKit env belum diset di Supabase' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Identity: gunakan id user (atau override bila diberikan & aman)
-    const participantIdentity = identity || user.id;
+    const body = (await req.json()) as TokenRequest;
+    const channel = body.channel ?? 1;
+    const room = `ptt-room-${channel}`;
+    // identity diambil dari user terautentikasi (tidak bisa di-spoof dari client)
+    const identity = user.id;
+    const displayName =
+      (user.user_metadata?.full_name as string) || user.email || user.id;
 
-    // 3. Mint LiveKit access token (server-side — secret TIDAK ke client)
-    const at = new AccessToken(livekitApiKey, livekitApiSecret, {
-      identity: participantIdentity,
-      name: user.email || participantIdentity,
+    const at = new AccessToken(apiKey, apiSecret, {
+      identity,
+      name: displayName,
       ttl: '2h',
     });
-
     at.addGrant({
       roomJoin: true,
-      room: roomName,
-      canPublish: true, // audio track (PTT)
+      room,
+      canPublish: true,
       canSubscribe: true,
-      canPublishData: false, // moderasi tetap di Supabase, bukan LiveKit Data API (AD-2)
+      canPublishData: true,
     });
 
-    const jwt = await at.toJwt();
+    const token = await at.toJwt();
 
-    return new Response(
-      JSON.stringify({ token: jwt, room: roomName, identity: participantIdentity }),
-      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Server Error';
-    console.error('[livekit-token] error:', message);
-    return new Response(
-      JSON.stringify({ error: message }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return new Response(JSON.stringify({ token, room, identity }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return new Response(JSON.stringify({ error: message }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 });

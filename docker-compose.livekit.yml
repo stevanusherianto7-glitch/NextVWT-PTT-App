@@ -1,31 +1,39 @@
-# docker-compose.livekit.yml — LiveKit SFU lokal (dev/test)
+# LiveKit SFU dev stack untuk NextVWT PTT.
+# Jalankan: docker compose -f docker-compose.livekit.yml up -d
+# Hentikan: docker compose -f docker-compose.livekit.yml down
 #
-# Jalankan:  docker compose -f docker-compose.livekit.yml up -d
-# Hentikan:  docker compose -f docker-compose.livekit.yml down
-#
-# Catatan:
-# - Pakai API key/secret DEV (jangan pakai ini di produksi!).
-# - Tanpa TLS (http/ws) — hanya untuk localhost. Produksi wajib wss + TURN.
-# - TURN DISABLED di dev (localhost tidak butuh NAT traversal).
-#   Untuk deploy VPS, set `turn.enabled: true` + domain + sertifikat (lihat DEPLOYMENT.md).
-# - Port: 7880 = WebSocket SFU, 7881 = TCP RTC, 50000-60000 = UDP RTC.
+# URL ws yang dipakai app: ws://localhost:7880  (lihat .env VITE_LIVEKIT_URL)
+# Key/secret dev (cocok dengan .env.example LIVEKIT_API_KEY/SECRET):
+#   devkey / devsecret1234567890abcdefghijklmn
+# JANGAN pakai key ini di production — ganti via secret Supabase / env VPS.
 
 services:
   livekit:
     image: livekit/livekit-server:latest
     container_name: nextvwt-livekit
-    command: --config /etc/livekit.yaml
-    ports:
-      - "7880:7880"          # WebSocket / HTTP API
-      - "7881:7881"          # TCP RTC
-      - "52000-52100:52000-52100/udp"  # UDP RTC range
-      - "3478:3478/udp"      # TURN UDP
-      - "5349:5349"          # TURN TLS
-    volumes:
-      - ./livekit/config.yaml:/etc/livekit.yaml:ro
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "/bin/sh", "-c", "wget -q -O /dev/null http://localhost:7880/ || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    ports:
+      - "7880:7880"        # WebSocket / signaling (VITE_LIVEKIT_URL)
+      - "7881:7881"        # HTTP debug port
+      - "50000-50020:50000-50020/udp"  # media (TURN/ICE range)
+    environment:
+      # LiveKit baca konfig dari env LIVEKIT_*
+      LIVEKIT_API_KEY: devkey
+      LIVEKIT_API_SECRET: devsecret1234567890abcdefghijklmn
+      LIVEKIT_WS_PORT: "7880"
+      # Dev mode: izinkan localhost tanpa TLS (ws:// bukan wss://)
+      LIVEKIT_DEV: "true"
+    command: >
+      --dev
+      --bind 0.0.0.0:7880
+      --rtc-port 50000-50020
+      --keys devkey:devsecret1234567890abcdefghijklmn
+
+  # Redis opsional untuk webhook/presence — tidak wajib untuk dev mesh→SFU.
+  # Dibiarkan comentar; uncomment bila perlu.
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: nextvwt-redis
+  #   restart: unless-stopped
+  #   ports:
+  #     - "6379:6379"
