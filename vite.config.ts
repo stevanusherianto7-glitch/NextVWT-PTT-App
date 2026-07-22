@@ -209,18 +209,17 @@ export default defineConfig(({ command: _command, mode }) => {
           '**/*.d.ts',
           'e2e/**',
         ],
-        // [COVERAGE] Threshold BERTAHAP — mulai di floor riil (bukan 70% palsu).
-        // Baseline terukur (seluruh src/): ~27.6% L / 22.2% B / 19.6% F / 27.9% S.
-        // Tahap 1 di-set sedikit DI BAWAH baseline agar gate hijau tapi
-        // mencegah regresi. Naikkan tiap batch test baru:
-        //   Tahap 1 (skrg): 25 / 20 / 18 / 25
-        //   Tahap 2 (target): 30 / 25 / 22 / 30
-        //   Tahap 3 (target): 40 / 35 / 32 / 40  ... dst sampai 100.
+        // [COVERAGE] Threshold BERTAHAP — naik tiap batch test baru.
+        // Baseline riil (seluruh src/): ~32.5% L / 24.3% B / 23% F / 32.7% S.
+        //   Tahap 1 (done): 25 / 20 / 18 / 25
+        //   Tahap 2 (skrg): 30 / 25 / 22 / 30   <-- aktif
+        //   Tahap 3 (target): 40 / 35 / 32 / 40
+        //   Tahap 4 (target): 50 / 45 / 42 / 50  ... -> 100.
         thresholds: {
-          lines: 25,
-          functions: 18,
-          branches: 20,
-          statements: 25,
+          lines: 30,
+          functions: 22,
+          branches: 25,
+          statements: 30,
         },
         reporter: ['text', 'html', 'lcov'],
         reportsDirectory: './coverage',

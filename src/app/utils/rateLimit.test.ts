@@ -1,26 +1,29 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { assertCooldown } from './rateLimit';
 
-describe('assertCooldown', () => {
-  it('passes on first call and records timestamp', () => {
-    expect(() => assertCooldown('k1', 1000, 'too fast')).not.toThrow();
-  });
-
-  it('throws if called again within cooldown', () => {
-    assertCooldown('k2', 10_000, 'too fast');
-    expect(() => assertCooldown('k2', 10_000, 'too fast')).toThrow('too fast');
-  });
-
-  it('allows call again after cooldown elapses', () => {
+describe('rateLimit/assertCooldown', () => {
+  beforeEach(() => {
     vi.useFakeTimers();
-    assertCooldown('k3', 50, 'too fast');
-    vi.advanceTimersByTime(60);
-    expect(() => assertCooldown('k3', 50, 'too fast')).not.toThrow();
-    vi.useRealTimers();
+    vi.setSystemTime(1_000_000);
   });
 
-  it('different keys are independent', () => {
-    assertCooldown('a', 10_000, 'x');
-    expect(() => assertCooldown('b', 10_000, 'x')).not.toThrow();
+  it('allows first call (no prior timestamp)', () => {
+    expect(() => assertCooldown('first-call', 1000, 'slow')).not.toThrow();
+  });
+
+  it('throws when called within cooldown window', () => {
+    assertCooldown('within', 1000, 'slow');
+    expect(() => assertCooldown('within', 1000, 'slow')).toThrow('slow');
+  });
+
+  it('allows again after cooldown elapses', () => {
+    assertCooldown('elapse', 1000, 'slow');
+    vi.advanceTimersByTime(1001);
+    expect(() => assertCooldown('elapse', 1000, 'slow')).not.toThrow();
+  });
+
+  it('different keys tracked independently', () => {
+    assertCooldown('keyA', 1000, 'slow');
+    expect(() => assertCooldown('keyB', 1000, 'slow')).not.toThrow();
   });
 });
