@@ -42,15 +42,16 @@ export default defineConfig({
         // RadioBody/Header/Footer, useSfuTransport, FloatingKaraokePlayer,
         // ChannelListModal, UserListModal, dll). Threshold dinaikkan mendekati riil
         // tapi tetap di bawah measured agar CI hijau & jujur.
-        branches: 42,
-        // TAHAP 5 (2026-07-22, sub-komponen RadioBody + RadioPanels): terukur
-        // 50.99% L / 46.06% B / 48.65% F / 51.61% S setelah +21 test (PTTArea,
-        // ReactionsOverlay, UserListOverlay, RadioPanels branch switching).
-        // Threshold dinaikkan mendekati riil tapi tetap di bawah measured.
         branches: 45,
-        functions: 48,
-        lines: 50,
-        statements: 51,
+        // TAHAP 6 (2026-07-22, feature panels + ModerationActionSheet): terukur
+        // 54.81% L / 50.05% B / 51.59% F / 55.68% S setelah +17 test (ChannelManagePanel,
+        // WalletPanel, ROIPBridgePanel, KaraokeQueuePanel, PrivateChannelPanel,
+        // ModerationActionSheet).
+        // Threshold dinaikkan mendekati riil tapi tetap di bawah measured.
+        branches: 49,
+        functions: 51,
+        lines: 54,
+        statements: 54,
       },
     },
   },
