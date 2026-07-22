@@ -118,6 +118,18 @@ class MockAudioContext {
 
 global.AudioContext = MockAudioContext as unknown as typeof AudioContext;
 
+// Mock ResizeObserver (jsdom lacks it; Radix Slider/ScrollArea need it)
+global.ResizeObserver = class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+} as unknown as typeof ResizeObserver;
+
+// jsdom lacks scrollIntoView (cmdk/Radix use it)
+if (!Element.prototype.scrollIntoView) {
+  Element.prototype.scrollIntoView = vi.fn();
+}
+
 // Silence console.error for expected errors in tests
 const originalError = console.error;
 beforeAll(() => {

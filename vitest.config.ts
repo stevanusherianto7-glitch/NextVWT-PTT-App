@@ -35,9 +35,14 @@ export default defineConfig({
         // test logic inti (features/*, komponen UI) ditambah. JANGAN set 100%
         // sebelum benar-benar terukur — lihat docs/TESTING.md.
         branches: 14,
-        functions: 14,
-        lines: 20,
-        statements: 20,
+        // TAHAP 3 (2026-07-22, rtl batch): terukur 34.61% L / 26.49% B / 27.3% F /
+        // 34.84% S setelah +64 test (logic + komponen UI presentasional).
+        // Naikkan per batch saat test komponen berat (RadioLayout, store slices,
+        // services) ditambah. JANGAN set 100% sebelum benar-benar terukur.
+        branches: 26,
+        functions: 27,
+        lines: 34,
+        statements: 34,
       },
     },
   },
