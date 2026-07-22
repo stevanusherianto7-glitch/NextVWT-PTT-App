@@ -53,16 +53,41 @@ Script menjalankan berturut-turut:
 > >5 menit di koneksi terbatas). Jika hang, gunakan **Opsi B** (Cloud).
 
 ### Opsi B — LiveKit lokal + Edge Function di Supabase Cloud
-Paling cepat jika project Supabase Cloud sudah ada:
+Paling cepat jika project Supabase Cloud sudah ada (NextVWT pakai project
+`https://tqixjycrxhjmpyffhxvg.supabase.co` → **project ref: `tqixjycrxhjmpyffhxvg`**):
+
 ```bash
-# 1. LiveKit lokal
+# 1. LiveKit lokal (container SFU)
 docker compose -f docker-compose.livekit.yml up -d
 
-# 2. Deploy Edge Function ke Cloud (butuh login + set secret)
+# 2. Login Supabase CLI (butuh access token — lihat §3.1)
 npx supabase login
+
+# 3. Link ke project NextVWT (ref di bawah sudah benar)
+npx supabase link --project-ref tqixjycrxhjmpyffhxvg
+
+# 4. Set secrets SERVER (dev placeholder — ganti di prod!)
+npx supabase secrets set LIVEKIT_API_KEY=devkey LIVEKIT_API_SECRET=secret1234567890abcdefghijklmnopqr
+
+# 5. Deploy Edge Function livekit-token
 npx supabase functions deploy livekit-token
-# Set di Dashboard: LIVEKIT_API_KEY + LIVEKIT_API_SECRET (lihat §5)
 ```
+
+> Setelah deploy, app otomatis memanggil `supabase.functions.invoke('livekit-token')`
+> ke Cloud (URL dari `VITE_SUPABASE_URL`). Tidak perlu jalankan `functions serve` lokal.
+> Verifikasi: buka log Edge Function di Dashboard atau `npx supabase functions list`.
+
+#### §3.1 Cara mendapatkan Supabase Access Token
+1. Buka **https://supabase.com/dashboard/account/tokens**
+   (avatar kanan-atas → Account → Access Tokens).
+2. Klik **Generate new token**, beri nama (mis. `nextvwt-dev`),
+   **Generate**, lalu **copy token** (ditampilkan sekali saja — simpan aman).
+3. Jalankan `npx supabase login` → paste token saat diminta.
+   Atau set env (CI): `set SUPABASE_ACCESS_TOKEN=<token>` (jangan commit!).
+4. Cek berhasil: `npx supabase projects list` → harus mencetak project Anda.
+
+> ⚠️ Token = **rahasia**. Jangan tempel ke chat, jangan commit ke repo.
+> Jika bocor: revoke di dashboard lalu generate baru.
 
 ### Opsi C — Full Cloud (produksi/staging)
 - LiveKit di VPS (self-host) atau LiveKit Cloud.
