@@ -1,10 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import {
-  SettingsPanelSkeleton,
-  KaraokePlayerSkeleton,
-  AquariumSkeleton,
-} from './SkeletonLoaders';
+import { SettingsPanelSkeleton, KaraokePlayerSkeleton, AquariumSkeleton } from './SkeletonLoaders';
 
 describe('SkeletonLoaders', () => {
   it('SettingsPanelSkeleton renders', () => {

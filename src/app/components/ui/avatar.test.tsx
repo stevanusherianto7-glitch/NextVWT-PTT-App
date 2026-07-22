@@ -11,6 +11,8 @@ describe('ui/Avatar', () => {
       </Avatar>
     );
     expect(container.firstChild).toBeInTheDocument();
-    expect(container.querySelector('AvatarFallback, [data-fallback]') || container.textContent).toBeTruthy();
+    expect(
+      container.querySelector('AvatarFallback, [data-fallback]') || container.textContent
+    ).toBeTruthy();
   });
 });
