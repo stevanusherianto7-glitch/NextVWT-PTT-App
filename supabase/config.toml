@@ -1,12 +1,10 @@
 # Supabase local dev config (partial) untuk NextVWT PTT.
-# Jalankan: npx supabase start  (atau functions serve saja)
+# Jalankan: npx supabase start  (lalu functions serve)
 project_id = "nextvwt-ptt"
 
 [api]
 enabled = true
 port = 54321
-# JWT verify dimatikan untuk dev lokal (sesuai usulan --no-verify-jwt)
-jwt_secret = "dev-jwt-secret-dont-use-in-prod"
 
 [functions.livekit-token]
 # Verified JWT dimatikan agar dev lokal tidak butuh auth header valid

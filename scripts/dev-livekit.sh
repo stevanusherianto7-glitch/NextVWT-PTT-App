@@ -1,35 +1,34 @@
 #!/usr/bin/env bash
-# scripts/dev-livekit.sh
-# Jalankan LiveKit SFU lokal (docker) + NextVWT dev server dengan SFU AKTIF.
+# dev-livekit.sh — One-command dev stack untuk NextVWT SFU (LiveKit + Supabase Edge Function)
 #
-# Usage:
-#   bash scripts/dev-livekit.sh          # start LiveKit (docker) + vite (SFU on)
-#   bash scripts/dev-livekit.sh --no-docker   # asumsi LiveKit sudah jalan di :7880
+# Yang dijalankan:
+#   1. Docker: LiveKit SFU lokal  (ws://localhost:7880)  -> docker-compose.livekit.yml
+#   2. Supabase: local stack      (DB + Auth + Functions) -> npx supabase start
+#   3. Supabase: serve livekit-token (token generator)   -> npx supabase functions serve
 #
-# Butuh: docker, node/pnpm. Supabase Edge Function `livekit-token` harus sudah
-# deploy & punya secret LIVEKIT_API_KEY/SECRET = devkey/devsecret... (lihat livekit/config.yaml).
+# Prasyarat:
+#   - Docker Desktop running (Engine up)
+#   - npx supabase CLI tersedia
+#   - .env sudah copy dari .env.example DAN VITE_LIVEKIT_URL=ws://localhost:7880
+#
+# Cara: bash scripts/dev-livekit.sh   (atau: ./scripts/dev-livekit.sh)
 
-set -e
+set -euo pipefail
+cd "$(dirname "$0")/.."
 
-LIVEKIT_WS="ws://localhost:7880"
-COMPOSE_FILE="docker-compose.livekit.yml"
+echo "==> [1/3] Start LiveKit SFU container..."
+docker compose -f docker-compose.livekit.yml up -d
+docker ps --filter name=nextvwt-livekit --format "    -> {{.Names}} {{.Status}}"
 
-if [ "$1" != "--no-docker" ]; then
-  echo "==> Starting LiveKit SFU via docker compose ($COMPOSE_FILE)"
-  docker compose -f "$COMPOSE_FILE" up -d
-  echo "==> Waiting for LiveKit health (http://localhost:7880)..."
-  for i in $(seq 1 20); do
-    if curl -sf -o /dev/null http://localhost:7880/ ; then
-      echo "==> LiveKit is up."
-      break
-    fi
-    sleep 1
-  done
+echo "==> [2/3] Start Supabase local stack (DB + Auth)..."
+# 'supabase start' hanya perlu sekali; jika sudah jalan, lewati.
+if npx supabase status >/dev/null 2>&1; then
+  echo "    Supabase sudah jalan, lewati start."
 else
-  echo "==> Skipping docker (--no-docker). Assuming LiveKit already on $LIVEKIT_WS"
+  npx supabase start
 fi
 
-echo "==> Starting NextVWT dev server with VITE_LIVEKIT_URL=$LIVEKIT_WS"
-# Export agar vite membaca env SFU (USE_SFU jadi true di config.ts)
-export VITE_LIVEKIT_URL="$LIVEKIT_WS"
-pnpm dev
+echo "==> [3/3] Serve Edge Function livekit-token (token generator)..."
+echo "    Buka terminal lain untuk menjalankan app: pnpm dev"
+echo "    Tekan Ctrl+C untuk menghentikan serve (Supabase stack tetap jalan)."
+npx supabase functions serve livekit-token --no-verify-jwt
