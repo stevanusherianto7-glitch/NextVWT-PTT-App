@@ -4,7 +4,7 @@
 #
 # URL ws yang dipakai app: ws://localhost:7880  (lihat .env VITE_LIVEKIT_URL)
 # Key/secret dev (cocok dengan .env.example LIVEKIT_API_KEY/SECRET):
-#   devkey / devsecret1234567890abcdefghijklmn
+#   devkey / secret1234567890abcdefghijklmn
 # JANGAN pakai key ini di production — ganti via secret Supabase / env VPS.
 
 services:
@@ -15,25 +15,17 @@ services:
     ports:
       - "7880:7880"        # WebSocket / signaling (VITE_LIVEKIT_URL)
       - "7881:7881"        # HTTP debug port
-      - "50000-50020:50000-50020/udp"  # media (TURN/ICE range)
+      - "50000-50020:50000-50020/udp"  # media (RTC/ICE range)
     environment:
-      # LiveKit baca konfig dari env LIVEKIT_*
+      # LiveKit baca konfig dari env LIVEKIT_* (lebih robust dari flag CLI)
       LIVEKIT_API_KEY: devkey
-      LIVEKIT_API_SECRET: devsecret1234567890abcdefghijklmn
+      LIVEKIT_API_SECRET: secret1234567890abcdefghijklmnopqr
+      # --keys format: "key: secret" (spasi wajib). Bisa multiple baris.
+      LIVEKIT_KEYS: "devkey: secret1234567890abcdefghijklmnopqr"
+      # Bind IP (tanpa port) + WS port terpisah
+      LIVEKIT_BIND: "0.0.0.0"
       LIVEKIT_WS_PORT: "7880"
+      LIVEKIT_UDP_PORT: "50000-50020"
       # Dev mode: izinkan localhost tanpa TLS (ws:// bukan wss://)
       LIVEKIT_DEV: "true"
-    command: >
-      --dev
-      --bind 0.0.0.0:7880
-      --rtc-port 50000-50020
-      --keys devkey:devsecret1234567890abcdefghijklmn
-
-  # Redis opsional untuk webhook/presence — tidak wajib untuk dev mesh→SFU.
-  # Dibiarkan comentar; uncomment bila perlu.
-  # redis:
-  #   image: redis:7-alpine
-  #   container_name: nextvwt-redis
-  #   restart: unless-stopped
-  #   ports:
-  #     - "6379:6379"
+    # command dikosongkan — semua via env di atas (hindari parsing flag CLI).
