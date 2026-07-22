@@ -43,9 +43,14 @@ export default defineConfig({
         // ChannelListModal, UserListModal, dll). Threshold dinaikkan mendekati riil
         // tapi tetap di bawah measured agar CI hijau & jujur.
         branches: 42,
-        functions: 45,
-        lines: 48,
-        statements: 48,
+        // TAHAP 5 (2026-07-22, sub-komponen RadioBody + RadioPanels): terukur
+        // 50.99% L / 46.06% B / 48.65% F / 51.61% S setelah +21 test (PTTArea,
+        // ReactionsOverlay, UserListOverlay, RadioPanels branch switching).
+        // Threshold dinaikkan mendekati riil tapi tetap di bawah measured.
+        branches: 45,
+        functions: 48,
+        lines: 50,
+        statements: 51,
       },
     },
   },
