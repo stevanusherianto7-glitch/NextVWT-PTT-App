@@ -43,15 +43,15 @@ export default defineConfig({
         // ChannelListModal, UserListModal, dll). Threshold dinaikkan mendekati riil
         // tapi tetap di bawah measured agar CI hijau & jujur.
         branches: 49,
-        // TAHAP 7 (2026-07-22, audio visualizer + ChannelManage sub-panels):
-        // estimasi naik dari Tahap 6 (54.81/50.05/51.59/55.68) setelah +14 test
-        // (useAudioVisualizer, ChannelMemberList, ChannelSettingsPanel,
-        // ModerationLogPanel). Threshold dinaikkan bertahap; CI verifikasi pasti.
-        // JIKA CI gagal threshold, turunkan ke measured riil (lihat run CI).
-        branches: 50,
-        functions: 52,
-        lines: 55,
-        statements: 56,
+        // TAHAP 6 (terbukti hijau di CI run 29935470556): 54.81 L / 50.05 B /
+        // 51.59 F / 55.68 S setelah +17 test. TAHAP 7 DITUNDA: coverage full
+        // run di CI crash (vitest emitUnexpectedExit, bukan threshold) — diduga
+        // instrumentasi coverage + akumulasi 118 test files / rAF loop di
+        // useAudioVisualizer. Kembalikan ke Tahap 6 sampai cara jalan coverage
+        // stabil ditemukan (pool forks / split coverage).
+        functions: 51,
+        lines: 54,
+        statements: 54,
       },
     },
   },
