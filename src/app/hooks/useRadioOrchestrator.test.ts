@@ -58,7 +58,11 @@ vi.mock('../../features/moderation/useChannelRole', () => ({
   useChannelRole: () => ({ role: 'member' as const, status: 'active' as const, loading: false }),
 }));
 vi.mock('../../features/moderation/useChannelSettings', () => ({
-  useChannelSettings: () => ({ settings: { allow_guest_ptt: true, channel_description: 'PROGRAM X' }, loading: false, updateSettings: vi.fn() }),
+  useChannelSettings: () => ({
+    settings: { allow_guest_ptt: true, channel_description: 'PROGRAM X' },
+    loading: false,
+    updateSettings: vi.fn(),
+  }),
 }));
 vi.mock('../../features/moderation/permissions', () => ({
   canUsePTT: () => true,

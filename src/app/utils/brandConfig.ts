@@ -41,8 +41,7 @@ export const BRAND: BrandConfig = {
  * Vite menyuntikkan global ini via `define`.
  */
 declare const __E2E_DISABLE_SFU__: boolean | undefined;
-const E2E_DISABLE_SFU =
-  typeof __E2E_DISABLE_SFU__ !== 'undefined' ? __E2E_DISABLE_SFU__ : false;
+const E2E_DISABLE_SFU = typeof __E2E_DISABLE_SFU__ !== 'undefined' ? __E2E_DISABLE_SFU__ : false;
 export const USE_SFU = !E2E_DISABLE_SFU && Boolean(BRAND.livekitUrl);
 
 /** Channels that do not show the reaction dock. */

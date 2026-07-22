@@ -26,12 +26,7 @@ beforeEach(() => {
   vi.spyOn(console, 'warn').mockImplementation(() => {});
 });
 
-import {
-  handleHangUp,
-  handleKick,
-  handleUpdateRole,
-  handleUpdateStatus,
-} from './modHandler';
+import { handleHangUp, handleKick, handleUpdateRole, handleUpdateStatus } from './modHandler';
 
 describe('modHandler', () => {
   beforeEach(() => {
@@ -60,14 +55,22 @@ describe('modHandler', () => {
 
     it('clears my transmitting + progress when I am target + transmitting', () => {
       safeParse.mockReturnValue({ targetUserId: 'me', moderatorName: 'Op' });
-      getState.mockReturnValue({ userId: 'me', isTransmitting: true, activeTransmitter: { userId: 'me' } });
+      getState.mockReturnValue({
+        userId: 'me',
+        isTransmitting: true,
+        activeTransmitter: { userId: 'me' },
+      });
       handleHangUp({ targetUserId: 'me' }, vi.fn());
       expect(setState).toHaveBeenCalledWith({ isTransmitting: false, progress: 0 });
     });
 
     it('clears activeTransmitter + calls clearWatchdog when tx matches target', () => {
       safeParse.mockReturnValue({ targetUserId: 'other' });
-      getState.mockReturnValue({ userId: 'me', isTransmitting: false, activeTransmitter: { userId: 'other' } });
+      getState.mockReturnValue({
+        userId: 'me',
+        isTransmitting: false,
+        activeTransmitter: { userId: 'other' },
+      });
       const clearWatchdog = vi.fn();
       handleHangUp({ targetUserId: 'other' }, clearWatchdog);
       expect(setState).toHaveBeenCalledWith({ activeTransmitter: null, progress: 0 });

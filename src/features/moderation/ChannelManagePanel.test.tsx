@@ -13,7 +13,10 @@ vi.mock('./ModerationLogPanel', () => ({
   ModerationLogPanel: () => <div data-testid="logs-panel">logs-panel</div>,
 }));
 
-const roleRef = vi.hoisted(() => ({ role: 'noc' as 'noc' | 'operator', status: 'active' as const }));
+const roleRef = vi.hoisted(() => ({
+  role: 'noc' as 'noc' | 'operator',
+  status: 'active' as const,
+}));
 vi.mock('./useChannelRole', () => ({
   useChannelRole: () => ({ role: roleRef.role, status: roleRef.status, loading: false }),
 }));

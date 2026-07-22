@@ -28,7 +28,7 @@ const playPressSound = vi.hoisted(() => vi.fn());
 const playReleaseSound = vi.hoisted(() => vi.fn());
 vi.mock('../utils/radioSound', () => ({ playPressSound, playReleaseSound }));
 
-const initGlobalAudioContext = vi.hoisted(() => vi.fn(() => ({} as AudioContext)));
+const initGlobalAudioContext = vi.hoisted(() => vi.fn(() => ({}) as AudioContext));
 vi.mock('../utils/audioContext', () => ({ initGlobalAudioContext }));
 
 // stub navigator.vibrate

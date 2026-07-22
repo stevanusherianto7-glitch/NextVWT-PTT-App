@@ -79,7 +79,13 @@ describe('useRadioReactions', () => {
     });
     const { result } = renderHook(() => useRadioReactions(true, 'Budi', 1));
     act(() => {
-      registered!({ senderId: 'me', senderCallSign: '2DYUA', category: 'sound', reaction: 'clap', id: 'x1' });
+      registered!({
+        senderId: 'me',
+        senderCallSign: '2DYUA',
+        category: 'sound',
+        reaction: 'clap',
+        id: 'x1',
+      });
     });
     // self -> dropped, no floating added
     expect(result.current.floatingReactions.length).toBe(0);
@@ -93,7 +99,14 @@ describe('useRadioReactions', () => {
     });
     const { result } = renderHook(() => useRadioReactions(true, 'Budi', 1));
     act(() => {
-      registered!({ senderId: 'other', senderCallSign: '9ZZZ', category: 'sound', reaction: 'laugh', id: 'x2', senderName: 'Ani' });
+      registered!({
+        senderId: 'other',
+        senderCallSign: '9ZZZ',
+        category: 'sound',
+        reaction: 'laugh',
+        id: 'x2',
+        senderName: 'Ani',
+      });
     });
     expect(result.current.floatingReactions.length).toBe(1);
     expect(result.current.floatingReactions[0].senderName).toBe('Ani');
@@ -107,7 +120,13 @@ describe('useRadioReactions', () => {
     });
     const { result } = renderHook(() => useRadioReactions(false, 'Budi', 1));
     act(() => {
-      registered!({ senderId: 'other', senderCallSign: '9ZZZ', category: 'sound', reaction: 'laugh', id: 'x3' });
+      registered!({
+        senderId: 'other',
+        senderCallSign: '9ZZZ',
+        category: 'sound',
+        reaction: 'laugh',
+        id: 'x3',
+      });
     });
     expect(result.current.floatingReactions.length).toBe(0);
   });

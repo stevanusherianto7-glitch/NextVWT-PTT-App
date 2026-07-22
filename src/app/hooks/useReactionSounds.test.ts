@@ -8,7 +8,12 @@ const createNode = () => ({
   start: vi.fn(),
   stop: vi.fn(),
   frequency: { setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn(), value: 0 },
-  gain: { setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn(), linearRampToValueAtTime: vi.fn(), value: 0 },
+  gain: {
+    setValueAtTime: vi.fn(),
+    exponentialRampToValueAtTime: vi.fn(),
+    linearRampToValueAtTime: vi.fn(),
+    value: 0,
+  },
   type: 'sine',
 });
 
@@ -20,7 +25,9 @@ const mockCtx = vi.hoisted(() => ({
   resume: vi.fn().mockResolvedValue(undefined),
   createGain: vi.fn(() => createNode()),
   createOscillator: vi.fn(() => createNode()),
-  createBuffer: vi.fn((_c: number, len: number) => ({ getChannelData: () => new Float32Array(len) })),
+  createBuffer: vi.fn((_c: number, len: number) => ({
+    getChannelData: () => new Float32Array(len),
+  })),
   createBufferSource: vi.fn(() => createNode()),
 }));
 

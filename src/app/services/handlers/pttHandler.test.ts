@@ -74,7 +74,12 @@ describe('pttHandler', () => {
   });
 
   it('moderator override: higher-priority remote stops my TX', () => {
-    getState.mockReturnValue({ ...baseState, isTransmitting: true, myChannelRole: 'member', lastTransmitTime: 100 });
+    getState.mockReturnValue({
+      ...baseState,
+      isTransmitting: true,
+      myChannelRole: 'member',
+      lastTransmitTime: 100,
+    });
     safeParse.mockReturnValue({
       isTransmitting: true,
       userId: 'op',
@@ -89,7 +94,12 @@ describe('pttHandler', () => {
   });
 
   it('collision: I lose when localTime > remoteTime -> my TX cleared', () => {
-    getState.mockReturnValue({ ...baseState, isTransmitting: true, myChannelRole: 'member', lastTransmitTime: 500 });
+    getState.mockReturnValue({
+      ...baseState,
+      isTransmitting: true,
+      myChannelRole: 'member',
+      lastTransmitTime: 500,
+    });
     safeParse.mockReturnValue({
       isTransmitting: true,
       userId: 'peer',
@@ -105,7 +115,13 @@ describe('pttHandler', () => {
   });
 
   it('collision tie: I lose when userId > payload.userId (deterministic)', () => {
-    getState.mockReturnValue({ ...baseState, isTransmitting: true, myChannelRole: 'member', lastTransmitTime: 100, userId: 'zzz' });
+    getState.mockReturnValue({
+      ...baseState,
+      isTransmitting: true,
+      myChannelRole: 'member',
+      lastTransmitTime: 100,
+      userId: 'zzz',
+    });
     safeParse.mockReturnValue({
       isTransmitting: true,
       userId: 'aaa',
@@ -128,7 +144,11 @@ describe('pttHandler', () => {
 
   it('watchdog force-clears stale transmitter after 60s', () => {
     startActiveTransmitterWatchdog('other', 'Budi');
-    getState.mockReturnValue({ ...baseState, activeTransmitter: { userId: 'other' }, isTransmitting: false });
+    getState.mockReturnValue({
+      ...baseState,
+      activeTransmitter: { userId: 'other' },
+      isTransmitting: false,
+    });
     vi.advanceTimersByTime(61000);
     expect(setState).toHaveBeenCalledWith({ activeTransmitter: null });
   });
