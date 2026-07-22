@@ -26,6 +26,9 @@ server media terpusat di tahap prototipe — audio mengalir antar browser via We
 
 **Target produksi** (lihat `docs/ROADMAP.md`): WebRTC mesh diganti **LiveKit SFU**
 — client hanya punya 1 koneksi ke server media, bukan N koneksi ke peer.
+**Status 2026-07-22**: SFU **sudah aktif (dev)** — LiveKit container lokal (`ws://localhost:7880`)
++ Edge Function `livekit-token` ACTIVE di Supabase Cloud. Mesh tetap sebagai fallback
+saat `VITE_LIVEKIT_URL` kosong. Lihat `docs/SFU_RUNBOOK.md`.
 
 ---
 
@@ -40,7 +43,7 @@ server media terpusat di tahap prototipe — audio mengalir antar browser via We
 | Realtime | Supabase Realtime | presence + broadcast per channel |
 | Auth/DB | Supabase | Google OAuth + Postgres (`channel_roles`, `channel_moderation_logs`) |
 | Native | Capacitor | `com.nextvwt.ptt`, `npx cap sync android` |
-| SFU (rencana) | LiveKit (`livekit-client` + `livekit-server`) | self-host di VPS |
+| SFU (aktif dev) | LiveKit (`livekit-client` + `livekit-server`) | self-host di VPS / container lokal `ws://localhost:7880` + Edge Function token |
 
 ---
 

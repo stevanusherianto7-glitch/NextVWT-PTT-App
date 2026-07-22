@@ -8,7 +8,7 @@ dengan audio real-time antar pengguna melalui WebRTC.
 
 ## Status
 - **Tahap**: Prototipe fungsional → Beta
-- **Audio transport**: WebRTC **mesh** (saat ini) → **LiveKit SFU** (rencana produksi, lihat `docs/ROADMAP.md`)
+- **Audio transport**: WebRTC **mesh** (fallback/dev) + **LiveKit SFU** (aktif, lihat `docs/SFU_RUNBOOK.md`)
 - **PRD**: `PRD.md` (v1.0, Draft — Review Internal)
 
 ## Stack Singkat
@@ -16,7 +16,7 @@ dengan audio real-time antar pengguna melalui WebRTC.
 |---|---|
 | UI | React 18 + Vite + TypeScript + Tailwind CSS |
 | State | Zustand (slices) |
-| Realtime/Audio | Supabase Realtime (presence + broadcast) + WebRTC mesh |
+| Realtime/Audio | Supabase Realtime (presence + broadcast) + WebRTC mesh (fallback) / LiveKit SFU (aktif) |
 | Auth/DB | Supabase (Auth, Postgres) |
 | Native | Capacitor (`com.nextvwt.ptt`) |
 | Test | Vitest (unit) + Playwright (e2e) |

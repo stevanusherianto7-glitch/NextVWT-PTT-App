@@ -22,11 +22,12 @@
 - [x] .env.example diupdate dengan template Biznet Gio
 - [x] @ts-nocheck dihapus dari turn-credentials/index.ts
 
-## LiveKit SFU Dual-Mode (2026-07-20 → 2026-07-21)
+## LiveKit SFU Dual-Mode (2026-07-20 → 2026-07-22)
 - [x] Mesh + SFU dual-mode via VITE_LIVEKIT_URL / USE_SFU
 - [x] AudioTransport interface + LiveKitAudioTransport
 - [x] livekit-token Edge Function (server-side mint, room-scoped)
 - [x] Integrasi ke useRadioAudioEngine; presence dari LiveKit participants
+- [x] **2026-07-22: DEPLOYED** — LiveKit container lokal (`ws://localhost:7880`, HTTP 200) + Edge Function `livekit-token` **ACTIVE** di Supabase Cloud (project `tqixjycrxhjmpyffhxvg`). SFU end-to-end live. Lihat `docs/SFU_RUNBOOK.md`.
 
 ## Build Status
 - pnpm type-check: PASS (diperbaiki 2026-07-21 — tsconfig.types ditambah vitest/globals; test files taip ulang)

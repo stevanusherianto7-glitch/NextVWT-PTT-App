@@ -8,7 +8,7 @@
 | **Tanggal** | Juli 2026 |
 | **Product Owner** | Stevan Usherianto |
 | **Platform Target** | Android (iOS roadmap) |
-| **Fase Saat Ini** | Prototipe Fungsional → Beta (audio mesh; rencana migrasi SFU) |
+| **Fase Saat Ini** | Beta (audio mesh fallback + **LiveKit SFU aktif dev**, lihat `docs/SFU_RUNBOOK.md`) |
 
 ---
 
@@ -259,7 +259,7 @@ Every feature is tagged **[P0]** (Must Have), **[P1]** (Should Have), **[P2]** (
 
 | ID | Fitur | Prioritas | Deskripsi |
 |---|---|---|---|
-| AUD-01 | WebRTC P2P audio (mesh) → LiveKit SFU | P0 | Transmisi audio latensi rendah. Prototipe: WebRTC mesh antar peer. Produksi: LiveKit SFU (AD-1, lihat §7.3) |
+| AUD-01 | WebRTC P2P audio (mesh) → LiveKit SFU | P0 | Transmisi audio latensi rendah. **Status 2026-07-22: SFU aktif (dev)** — LiveKit container lokal + Edge Function `livekit-token` ACTIVE di Supabase Cloud. Mesh tetap fallback saat `VITE_LIVEKIT_URL` kosong (AD-1, lihat §7.3 + `docs/SFU_RUNBOOK.md`) |
 | AUD-02 | Fallback base64 via Supabase | P0 | Fallback jika WebRTC/SFU gagal (NAT/firewall) atau saat mesh mode |
 | AUD-03 | VAD (Voice Activity Detection) | P1 | Mute mic otomatis saat silence > 1.5 detik |
 | AUD-04 | Discussion mode audio | P0 | Echo cancel + noise suppress + auto gain |

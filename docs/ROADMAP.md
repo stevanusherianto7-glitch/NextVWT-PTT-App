@@ -17,7 +17,7 @@ diambil alih arsitek pada 2026-07-20 (user mendelegasikan).
   dev-only guard `simulatedUserOffset`, ekstrak `UserListModal`, fix lint + bug `channelStatus`.
 - TARGET: 0 warning lint, type-check OK, 196 test pass, build OK (TERCAPAI).
 
-## Fase 2 — Migrasi Mesh → LiveKit SFU (SEBAGIAN SELESAI)
+## Fase 2 — Migrasi Mesh → LiveKit SFU (SELESAI — dev live 2026-07-22)
 **Mengapa**: mesh tidak skalabilitas untuk target PRD 10–50 user/channel
 (ref: `david-spies/ptt-radio` `MAX_PEERS=8`).
 
@@ -53,7 +53,7 @@ moderasi/presence → ch100 → deploy/verifikasi).
 
 **Catatan infra (bukan kode, terverifikasi 2026-07-21):**
 - LiveKit dev butuh `rtc.node_ip` = IP host Windows (bukan IP container 172.x) agar browser reach media port via Docker port-map. Lihat `livekit/config.yaml`.
-- `livekit-token` Edge Function butuh deploy via Supabase CLI: `supabase login` → `supabase functions deploy livekit-token` → `supabase secrets set LIVEKIT_API_KEY=devkey LIVEKIT_API_SECRET=devsecret1234567890abcdefghijklmn`. Publishable key SAJA tidak cukup untuk deploy. Tanpa deploy, app SFU mode jalan tapi token-mint fallback (graceful) — SFU server + token + browser connect tetap terbukti via `scripts/_sfu_browser_connect.mjs`.
+- `livekit-token` Edge Function **sudah DEPLOY** (2026-07-22, ACTIVE di project `tqixjycrxhjmpyffhxvg`) via `supabase login` → `supabase functions deploy livekit-token` → `supabase secrets set LIVEKIT_API_KEY=devkey LIVEKIT_API_SECRET=secret1234567890abcdefghijklmnopqr`. Publishable key SAJA tidak cukup untuk deploy. Token-mint sekarang live (bukan fallback) — SFU end-to-end terbukti: LiveKit container `ws://localhost:7880` (HTTP 200) + Edge Function ACTIVE. Lihat `docs/SFU_RUNBOOK.md` §3.1 cara dapat access token.
 - Unit test diisolasi dari `.env` via `vitest.config.ts` (`envFile:false` + `env` kosong) → mock supabase dipakai. Dev/Playwright tetap pakai `.env` (Supabase URL milik user).
 
 **Mapping fitur**:
