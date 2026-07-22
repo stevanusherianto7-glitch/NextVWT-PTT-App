@@ -27,6 +27,7 @@ dengan audio real-time antar pengguna melalui WebRTC.
 - `SECURITY.md` — Checklist keamanan & signing fingerprint
 - `docs/ENVIRONMENT.md` — Variabel environment & konfigurasi
 - `docs/DEPLOYMENT.md` — Build, deploy VPS, Capacitor Android
+- `docs/SFU_RUNBOOK.md` — **LiveKit SFU**: jalankan, verifikasi, troubleshooting
 - `docs/TESTING.md` — Cara menjalankan unit & e2e test
 - `docs/CONTRIBUTING.md` — Konvensi kode & alur kontribusi
 - `docs/ROADMAP.md` — Fase pengembangan & migrasi mesh → SFU
@@ -37,6 +38,18 @@ pnpm install
 cp .env.example .env        # isi VITE_SUPABASE_URL, VITE_SUPABASE_PUBLISHABLE_KEY
 pnpm dev                    # http://localhost:5188
 ```
+
+## Quick Start — SFU (LiveKit)
+Mode mesh default jalan tanpa SFU. Untuk aktifkan SFU (audio via server):
+```bash
+# 1. Salin env & isi VITE_LIVEKIT_URL=ws://localhost:7880
+cp .env.example .env
+# 2. Jalankan stack dev (LiveKit + Supabase Edge Function token)
+bash scripts/dev-livekit.sh
+# 3. App otomatis pakai SFU saat VITE_LIVEKIT_URL terisi (lihat docs/SFU_RUNBOOK.md)
+```
+Verifikasi: `curl -s -o /dev/null -w "HTTP %{http_code}\n" http://127.0.0.1:7880/`
+harus mencetak `HTTP 200`.
 
 ## Scripts
 | Perintah | Fungsi |
