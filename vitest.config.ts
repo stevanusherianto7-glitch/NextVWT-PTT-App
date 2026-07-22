@@ -37,12 +37,15 @@ export default defineConfig({
         branches: 14,
         // TAHAP 3 (2026-07-22, rtl batch): terukur 34.61% L / 26.49% B / 27.3% F /
         // 34.84% S setelah +64 test (logic + komponen UI presentasional).
-        // Naikkan per batch saat test komponen berat (RadioLayout, store slices,
-        // services) ditambah. JANGAN set 100% sebelum benar-benar terukur.
-        branches: 26,
-        functions: 27,
-        lines: 34,
-        statements: 34,
+        // NAHAP 4 (2026-07-22, komponen berat + services WebRTC): terukur 50.15% L /
+        // 44.33% B / 48.07% F / 50.73% S setelah +135 test (RadioLayout, SettingsPanel,
+        // RadioBody/Header/Footer, useSfuTransport, FloatingKaraokePlayer,
+        // ChannelListModal, UserListModal, dll). Threshold dinaikkan mendekati riil
+        // tapi tetap di bawah measured agar CI hijau & jujur.
+        branches: 42,
+        functions: 45,
+        lines: 48,
+        statements: 48,
       },
     },
   },
