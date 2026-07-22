@@ -197,20 +197,30 @@ export default defineConfig(({ command: _command, mode }) => {
       // [P2-7] Coverage config menggunakan @vitest/coverage-v8 (V8 native, lebih cepat dari istanbul)
       coverage: {
         provider: 'v8',
-        // [P2-7] Hanya fokus pada hooks yang kita test untuk sprint ini
-        include: [
-          'src/app/hooks/useVAD.ts',
-          'src/app/hooks/useAudioPlayback.ts',
-          'src/app/hooks/useWebRTC.ts',
-        ],
+        // [COVERAGE] Ukur SELURUH src/ secara jujur (bukan cuma 3 file).
+        // Entrypoints (main.tsx/App.tsx) & e2e di-exclude dari threshold
+        // agar angka mewakili logic yang bisa di-test, bukan bootstrap.
+        include: ['src/**/*.{ts,tsx}'],
         exclude: [
           '**/*.test.ts',
+          '**/*.test.tsx',
+          'src/main.tsx',
+          'src/App.tsx',
+          '**/*.d.ts',
+          'e2e/**',
         ],
+        // [COVERAGE] Threshold BERTAHAP — mulai di floor riil (bukan 70% palsu).
+        // Baseline terukur (seluruh src/): ~27.6% L / 22.2% B / 19.6% F / 27.9% S.
+        // Tahap 1 di-set sedikit DI BAWAH baseline agar gate hijau tapi
+        // mencegah regresi. Naikkan tiap batch test baru:
+        //   Tahap 1 (skrg): 25 / 20 / 18 / 25
+        //   Tahap 2 (target): 30 / 25 / 22 / 30
+        //   Tahap 3 (target): 40 / 35 / 32 / 40  ... dst sampai 100.
         thresholds: {
-          lines: 70,
-          functions: 65,
-          branches: 60,
-          statements: 70,
+          lines: 25,
+          functions: 18,
+          branches: 20,
+          statements: 25,
         },
         reporter: ['text', 'html', 'lcov'],
         reportsDirectory: './coverage',
